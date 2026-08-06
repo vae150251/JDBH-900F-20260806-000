@@ -1,0 +1,15 @@
+"D:\Program Files (x86)\arm\bin\armproc.dll" 
+
+"D:\Program Files (x86)\arm\bin\armjlink2.dll" 
+
+"E:\All_Backup\Program Code\Artery_MCU\ZRR-900F\Õ®”√≥Ã–Ú\ZRR900FV2ATFSoftUlib-V2.0-20210701\Debug\Exe\ZRR900FV2ATFUlib_flash.out" 
+
+--plugin "D:\Program Files (x86)\arm\bin\armbat.dll" 
+
+--device_macro "D:\Program Files (x86)\arm\config\debugger\ArteryTek\AT32F4xx_XL.dmac" 
+
+--flash_loader "D:\Program Files (x86)\arm\config\flashloader\ArteryTek\AT32F403A\AT32F403AVCT7\FlashAT32F403AVCT7.board" 
+
+
+
+

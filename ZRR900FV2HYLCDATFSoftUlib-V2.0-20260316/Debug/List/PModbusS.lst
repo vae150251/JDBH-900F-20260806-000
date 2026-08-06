@@ -1,0 +1,1640 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.70.2.11706/W32 for ARM       17/Jun/2026  08:45:30
+# Copyright 1999-2016 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\PModbusS.c
+#    Command line =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\PModbusS.c
+#        -D ATF403AVCT7 -D LIBRARY_VERSION -D USE_STDPERIPH_DRIVER -D
+#        AT_START_F403A_V1_0 -lcN
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List
+#        -lA
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List
+#        -o
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\Obj
+#        --no_cse --no_unroll --no_inline --no_code_motion --no_tbaa
+#        --no_clustering --no_scheduling --debug --endian=little
+#        --cpu=Cortex-M4 -e --char_is_signed --enable_multibytes --fpu=VFPv4_sp
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.5\arm\INC\c\DLib_Config_Full.h" -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\STM32F10x_StdPeriph_Driver\inc\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\CMSIS\CM4\CoreSupport\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\CMSIS\CM4\DeviceSupport\
+#        -On --use_c++_inline
+#    Locale       =  Chinese (Simplified)_China.936
+#    List file    =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List\PModbusS.lst
+#    Object file  =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\Obj\PModbusS.o
+#
+###############################################################################
+
+D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\PModbusS.c
+      1          ////////////////////////////////////////////////////////////////////////////
+      2          //                      MODBUS协议应用层接口
+      3          //函数描述：	实现的是MODBUS RTU格式的传输规则
+      4          //Date:		2008.9.26
+      5          //日期：	
+      6          //修改：	
+      7          //
+      8          //
+      9          ////////////////////////////////////////////////////////////////////////////
+     10          #include "PModbusS.h"
+     11          #include "GlobeDef.h"
+     12          #include "stm32f10x.h"
+     13          #include "lib.h"
+     14          #include "drive.h"
+     15          #include "Bhjdq.h"
+     16          #include "Eep.h"
+     17          #include "UartDrv.h"
+     18          
+     19          #define MAX_MODBUS_BUFSIZE	1200		//定义通信缓冲区长度,必须是2的n次方,否则算法会出错
+     20          
+     21          
+     22          #define  CMD_YXYC			0x01	//遥信遥测命令
+     23          #define  CMD_YX			0x02	//遥信命令
+     24          #define  CMD_MEA		0x03	//遥测、定值、参数、控制字
+     25          #define  CMD_YC		    0x04	  //遥测
+     26          #define  CMD_YK			0x05	//遥控
+     27          #define  CMD_FG			0x06	//复归
+     28          #define  CMD_SOE		0x0c	//提取SOE
+     29          #define  CMD_TIME		0x10	//对时
+     30          #define  CMD_MYK			0x0f	//多继电器
+     31          
+     32          #define  CMD_AC_TEST		0x30	//模拟量测试
+     33          
+     34          // exception response error codes
+     35          #define MODBUS_ERR_FUNCTION					0x01	//非法的功能码
+     36          #define MODBUS_ERR_DATAADDR					0x02	//非法的数据地址
+     37          #define MODBUS_ERR_DATAVALUE				0x03	//非法的数据值
+     38          #define MODBUS_ERR_SLAVEDEVICEFAILER		0x04	//从机执行失败
+     39          #define MODBUS_ERR_ACKNOWLEDGE				0x05	//确认：需要长时间才能执行完毕，防止主机超时
+     40          #define MODBUS_ERR_SLAVEDEVICEBUSY			0x06	//从机设备忙
+     41          #define MODBUS_ERR_NEGATIVEACKNOWLEDGE		0x07	//否定确认
+     42          #define MODBUS_ERR_MEMORYPARITYERROR		0x08	//从机读内存奇偶错
+     43          
+     44          u8 m_pModSRXData[MAX_MODBUS_BUFSIZE];
+     45          u8 m_pModSTXData[MAX_MODBUS_BUFSIZE];
+     46          u16 m_ModSRXLength;
+     47          u16 m_ModSTXLength;
+     48          
+     49          u8  m_ModSAddress;
+     50          u8  m_ModScurrRecvId;		//主站询问功能id号
+     51          static u8 by_Com103Buf[128];
+     52          
+     53          //规约初始化
+     54          void PModBusS_Initialize(void)
+     55          {
+     56          	m_ModSRXLength=0;
+     57          	m_ModSTXLength=0;
+     58          	
+     59          	m_ModSAddress=0;
+     60          	m_ModScurrRecvId=0;
+     61          	
+     62          }
+     63          u8 com_flag=0;
+     64          //规约主任务
+     65          void PModBus_ModbusS(void)
+     66          {
+     67          	m_ModSRXLength = Uart_Read(USART1, m_pModSRXData);
+     68          	if( m_ModSRXLength )
+     69          	{
+     70          		//检查是否有升级请求
+     71          		if((m_pModSRXData[0]==0x58) && (m_pModSRXData[7]==0x58))
+     72          		{
+     73          			if( PONLSJ_checkPacket(RUN_Syspar.RS485_ADR, m_pModSRXData, m_ModSRXLength) )		//校验数据包的正确性
+     74          			{
+     75          				PONLSJ_analysisPacket();	//包解析
+     76          				m_ModSTXLength = PONLSJ_buildPacket(RUN_Syspar.RS485_ADR, m_pModSRXData, m_pModSTXData);	//
+     77          				Uart_Write(USART1, m_pModSTXData, m_ModSTXLength);
+     78          				m_ModSTXLength = 0;
+     79          				WDog_Clear();
+     80          				Trip_P(KC_LED_COM);
+     81          	//			GPIO_WriteBit(GPIOE, GPIO_Pin_13, (BitAction)(1-GPIO_ReadOutputDataBit(GPIOE, GPIO_Pin_13)));	//
+     82          			}
+     83          		}
+     84          		else if(m_pModSRXData[0]=='Q'&&m_ModSRXLength==1)
+     85          		{
+     86                          com_flag=1;
+     87          		}
+     88          		else if( PModBusS_checkPacket() )		//校验数据包的正确性
+     89          		{
+     90          			PModBusS_buildPacket();	//
+     91          			Uart_Write(USART1, m_pModSTXData, m_ModSTXLength);
+     92          			m_ModSTXLength = 0;
+     93          			Trip_P(KC_LED_COM);
+     94          		}
+     95          	}
+     96          	else 
+     97          	{
+     98          	  
+     99          	  if(com_flag)
+    100          	  {
+    101          		   com_flag=0;
+    102          	  	    m_ModSTXLength=PCOM_Answer(m_pModSRXData,m_pModSTXData,by_Com103Buf);
+    103          	  }
+    104          	  	   
+    105          				
+    106          			
+    107          			
+    108          			
+    109          	    Trip_F(KC_LED_COM);
+    110          	}
+    111          }
+    112          u16 COM_TXLEN;
+    113          u16 PCOM_Answer(char *rbuf,char *sbuf,u8 *buff103)
+    114          {
+    115           u16 volatile i,size,size1,num;
+    116          float Tdata0;
+    117          MEM_clear(m_pModSTXData,1000);
+    118            sbuf=m_pModSTXData;
+    119          	 
+    120              num =sprintf(sbuf,"\n\r 遥测点: %02d个   \n\r",NumOfYC1); 
+    121               COM_TXLEN=num;
+    122          	 sbuf+=COM_TXLEN;
+    123          
+    124          	 num=sprintf(sbuf," 名称     单位     系数\n\r"); 
+    125              COM_TXLEN+=num;
+    126          	 sbuf+=num;
+    127            
+    128          	if(RUN_Syspar.RS485_YC)
+    129          	{
+    130          	   for(i=0;i<NumOfYC1;i++)
+    131          	   {
+    132          		   size=strlen(MeaValTab1[i].szName);
+    133          		   size1=strlen(MeaValTab1[i].szUnit);
+    134          		   if(MeaValTab1[i].Kind==MEAKIND_I)
+    135          			  Tdata0=0.1;
+    136          		   if(MeaValTab1[i].Kind==MEAKIND_U)
+    137          			  Tdata0=1.0;
+    138          			if(MeaValTab1[i].Kind==MEAKIND_P)
+    139          			  Tdata0=1.0;
+    140          			if(MeaValTab1[i].Kind==MEAKIND_F)
+    141          			  Tdata0=0.01;
+    142          			if(MeaValTab1[i].Kind==MEAKIND_K)
+    143          			  Tdata0=0.001;	
+    144          		 num=sprintf(sbuf,"%2d,  %.*s   %.*s   %1.4f \n\r",i,size,MeaValTab1[i].szName,size1,MeaValTab1[i].szUnit,Tdata0); 
+    145          		   COM_TXLEN+=num;
+    146          		  sbuf+=num;
+    147          	   }
+    148          	}
+    149          	else
+    150          	{
+    151          		 for(i=0;i<NumOfYC1;i++)
+    152          	   {
+    153          		   size=strlen(MeaValTab1[i].szName);
+    154          		   size1=strlen(MeaValTab1[i].szUnit);
+    155          		   if(MeaValTab1[i].Kind==MEAKIND_I)
+    156          			  Tdata0=0.0024414;
+    157          		   if(MeaValTab1[i].Kind==MEAKIND_U)
+    158          			  Tdata0=0.0488281;
+    159          			if(MeaValTab1[i].Kind==MEAKIND_P)
+    160          			  Tdata0=0.4228515;
+    161          			if(MeaValTab1[i].Kind==MEAKIND_F)
+    162          			  Tdata0=0.0244140;
+    163          			if(MeaValTab1[i].Kind==MEAKIND_K)
+    164          			  Tdata0=0.0004883;	
+    165          		 num=sprintf(sbuf,"%2d,  %.*s   %.*s   %.7f \n\r",i,size,MeaValTab1[i].szName,size1,MeaValTab1[i].szUnit,Tdata0); 
+    166          		   COM_TXLEN+=num;
+    167          		  sbuf+=num;
+    168          	   }  
+    169          	}
+    170             
+    171                num =sprintf(sbuf," 遥信点: %02d个   \n\r",64); 
+    172               COM_TXLEN+=num;
+    173          	 sbuf+=num;
+    174          
+    175          	 num=sprintf(sbuf," 编号     名称     \n\r"); 
+    176              COM_TXLEN+=num;
+    177          	 sbuf+=num;
+    178            
+    179              for(i=0;i<16;i++)
+    180          	{    
+    181          	     if(i<NumOfDI)
+    182          		 {
+    183          	       size=strlen(tDITab[i].szName);
+    184          	  	   num=sprintf(sbuf,"%2d,  %.*s  \n\r",i,size,tDITab[i].szName); 
+    185          			 COM_TXLEN+=num;
+    186          	         sbuf+=num;
+    187          		 }
+    188          		 else
+    189          		 {
+    190          		      
+    191          	  	       num=sprintf(sbuf,"%2d, 备用  \n\r",i); 
+    192          			    COM_TXLEN+=num;
+    193          	           sbuf+=num;	    
+    194          		 }
+    195          	}
+    196           
+    197          	 for(i=0;i<16;i++)
+    198          	{    
+    199          	     if(i<NumOfYB)
+    200          		 {
+    201          	       size=strlen(ybTab[i].szName);
+    202          	  	   num=sprintf(sbuf,"%2d,  %.*s  \n\r",i+16,size,ybTab[i].szName); 
+    203          			 COM_TXLEN+=num;
+    204          	         sbuf+=num;
+    205          		 }
+    206          		 else
+    207          		 {
+    208          		       size=strlen("备用");
+    209          	  	       num=sprintf(sbuf,"%2d,   备用  \n\r",i+16); 
+    210          			    COM_TXLEN+=num;
+    211          	           sbuf+=num;	    
+    212          		 }
+    213          	}
+    214          
+    215          	
+    216          	
+    217          	for(i=0;i<(COM_TXLEN/255+1);i++)
+    218          	{
+    219          	      if(COM_TXLEN-i*255>=255)
+    220          	        num=255;
+    221          		  else
+    222          			num=COM_TXLEN-i*255;
+    223          	     Uart_Write(USART1, &m_pModSTXData[i*255], num);
+    224          		WDog_Clear();
+    225          		 delay_ms(200);
+    226          		 
+    227          	}
+    228          	 
+    229              sbuf=m_pModSTXData;
+    230          	COM_TXLEN=0;
+    231          	MEM_clear(m_pModSTXData,1000);
+    232          	for(i=0;i<32;i++)
+    233          	{   
+    234          			if(i>=NumOfEvent) break;
+    235                   if(i==0) continue;
+    236          	     if(tEvtTab[i].uSoeNo>=0x20&&tEvtTab[i].uSoeNo<0x40)
+    237          		 {
+    238          	       size=strlen(tEvtTab[i].sYxName);
+    239          	  	   num=sprintf(sbuf,"%2d,   %.*s  \n\r",tEvtTab[i].uSoeNo,size,tEvtTab[i].sYxName); 
+    240          			 COM_TXLEN+=num;
+    241          	         sbuf+=num;
+    242          		 }
+    243          		 else
+    244          		 {
+    245          		       size=strlen("备用");
+    246          	  	       num=sprintf(sbuf,"%2d,  备用  \n\r",i+32); 
+    247          			    COM_TXLEN+=num;
+    248          	           sbuf+=num;	    
+    249          		 }
+    250          	}
+    251          	
+    252          #ifndef ZRR_YK
+    253                num =sprintf(sbuf," 遥控点: %02d个   \n\r",2); 
+    254               COM_TXLEN+=num;
+    255          	 sbuf+=num;
+    256          
+    257          	 num=sprintf(sbuf," 编号     名称     \n\r"); 
+    258              COM_TXLEN+=num;
+    259          	 sbuf+=num;
+    260                 num=sprintf(sbuf,"%2d,   开关遥控  \n\r",0); 
+    261          	    COM_TXLEN+=num;
+    262          	 sbuf+=num;   
+    263          	   
+    264                 num=sprintf(sbuf,"%2d,   保护复归  \n\r",1); 
+    265          	    COM_TXLEN+=num;
+    266               sbuf+=num;
+    267          #endif
+    268          	  
+    269          	 for(i=0;i<(COM_TXLEN/255+1);i++)
+    270          	{
+    271          	      if(COM_TXLEN-i*255>=255)
+    272          	        num=255;
+    273          		  else
+    274          			num=COM_TXLEN-i*255;
+    275          	     Uart_Write(USART1, &m_pModSTXData[i*255], num);
+    276          		WDog_Clear();
+    277          		 delay_ms(200);
+    278          		 
+    279          	}
+    280           
+    281          	return  (COM_TXLEN);	
+    282          }
+    283          
+    284          
+    285          // 
+    286          // Purpose: 检查接收数据包的正确性。
+    287          // Result : TRUE  --- Data pack is correct
+    288          //          FALSE --- Data pack is incorrect
+    289          //
+    290          int PModBusS_checkPacket(void)
+    291          {
+    292          //	u16 crc=0;
+    293          	
+    294          //	crc = GetCRC16NOT(m_pModSRXData,m_ModSRXLength);
+    295          	if(GetCRC16NOT(m_pModSRXData,m_ModSRXLength) !=0)
+    296          	{
+    297          		return FALSE;
+    298          	}
+    299          	m_ModSAddress  = m_pModSRXData[0];
+    300          	m_ModScurrRecvId = m_pModSRXData[1];
+    301          	if(RUN_Syspar.RS485_ADR != m_ModSAddress)
+    302          	{
+    303          		return FALSE;
+    304          	}
+    305          	return TRUE;
+    306          }
+    307          
+    308           
+    309          static u8 *p_data;
+    310          static u16 w_DataStart,w_DataLen;
+    311          // 
+    312          // Purpose: 根据运行状态参数生成当前待发送的数据包。
+    313          //
+    314          int PModBusS_buildPacket(void)
+    315          {
+    316          	 
+    317          	
+    318          	switch(m_ModScurrRecvId) {
+    319          	case CMD_YXYC:	//0x01遥信遥测命令
+    320          		 
+    321          		 m_ModSTXLength= ModbusJK_GetYXYC(m_pModSRXData,m_pModSTXData,by_Com103Buf);
+    322          		break;
+    323          	case CMD_YX:	//0x02遥信命令
+    324          		 m_ModSTXLength= PModBusS_AnswerYX(m_pModSRXData,m_pModSTXData,by_Com103Buf);
+    325          		break;
+    326          	case CMD_MEA:	//0x03遥测、定值、系统参数、控制字
+    327          	  m_ModSTXLength= ModbusJK_GetMore(m_pModSRXData,m_pModSTXData,by_Com103Buf);
+    328          		break;
+    329          	case CMD_YC:	//0x04遥测、
+    330          		 m_ModSTXLength=PModBusS_AnswerData(m_pModSRXData,m_pModSTXData,by_Com103Buf);
+    331          		break; 
+    332          	case CMD_YK:	//0x05遥控
+    333          		m_ModSTXLength=PModBusS_AnswerYK(m_pModSRXData,m_pModSTXData,by_Com103Buf);
+    334          		break;
+    335          	case CMD_MYK:	//0x0F多继电器遥控
+    336          		m_ModSTXLength=PModBusS_AnswerMYK(m_pModSRXData,m_pModSTXData,by_Com103Buf);
+    337          		break;	
+    338          	 case CMD_FG:	//0x06复归
+    339          	 	m_ModSTXLength=ModbusJK_Fugui(m_pModSRXData,m_pModSTXData,by_Com103Buf);
+    340          		break;
+    341          	case CMD_SOE:	//0x0c提取SOE
+    342                  m_ModSTXLength= ModbusJK_GetSoe(m_pModSRXData,m_pModSTXData,by_Com103Buf);
+    343          		break;
+    344          	case CMD_TIME:	//0x10对时、修改定值、参数、控制字
+    345               m_ModSTXLength= ModbusJK_SetMore(m_pModSRXData,m_pModSTXData,by_Com103Buf);
+    346          		break;
+    347          		
+    348          	  case CMD_AC_TEST:	//0x30模拟量测试
+    349                m_ModSTXLength= ModbusAC_TEST(m_pModSRXData,m_pModSTXData,by_Com103Buf);
+    350          		break;	
+    351          		
+    352          	default:
+    353          		m_ModSTXLength = Modbus_ProcessError(m_pModSRXData, MODBUS_ERR_FUNCTION, m_pModSTXData);
+    354                  break;   
+    355          	}
+    356          	
+    357          	return (int)0;
+    358          }
+    359          /* 生成Modbus错误帧 */
+    360          u16 Modbus_ProcessError(u8 *src, u8 btErrCode, u8 *dest)
+    361          {
+    362          	u16 wRet,m_crc;
+    363          	
+    364          	*dest = *src;
+    365          	*(dest+1) = (*src) | 0x80;
+    366          	*(dest+2) = btErrCode;
+    367          	wRet = 3;
+    368          	m_crc =GetCRC16NOT(dest, wRet);
+    369          	*(dest+3)= LOBYTE(m_crc);
+    370          	*(dest+4) = HIBYTE(m_crc);
+    371          	return wRet+2;
+    372          }
+    373          //
+    374          //处理02h报文时调用
+    375          //
+    376          u16 ModbusJK_GetYXYC(u8 *rbuf,u8 *sbuf,u8 *buff103)
+    377          {
+    378          	int i=0, len=0;
+    379          	u16 m_crc;
+    380          	u8 NumByteYx=0;
+    381          	u8 NumStart=0;
+    382          	u32 YX_Buff1,YX_Buff2;
+    383          	u8 yxbuf[64];
+    384              p_data=rbuf+2;	
+    385           	w_DataStart=*p_data++;  w_DataStart<<=8;  w_DataStart|=*p_data++;	//数据起始地址
+    386          	w_DataLen=*p_data++;    w_DataLen<<=8;    w_DataLen|=*p_data++;
+    387          			
+    388          	  if(w_DataStart>=YXNUMMAX)return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAADDR, sbuf);
+    389          		if((w_DataStart+w_DataLen)>YXNUMMAX)
+    390          			w_DataLen=YXNUMMAX-w_DataStart;
+    391          	
+    392          	m_pModSTXData[0] = m_ModSAddress;	//从站地址
+    393          	m_pModSTXData[1] = m_ModScurrRecvId;
+    394          	m_pModSTXData[2] = w_DataLen >> 3;
+    395          	if(w_DataLen%8)			//如果主站问的遥信个数不是8的整数倍时的处理
+    396          	{					//即遥信个数对8取余，若余数非0，则发送的字节个数需要加1
+    397          		m_pModSTXData[2]++;
+    398          	}
+    399          	len = 3;
+    400          	
+    401          	NumStart = w_DataStart/8;	//在NumByteYX量中体现遥信的位置
+    402          	for(i=3; i<(3+m_pModSTXData[2]+NumStart); i++)	//使用之前对缓冲区清零
+    403          	{
+    404          		m_pModSTXData[i] = 0;
+    405          	}
+    406          	YX_Buff1=YX_Buff2=0;
+    407          	
+    408          	YX_Buff1|=(u32)YX1_sts[YX_EDI1];    		//实遥信1-16
+    409          	YX_Buff1|=(u32)YX1_sts[YX_EDI2]<<8;	
+    410          	YX_Buff1|=(u32)(*P_YB_YX)<<16;		//压板
+    411          
+    412          	
+    413          
+    414          	
+    415          	YX_Buff2|=(u32)Modbus_YX_sts[0];
+    416          	YX_Buff2|=(u32)Modbus_YX_sts[1]<<8;
+    417          	YX_Buff2|=(u32)Modbus_YX_sts[2]<<16;
+    418          	YX_Buff2|=(u32)Modbus_YX_sts[3]<<24;
+    419          	for(i=0;i<4;i++)
+    420          		Modbus_YX_sts[i]=YX1_sts[YX_SG1+i];		//虚遥信送完才更新,保证不丢失
+    421          	
+    422          	for(i=0;i<32;i++)				//将64个遥信分解到缓冲区
+    423          	{
+    424          		yxbuf[i] = (YX_Buff1>>i)&0x01;
+    425          	}
+    426          	for(i=0;i<32;i++)
+    427          	{
+    428          		yxbuf[32+i] = (YX_Buff2>>i)&0x01;
+    429          	}
+    430          	
+    431          	//遥信数据，每8个一组，构成一个字节，每位表示一个input status,地址低的在低位
+    432          	for(i=w_DataStart;i<w_DataStart+w_DataLen;i++)
+    433          	{
+    434          		//遥信在主板数据库中是以0x0001存放的,即H为0x00,L为0x01.
+    435          		NumByteYx = (i - w_DataStart)/8;		//确定遥信发送的字节位置，即遥信在发送报文中的位置
+    436          		if((len+NumByteYx) >= YXNUMMAX) break;
+    437          		
+    438          		if(yxbuf[i])
+    439          		{
+    440          			m_pModSTXData[len + NumByteYx] |=  1<< (i-w_DataStart)%8;	
+    441          		}
+    442          	}
+    443          	len += m_pModSTXData[2];
+    444          	
+    445          	m_crc = GetCRC16NOT(m_pModSTXData,len);
+    446          	m_pModSTXData[len]   = LOBYTE(m_crc);
+    447          	m_pModSTXData[len + 1] = HIBYTE(m_crc);
+    448          	return  (len + 2);	
+    449          }
+    450          
+    451          //
+    452          //处理02h报文时调用
+    453          //
+    454          u16 PModBusS_AnswerYX(u8 *rbuf,u8 *sbuf,u8 *buff103)
+    455          {
+    456          	int i=0, len=0;
+    457          	u16 m_crc;
+    458          	u8 NumByteYx=0;
+    459          	u8 NumStart=0;
+    460          	u32 YX_Buff1,YX_Buff2,YX_Buff3,YX_Buff4;
+    461          	u8 yxbuf[128];
+    462              p_data=rbuf+2;	
+    463           	w_DataStart=*p_data++;  w_DataStart<<=8;  w_DataStart|=*p_data++;	//数据起始地址
+    464          	w_DataLen=*p_data++;    w_DataLen<<=8;    w_DataLen|=*p_data++;
+    465          			
+    466          	  if(w_DataStart>=YXNUMMAX) return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAADDR, sbuf); 
+    467          		if((w_DataStart+w_DataLen)>YXNUMMAX)
+    468          			w_DataLen=YXNUMMAX-w_DataStart;
+    469          	
+    470          	m_pModSTXData[0] = m_ModSAddress;	//从站地址
+    471          	m_pModSTXData[1] = m_ModScurrRecvId;
+    472          	m_pModSTXData[2] = w_DataLen >> 3;
+    473          	if(w_DataLen%8)			//如果主站问的遥信个数不是8的整数倍时的处理
+    474          	{					//即遥信个数对8取余，若余数非0，则发送的字节个数需要加1
+    475          		m_pModSTXData[2]++;
+    476          	}
+    477          	len = 3;
+    478          	
+    479          	NumStart = w_DataStart/8;	//在NumByteYX量中体现遥信的位置
+    480          	for(i=3; i<(3+m_pModSTXData[2]+NumStart); i++)	//使用之前对缓冲区清零
+    481          	{
+    482          		m_pModSTXData[i] = 0;
+    483          	}
+    484          	YX_Buff1=YX_Buff2=YX_Buff3=YX_Buff4=0;
+    485          	
+    486          	YX_Buff1|=(u32)YX1_sts[YX_EDI1];    		//实遥信1-16
+    487          	YX_Buff1|=(u32)YX1_sts[YX_EDI2]<<8;	
+    488          
+    489          	YX_Buff2|=(u32)(*P_YB_YX);		//压板
+    490          	
+    491          	YX_Buff3|=(u32)Modbus_YX_sts[0];
+    492          	YX_Buff3|=(u32)Modbus_YX_sts[1]<<8;
+    493          	YX_Buff3|=(u32)Modbus_YX_sts[2]<<16;
+    494          	YX_Buff3|=(u32)Modbus_YX_sts[3]<<24;
+    495                  
+    496          	YX_Buff4|=(u32)Modbus_YX_sts[4];
+    497          	YX_Buff4|=(u32)Modbus_YX_sts[5]<<8;
+    498          	YX_Buff4|=(u32)Modbus_YX_sts[6]<<16;
+    499          	YX_Buff4|=(u32)Modbus_YX_sts[7]<<24;
+    500              
+    501          	for(i=0;i<8;i++)
+    502          		Modbus_YX_sts[i]=YX1_sts[YX_SG1+i];		//虚遥信送完才更新,保证不丢失
+    503          	
+    504          	for(i=0;i<32;i++)				//将64个遥信分解到缓冲区
+    505          	{
+    506          		yxbuf[i] = (YX_Buff1>>i)&0x01;
+    507          	}
+    508          	for(i=0;i<32;i++)
+    509          	{
+    510          		yxbuf[32+i] = (YX_Buff2>>i)&0x01;
+    511          	}
+    512          	for(i=0;i<32;i++)
+    513          	{
+    514          		yxbuf[64+i] = (YX_Buff3>>i)&0x01;
+    515          	}
+    516          	for(i=0;i<32;i++)
+    517          	{
+    518          		yxbuf[96+i] = (YX_Buff4>>i)&0x01;
+    519          	}
+    520          	
+    521          	//遥信数据，每8个一组，构成一个字节，每位表示一个input status,地址低的在低位
+    522          	for(i=w_DataStart;i<w_DataStart+w_DataLen;i++)
+    523          	{
+    524          		//遥信在主板数据库中是以0x0001存放的,即H为0x00,L为0x01.
+    525          		NumByteYx = (i - w_DataStart)/8;		//确定遥信发送的字节位置，即遥信在发送报文中的位置
+    526          		if((len+NumByteYx) >= YXNUMMAX) break;
+    527          		
+    528          		if(yxbuf[i])
+    529          		{
+    530          			m_pModSTXData[len + NumByteYx] |=  1<< (i-w_DataStart)%8;	
+    531          		}
+    532          	}
+    533          	len += m_pModSTXData[2];
+    534          	
+    535          	m_crc = GetCRC16NOT(m_pModSTXData,len);
+    536          	m_pModSTXData[len]   = LOBYTE(m_crc);
+    537          	m_pModSTXData[len + 1] = HIBYTE(m_crc);
+    538          	return  (len + 2);	
+    539          }
+    540          s16 YC_Change_CAN(s32 val,s32 Y103)				// 转换上送的遥测  入口参数：
+    541          {
+    542          	s32 Yc;
+    543           	Yc=(val*2048)/Y103;								// (YC/1000)*(2048/5)
+    544          	return (s16)Yc;
+    545          }
+    546          //
+    547          //处理04h报文时调用
+    548          //
+    549          u16 PModBusS_AnswerData(u8 *rbuf,u8 *sbuf,u8 *buff103)
+    550          {
+    551          	 
+    552          	u8 len=0;
+    553          	 
+    554          	u16 m_crc;
+    555          	s16  Yc,i;
+    556          	s32 *ptr;
+    557          	float Yctmp;
+    558          
+    559          	p_data=rbuf+2;	
+    560          	w_DataStart=*p_data++;  w_DataStart<<=8;  w_DataStart|=*p_data++;	//数据起始地址
+    561          	w_DataLen=*p_data++;    w_DataLen<<=8;    w_DataLen|=*p_data++;
+    562          			
+    563          	  if(w_DataStart>NumOfYC1) return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAADDR, sbuf);
+    564          		if((w_DataStart+w_DataLen)>(NumOfYC1))
+    565          			w_DataLen=(NumOfYC1)-w_DataStart;
+    566          		
+    567          	m_pModSTXData[0] = m_ModSAddress;	//从站地址
+    568          	m_pModSTXData[1] = m_ModScurrRecvId;
+    569          	m_pModSTXData[2] = w_DataLen*2;		//字节个数
+    570          
+    571          	
+    572          	  
+    573          		 
+    574          		 
+    575          	 	ptr=(s32 *)&UIPQ_buffer;
+    576          		
+    577               len=0;
+    578          		 if(RUN_Syspar.RS485_YC)
+    579          		 {
+    580          			for(i=w_DataStart;i<w_DataStart+w_DataLen;i++)
+    581          			{
+    582          				  if(MeaValTab1[i].Kind==MEAKIND_I) 
+    583          				   {  
+    584          						Yctmp=((*ptr++)*CT_inf)/100.0;
+    585          				   }
+    586          				   else if(MeaValTab1[i].Kind==MEAKIND_U) 
+    587          				   {  
+    588          						Yctmp=((*ptr++)*PT_inf)/1000.0;
+    589          				   }	 
+    590          				   else if(MeaValTab1[i].Kind==MEAKIND_P) 
+    591          				   {    
+    592          						Yctmp = (*ptr++)*(s32)CT_inf/100.0*(s32)PT_inf/10000.0;	//精确到1KW
+    593          				   }	
+    594          				   else  
+    595          				   {  
+    596          						Yctmp=(*ptr++)/10;
+    597          				   }	   
+    598          	
+    599          		    // Yc=YC_Change_CAN(Yctmp,MeaValTab1[i].MEA103);
+    600          			   m_pModSTXData[3+len] = HIBYTE(Yctmp);
+    601          			   m_pModSTXData[4+len] = LOBYTE(Yctmp);  
+    602          			   len=len+2;
+    603          			 }	
+    604          		  }
+    605          		 else
+    606          		 {
+    607          			for(i=w_DataStart;i<w_DataStart+w_DataLen;i++)
+    608          			{
+    609          				 Yc=YC_Change_CAN(*ptr++,MeaValTab1[i].MEA103);
+    610          				m_pModSTXData[3+len] = HIBYTE(Yc);
+    611          				m_pModSTXData[4+len] = LOBYTE(Yc);  
+    612          				len=len+2;
+    613          			}	
+    614          		 }
+    615          	 
+    616          		m_pModSTXData[2] = len;
+    617          		m_crc = GetCRC16NOT(m_pModSTXData,len+3);
+    618          		m_pModSTXData[len+3]   = LOBYTE(m_crc);
+    619          		m_pModSTXData[len+4] = HIBYTE(m_crc);
+    620          		return ( len + 5);
+    621          	 
+    622          	
+    623          
+    624          }
+    625          
+    626          //
+    627          //处理05h报文时调用
+    628          //
+    629          u16 PModBusS_AnswerYK(u8 *rbuf,u8 *sbuf,u8 *buff103)
+    630          {
+    631               static u16 w_OutLct,w_OutSta,w_YKjh;
+    632          	p_data=rbuf+2;	
+    633          	w_OutLct=*p_data++;  w_OutLct<<=8;  w_OutLct|=*p_data++;	//继电器号(1~8)
+    634          	w_OutSta=*p_data++;   w_YKjh=*p_data++;						//只进行合操作
+    635          	
+    636          	//if(by_BSYF!=0)	return false;//2010.4.1 XWW
+    637          	if(YX1_sts[YX_EDI2]&KR_YFJD) return Modbus_ProcessError(rbuf, MODBUS_ERR_NEGATIVEACKNOWLEDGE, sbuf);
+    638          
+    639          	//YK_Exe.num=w_OutLct;
+    640                  
+    641          #ifndef ZRR_YK
+    642          		
+    643          	if(w_YKjh==0xcc)
+    644          	{
+    645          		memcpy(sbuf,(char *)rbuf,8);
+    646          		return 8;
+    647          	}
+    648          	if(w_OutLct==0x0)
+    649          	{
+    650            
+    651          		switch (w_OutSta)
+    652          		{
+    653          		case 0x0:
+    654          			//远方合闸
+    655          		    Trip_P(KC_YKH);		//新版NP620A有专门遥控合闸继电器
+    656                      delay_ms(500);
+    657          			Trip_F(KC_YKH);
+    658                      EventManage_CZJL_Write(JL_DL,JL_YK);
+    659          			break;
+    660          		case 0xff:
+    661          			//远方跳闸
+    662          		     FLAG_FZ|=FLG_TZyf;	//置远方分闸标志
+    663          		     Trip_P(KC_YKT);		//新版NP620A有专门遥控分闸继电器
+    664                        delay_ms(500);
+    665          		     Trip_F(KC_YKT);
+    666              	     FLAG_FZ&=~FLG_TZyf;	//清远方合闸标志
+    667                       EventManage_CZJL_Write(JL_DL,JL_YK);
+    668          			break;
+    669          		default:
+    670          			break;
+    671          		}
+    672          	}
+    673          	
+    674          	if(w_OutLct==1)
+    675          	{
+    676          		FG_Timer_Over();
+    677          	}
+    678          #endif
+    679          		memcpy(sbuf,(char *)rbuf,8);
+    680          		return 8;
+    681          	
+    682          }
+    683          
+    684          //复归命令
+    685          u16 ModbusJK_Fugui(u8 *rbuf,u8 *sbuf,u8 *buff103)
+    686          {	
+    687          	//if(!CrcOk(rbuf,6)) return 0;
+    688          
+    689                  FG_Timer_Over();
+    690          		memcpy(sbuf,(char *)rbuf,8);
+    691          		return 8;
+    692          	
+    693          
+    694          }
+    695          //
+    696          //处理0Fh报文时调用
+    697          //
+    698          u16 PModBusS_AnswerMYK(u8 *rbuf,u8 *sbuf,u8 *buff103)
+    699          {
+    700          	static u16 w_OutLct,w_OutSta;
+    701          	
+    702          
+    703          	//if(!CrcOk(rbuf,6)) return 0;
+    704          	p_data=rbuf+2;	
+    705          	w_OutLct=*p_data++;  w_OutLct<<=8;  w_OutLct|=*p_data++;//继电器号(1~8)
+    706          	w_OutSta=*p_data++;  w_OutSta<<=8;  w_OutSta|=*p_data++;//只进行合操作
+    707          	
+    708          	if(w_OutLct==0 || w_OutLct>NumOfDoOut1_Default) return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAADDR, sbuf);
+    709          	w_OutLct--;
+    710                      Timer_KC=5000;
+    711          			 Timer_FG=500;	 
+    712          	if(w_OutSta==0xff00 || w_OutSta==0x00ff || w_OutSta==0xffff)//只进行合操作
+    713          	{
+    714          	    Trip_P(tDoTab_Default[w_OutLct].byNo);
+    715          	}
+    716          	else if(w_OutSta==0)
+    717          	{
+    718          	    Trip_F(tDoTab_Default[w_OutLct].byNo);
+    719          	}
+    720          	else
+    721          		return 0;
+    722          	
+    723           
+    724          		memcpy(sbuf,rbuf,8);
+    725          		return 8;
+    726          
+    727          }
+    728          
+    729          void JK103_Set_clock(u8* BUFF103,u8 commaddress);
+    730          
+    731          //0x03遥测、定值、系统参数、控制字
+    732          u16 ModbusJK_GetMore(u8 *rbuf,u8 *sbuf,u8 *buff103)
+    733          {
+    734          	static u16 i,w_CRCLen;
+    735          	u16  *pBuff2,w_val;
+    736          	s16  Yc;
+    737          	s32 *ptr;
+    738          
+    739          	//if(!CrcOk(rbuf,6)) return 0;
+    740          	p_data=rbuf+2;	
+    741          	w_DataStart=*p_data++;  w_DataStart<<=8;  w_DataStart|=*p_data++;	//数据起始地址
+    742          	w_DataLen=*p_data++;    w_DataLen<<=8;    w_DataLen|=*p_data++;
+    743          	//读取统一处理
+    744          	//读起始位置超过总数量返回0
+    745          	//读起始位置+需要读取的数量 超过总数量则将需要读取的数量改为最大剩余的数量
+    746           	p_data=sbuf;
+    747          	*p_data++=m_ModSAddress;		//addr
+    748          	*p_data++=CMD_MEA;			//Fun		//数据长度
+    749          	if(w_DataStart<50)		//遥测(数量：50个-100BYTE)
+    750          	{
+    751          		if(w_DataStart>=NumOfYC1) return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAADDR, sbuf);
+    752          		if((w_DataStart+w_DataLen)>NumOfYC1)
+    753          			w_DataLen=NumOfYC1-w_DataStart;
+    754          		w_CRCLen=w_DataLen<<1;
+    755          		*p_data++=(u8)w_CRCLen;//Num
+    756          			ptr=(s32 *)&UIPQ_buffer;
+    757          		
+    758          		 
+    759          		for(i=w_DataStart;i<w_DataLen;i++)
+    760          		{
+    761          			 Yc=YC_Change_CAN(*ptr++,MeaValTab1[i].MEA103);
+    762          			*p_data++ = HIBYTE(Yc);
+    763          			*p_data++ = LOBYTE(Yc);  
+    764          			 
+    765          		}	
+    766          
+    767          		//memcpy(p_data,&wMeaBuffer103[w_DataStart],w_CRCLen);
+    768          	}
+    769          	else if(w_DataStart==0x50)	//装置型号 
+    770          	{
+    771          		w_CRCLen=6;	
+    772          		*p_data++=(u8)w_CRCLen;//Num
+    773          		*p_data++=szType[8];
+    774          		*p_data++=szType[9];
+    775          		*p_data++=szType[10];
+    776          		*p_data++=szType[11];
+    777          		*p_data++=szType[12];
+    778          		*p_data++=szType[13];			
+    779          	}
+    780          	
+    781          	else if(w_DataStart==0x55)	//装置型号 
+    782          	{
+    783           
+    784          			  	
+    785          		w_CRCLen=sprintf(p_data,"%.*s %.*s%X",strlen(name_date),name_date,strlen(name_VAR),name_VAR,VAR_crc1); 
+    786          
+    787          	 	
+    788          	}	
+    789          	else if(w_DataStart==0x60)	//定值区 
+    790          	{
+    791          		w_CRCLen=2;	
+    792          		*p_data++=(u8)w_CRCLen;//Num
+    793          		*p_data++=0;
+    794          		*p_data++=FixVal_Manage.uCurSection;		
+    795          	}	
+    796          	else if(w_DataStart<250)	//定值(数量：75个-150BYTE)
+    797          	{
+    798          		w_DataStart-=100;  
+    799          		
+    800          		if(w_DataStart>=Numset) return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAADDR, sbuf);
+    801          		if((w_DataStart+w_DataLen)>Numset)return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAADDR, sbuf);
+    802          			 
+    803          		if(w_DataLen>75) return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAADDR, sbuf);
+    804          		w_CRCLen=w_DataLen*2;
+    805          		*p_data++=(u8)w_CRCLen;//Num
+    806          		w_DataLen=w_DataStart+w_DataLen;
+    807          		if(!Set_QFTZ.Type)		//线路保护
+    808          	    {
+    809          		 pBuff2=(u16*)&BAK_SET;
+    810          		}
+    811          #ifdef	ZRR900F		
+    812          		else if(Set_QFTZ.Type==1)	//变压器保护
+    813          		{
+    814          		 pBuff2=(u16*)&BAK_SETBYQ;
+    815          	  
+    816          		}
+    817          		 else if(Set_QFTZ.Type==2)	//电动机保护
+    818          		{
+    819          		 pBuff2=(u16*)&BAK_SETMOTO;
+    820          	  
+    821          		}	  
+    822          #endif		
+    823          		for(i=w_DataStart;i<w_DataLen;i++)
+    824          		{
+    825          		  w_val=*pBuff2++;
+    826          			*p_data++=(u8)(w_val>>8);
+    827          			*p_data++=(u8)w_val;
+    828          		}
+    829          	 }
+    830          	else						//压板(数量：16个-32BYTE)
+    831          	{
+    832          		w_DataStart-=300;
+    833          		if(w_DataStart>=NumOfYB) return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAADDR, sbuf);
+    834          		if((w_DataStart+w_DataLen)>NumOfYB)
+    835          			w_DataLen=NumOfYB-w_DataStart;
+    836          		w_CRCLen=w_DataLen<<1;
+    837          		*p_data++=(u8)w_CRCLen;//Num
+    838          		w_DataLen=w_DataStart+w_DataLen;
+    839          				
+    840          	
+    841          		for( i=w_DataStart; i<w_DataLen; i++ )
+    842          		{
+    843          			if(*P_YB_YX & (1<<i) )	
+    844          			{//投入
+    845          				*p_data++= 0;
+    846          				*p_data++= 0x55;	
+    847          			}
+    848          			else			
+    849          			{//退出
+    850          				*p_data++= 0;
+    851          				*p_data++= 0xaa;	
+    852          			}
+    853          		}
+    854          	}
+    855          	Lib_CRC16(sbuf,w_CRCLen+3);
+    856          	 
+    857          	 return (w_CRCLen+5);
+    858          }
+    859          
+    860          //提取SOE
+    861          void Make_FaultData(u8 byKind,u8 byPh,u16 wGZVal,u8 *pBuf);
+    862          u8 ChangToBCD(u8 bydata)
+    863          {
+    864          	static u8 by_BCD;
+    865          	by_BCD=((bydata/10)<<4)|(bydata%10);
+    866          	return by_BCD;
+    867          }
+    868          
+    869           
+    870          u16 ModbusJK_GetSoe(u8 *rbuf,u8 *sbuf,u8 *buff103)
+    871          {
+    872          	static u8 *p_Send;
+    873          	static u16 w_Use;
+    874          	//static u32 d_YXState;//遥信对应的状态(bit31~0)
+    875          	 static u16 by_rptno;
+    876          	static u8 cmp,by_Ph,i;
+    877          	SoeList	*pSoeList;
+    878            u8 *ALM_TIM,*SOE_TIM;
+    879                     
+    880                     	
+    881          	//if(!CrcOk(rbuf,2)) return 0;
+    882          	p_Send=sbuf;
+    883          //FindNextSoe:
+    884          //	if(Soe_Buff.SoeManList[D_485].uStatus==' ')
+    885           	if(Soe_Buff.SoeManList[D_485].uReadPt==Soe_Buff.uWritePt) //Soe报文缓冲区为256条，此处不考虑超过256条后的溢出
+    886          	{
+    887          		by_103SOESta=0x01;
+    888          		*p_Send++=m_ModSAddress;		//addr
+    889          		*p_Send++=CMD_SOE;			//Fun
+    890          		*p_Send++=0;				//BYTE Count
+    891          		Lib_CRC16(sbuf,3);
+    892          		return 5;
+    893          	}	
+    894          	pSoeList=&Soe_Buff.SoeB[Soe_Buff.SoeManList[D_485].uReadPt];
+    895           
+    896          	for(i=0;i<NumOfEvent;i++)//查找和报文区中相对应的事件列表
+    897          	{
+    898          		if(pSoeList->uObjectNo==tEvtTab[i].uSoeNo)	
+    899          			break;
+    900          	}
+    901          	/*if(i>=con_EVTTABNUM) 
+    902          		w_Attrib=0;
+    903          	else
+    904          		w_Attrib=tEvtTab[i].wCom103 & 0xff00;
+    905          	
+    906          	if(w_Attrib!=SOEEVENT && w_Attrib!=TRIPEVENT && w_Attrib!=FAILEVENT)
+    907          	{
+    908          		Soe_Buff.SoeManList[D_485].uReadPt++;
+    909          		Soe_Buff.SoeManList[D_485].uReadPt %=preSoeNumber;
+    910          
+    911          		goto FindNextSoe;
+    912          	}
+    913          */
+    914          	*p_Send++=m_ModSAddress;		//addr
+    915          	*p_Send++=CMD_SOE;			//Fun
+    916          	*p_Send++=0x0F;				//BYTE Count
+    917          	w_Use=pSoeList->timer.Micros;
+    918          //	w_second|=b_SoeRecord[b_Record_Comsend_ptr][7];
+    919          	//w_Use=(WORD)(w_second%1000);
+    920          	*p_Send++=(u8)(w_Use/100);//msecond_HByte BCD码
+    921          	w_Use=(u8)(w_Use%100); 
+    922          	*p_Send++=ChangToBCD(w_Use);//msecond_LByte BCD码
+    923          	*p_Send++=pSoeList->timer.Second;
+    924          	*p_Send++=pSoeList->timer.Minute;//minute
+    925          	*p_Send++=pSoeList->timer.Hour;//hour
+    926          	*p_Send++=pSoeList->timer.Date;//day
+    927          	*p_Send++=pSoeList->timer.Month;//month
+    928          	w_Use=pSoeList->timer.Year;
+    929          	if(w_Use>=2000) w_Use-=2000;
+    930          	*p_Send++=pSoeList->timer.Year;//year
+    931          	
+    932          //	switch(w_Attrib) {
+    933          	//case 0x1800:	//是遥信SOE
+    934          	 if(pSoeList->uObjectNo<15||pSoeList->uObjectNo==0x5f||pSoeList->uObjectNo==0x7f)
+    935          	{
+    936          		*p_Send++=1;		//属性1－遥信SOE
+    937          		*p_Send++=pSoeList->uObjectNo;//(u8)((tEvtTab[i].wCom103&0x7f)-1);		//变位遥信位置(0~31)
+    938          		//d_YXState=0;
+    939          		if(pSoeList->uStatus)
+    940          			*p_Send++=0xff;
+    941                   else
+    942          			*p_Send++=0;
+    943               	*p_Send++=0;
+    944          		*p_Send++=0;
+    945          		*p_Send++=0;
+    946          	//	*p_Send++=0;
+    947             
+    948          	     Soe_Buff.SoeManList[D_485].uReadPt++;
+    949              	Soe_Buff.SoeManList[D_485].uReadPt %=TRIPRPT_NUM;
+    950          	 	if(Soe_Buff.SoeManList[D_485].uReadPt==Soe_Buff.uWritePt) //Soe报文缓冲区为256条，此处不考虑超过256条后的溢出
+    951          		{
+    952          			by_103SOESta=0x01;
+    953          			*p_Send++=0;
+    954          
+    955          		}
+    956                   else
+    957          			*p_Send++=0xff;
+    958          	}
+    959          
+    960              if (pSoeList->uObjectNo >=0x40 && pSoeList->uObjectNo <0x5f)	
+    961          	{
+    962          		*p_Send++=2;		//属性2－保护SOE
+    963          		*p_Send++=pSoeList->uObjectNo-0x40;		//保护位置(0~31)
+    964          		if(pSoeList->uStatus)
+    965          			*p_Send++=0xff;
+    966                   else
+    967          			*p_Send++=0;
+    968          		 	if(!(tEvtTab[i].uParaNum))
+    969          			{
+    970          					*p_Send++=0; *p_Send++=0; *p_Send++=0;
+    971          				 Soe_Buff.SoeManList[D_485].uReadPt++;
+    972          				Soe_Buff.SoeManList[D_485].uReadPt %=TRIPRPT_NUM;
+    973          				if(Soe_Buff.SoeManList[D_485].uReadPt==Soe_Buff.uWritePt) //Soe报文缓冲区为256条，此处不考虑超过256条后的溢出
+    974          				{
+    975          					by_103SOESta=0x01;
+    976          					*p_Send++=0;
+    977          		
+    978          				}
+    979          				 else
+    980          					*p_Send++=0xff;
+    981          					 
+    982          			}
+    983          			else
+    984          			{
+    985          						 w_Use=0; by_Ph=0;		 	
+    986          						for(by_rptno=0;by_rptno<TRIPRPT_NUM;by_rptno++)//查找和此遥信报告相同的事件报告
+    987          						{
+    988          						if(tEvtTab[Action_Buff.ActionBuff[by_rptno].uCode].uSoeNo!=pSoeList->uObjectNo) continue; //事件代码是否相同？
+    989          							ALM_TIM=(u8 *)&Action_Buff.ActionBuff[by_rptno].timer.Micros;
+    990          							SOE_TIM=(u8 *)&Soe_Buff.SoeB[Soe_Buff.SoeManList[D_485].uReadPt].timer.Micros;	
+    991          							for(cmp=0;cmp<8;cmp++)
+    992          							{
+    993          								
+    994          								if(*ALM_TIM++!=*SOE_TIM++)//比较报文时间
+    995          									break;
+    996          							}
+    997          						if(cmp==8)//说明事件代码和报文时间均相同
+    998          							{
+    999          								w_Use=Action_Buff.ActionBuff[by_rptno].Para[0].data;
+   1000          								
+   1001          								by_Ph=Action_Buff.ActionBuff[by_rptno].Para[0].Phase;
+   1002          								break;
+   1003          							}
+   1004          							
+   1005          						}
+   1006          						Make_FaultData(tEvtTab[i].uParaCode[0],by_Ph,w_Use,p_Send);
+   1007          						 Soe_Buff.SoeManList[D_485].uReadPt++;
+   1008          						Soe_Buff.SoeManList[D_485].uReadPt %=TRIPRPT_NUM;
+   1009          						p_Send=p_Send+3;
+   1010          						if(Soe_Buff.SoeManList[D_485].uReadPt==Soe_Buff.uWritePt) //Soe报文缓冲区为256条，此处不考虑超过256条后的溢出
+   1011          						{
+   1012          							by_103SOESta=0x01;
+   1013          				
+   1014          							*p_Send++=0;
+   1015          				
+   1016          						}
+   1017          						 else
+   1018          							*p_Send++=0xff;
+   1019          			}
+   1020          			 
+   1021             }
+   1022            if (pSoeList->uObjectNo >=0x60 && pSoeList->uObjectNo <0x7f)
+   1023             {
+   1024          		*p_Send++=3;		//属性3－告警SOE
+   1025          		*p_Send++=pSoeList->uObjectNo-0x60;		//告警位置(0~16)
+   1026          		if(pSoeList->uStatus)
+   1027          			*p_Send++=0xff;
+   1028                   else
+   1029          			*p_Send++=0;
+   1030          		*p_Send++=0; *p_Send++=0; *p_Send++=0;
+   1031          
+   1032          	     Soe_Buff.SoeManList[D_485].uReadPt++;
+   1033              	Soe_Buff.SoeManList[D_485].uReadPt %=TRIPRPT_NUM;
+   1034          	 	if(Soe_Buff.SoeManList[D_485].uReadPt==Soe_Buff.uWritePt) //Soe报文缓冲区为256条，此处不考虑超过256条后的溢出
+   1035          		{
+   1036          			by_103SOESta=0x01;
+   1037          			*p_Send++=0;
+   1038          
+   1039          		}
+   1040                   else
+   1041          			*p_Send++=0xff;
+   1042          
+   1043          		 
+   1044             }
+   1045          	 Lib_CRC16(sbuf,18);
+   1046          	return 20;
+   1047          
+   1048          
+   1049          }
+   1050          //对时、修改定值、参数、控制字
+   1051          u16 ModbusJK_SetMore(u8 *rbuf,u8 *sbuf,u8 *buff103)
+   1052          {
+   1053          	
+   1054          	static u16 i,w_DataNum,w_Val;
+   1055          	static u16 w_attrib,uLen;
+   1056              u8    *pt,*pBuff;
+   1057          	u16  *w_pBuff;
+   1058          
+   1059          	p_data=rbuf+2;	
+   1060          	w_DataStart=*p_data++;  w_DataStart<<=8;  w_DataStart|=*p_data++;	//数据起始地址
+   1061          	w_DataLen=*p_data++;	w_DataLen<<=8;	  w_DataLen|=*p_data++;
+   1062          	w_DataNum=*p_data++;
+   1063          	//if(!CrcOk(rbuf,w_DataNum+7)) return 0;
+   1064          	
+   1065          	//设置统一处理
+   1066          	//设置始位置超过总数量返回0
+   1067          	//设置起始位置+需要设置的数量 超过总数量则将需要设置的数量改为最大剩余的数量
+   1068          	if(w_DataStart<0x50)		//对时
+   1069          	{
+   1070          		if(w_DataLen!=6 || w_DataNum!=12) return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAADDR, sbuf);
+   1071          		w_DataLen=*p_data++;    w_DataLen<<=8;    w_DataLen|=*p_data++;
+   1072          		w_DataLen=w_DataLen*1000;//second
+   1073          		*buff103=LOBYTE(w_DataLen);
+   1074          		*(buff103+1)=HIBYTE(w_DataLen);
+   1075          		p_data++;	*(buff103+2)=*p_data++;   //minute 
+   1076          		p_data++;	*(buff103+3)=*p_data++;   //hour 
+   1077          		p_data++;	*(buff103+5)=*p_data++;   //day 
+   1078          		p_data++;	*(buff103+6)=*p_data++;   //month 
+   1079          		w_DataLen=*p_data++;    w_DataLen<<=8;    w_DataLen|=*p_data++;
+   1080          		*(buff103+7)=(u8)(w_DataLen-2000);   //year 
+   1081          		JK103_Set_clock(buff103,0);
+   1082          	}
+   1083          	else	if(w_DataStart==0x51)		//电压电流
+   1084              {
+   1085          	    if(w_DataNum=='U')
+   1086          		{
+   1087          		  UICL_set();
+   1088          		  SETFZ_Save(DZ_BHUIpar);		//保存保护校准系数
+   1089          
+   1090          	 	   memcpy(sbuf,"UIPQOK!",7);
+   1091          	       return 7;   
+   1092          		}
+   1093          	  
+   1094          	}
+   1095          	else if(w_DataStart==0x60)	//定值区 
+   1096          	{
+   1097          	
+   1098          		p_data++; 
+   1099          		//by_SetNo=*p_data++;	
+   1100          		//if(!(SET_Change_Set(by_SetNo)))	 return 0;			
+   1101          		 
+   1102          	}	
+   1103          	else if(w_DataStart<250)	//修改定值
+   1104          	{
+   1105          	 if(w_DataNum!=(w_DataLen*2))  return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAADDR, sbuf);
+   1106          		w_DataStart-=100;
+   1107          		if(w_DataStart>=Numset)  return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAADDR, sbuf);
+   1108          		
+   1109          			
+   1110           
+   1111          		if((w_DataStart+w_DataLen)>Numset)
+   1112          		{
+   1113          			w_DataLen=Numset;
+   1114          		//	*(rbuf+5)=(u8)w_DataNum;	//修改返回报文中数据长度，表示装置接受修改的数量
+   1115          		}
+   1116          		else
+   1117          			w_DataLen=w_DataStart+w_DataLen;
+   1118          		w_pBuff=(u16 *)&ZJ_FixVal_Buff.w_SetValue;
+   1119          		for(i=w_DataStart;i<w_DataLen;i++)
+   1120          		{
+   1121          			w_Val=*p_data++;  w_Val<<=8;
+   1122          			w_Val|=*p_data++; 
+   1123          			*w_pBuff++=w_Val;
+   1124          		}
+   1125          			ZJ_FixVal_Buff.wStatus=SetSts;	//有效
+   1126          			pBuff=(u8 *)&ZJ_FixVal_Buff.w_SetValue;
+   1127          	        uLen=sizeof(SetBuff);
+   1128                     ZJ_FixVal_Buff.wCrc=CalSum16(pBuff,uLen);
+   1129          		if(!(Set_Check((FixValueBuff *)&ZJ_FixVal_Buff)))return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAVALUE, sbuf);
+   1130                       
+   1131          		if (!SET_Write_Set(Id_MMI,FixVal_Manage.uCurSection)) return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAVALUE, sbuf);//写入指定定值区
+   1132          
+   1133          		//if(!SET_Chk103Set()) 
+   1134          		//if ( SET_Write_Set(by_CurSetNo)!=0 ) return 0;//写入指定定值区
+   1135          	 }
+   1136          	
+   1137          	else						//修改控制字
+   1138          	{
+   1139          		w_DataStart-=300;
+   1140          		if(w_DataStart>=NumOfYB)  return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAADDR, sbuf);
+   1141          		if((w_DataStart+w_DataLen)>NumOfYB) 
+   1142                                          return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAADDR, sbuf);	 
+   1143          			w_DataLen=w_DataStart+w_DataLen;
+   1144          
+   1145          			   if(!Set_QFTZ.Type)		//线路保护
+   1146          				{
+   1147          					pt=(u8*)&BAK_YB;
+   1148          				}
+   1149          #ifdef	ZRR900F	   
+   1150          				else if(Set_QFTZ.Type==1)	//变压器保护
+   1151          				{
+   1152          					pt=(u8*)&BAK_YBBYQ;		
+   1153          				}
+   1154          				else if(Set_QFTZ.Type==2)	//电动机保护
+   1155          				{
+   1156          					pt=(u8*)&BAK_YBMOTO;	
+   1157          				}
+   1158          #endif
+   1159          				else
+   1160          				{
+   1161          					 pt=(u8*)&BAK_YB;		 
+   1162          				}
+   1163          				pt+=4;	//status,YB_YX	
+   1164          		
+   1165          		for(i=w_DataStart;i<w_DataLen;i++)
+   1166          		{
+   1167           
+   1168          			p_data++;  w_attrib=*p_data++;
+   1169          			if(w_attrib==0x55)//投入
+   1170          			{
+   1171          				*(pt+i)=YBON;
+   1172          				*P_YB_YX|=(1<<i);
+   1173          			}
+   1174          			else if(w_attrib==0xaa)//退出
+   1175          			{
+   1176          				*(pt+i)=YBOFF;
+   1177          				*P_YB_YX&=~(1<<i);
+   1178          			}
+   1179          		}
+   1180          	   SETFZ_Save(Set_QFTZ.Type+2);	//保存压板
+   1181          		
+   1182          
+   1183          	  
+   1184          	}
+   1185          	
+   1186           
+   1187           
+   1188          	memcpy(sbuf,rbuf,6);
+   1189          	Lib_CRC16(sbuf,6);
+   1190          	 
+   1191          	return 8;
+   1192          }
+   1193          
+   1194          //根据故障属性判断是否显示故障选相和故障值
+   1195          #define MODBUS_I	1	//单位：A
+   1196          #define MODBUS_U	2	//单位：V
+   1197          #define MODBUS_F	3	//单位：Hz
+   1198          #define MODBUS_Io	4	//单位：A
+   1199          #define MODBUS_Uo   5	//单位：V
+   1200          #define MODBUS_I1	6	//单位：A
+   1201          #define MODBUS_I2	7	//单位：A
+   1202          #define MODBUS_P    8	//单位：V
+   1203          
+   1204          void Make_FaultData(u8 byKind,u8 byPh,u16 wGZVal,u8 *pBuf)
+   1205          {
+   1206          	 
+   1207           
+   1208          	static u8 by_GZph,*pData;
+   1209               u32 data;
+   1210          	 data=((u32)wGZVal*256)/100;
+   1211          	pData=pBuf;
+   1212          	*pData++=HIBYTE(data);//故障值放大100倍
+   1213          	*pData++=LOBYTE(data);
+   1214               *pData++=0;
+   1215          //	*pData++=0;
+   1216          	/*switch(byKind){
+   1217          	case Para_I:	
+   1218          		by_GZph=byPh&0x07;		//故障值属性对应tGZPHTab[]表
+   1219          		by_GZph|=(MODBUS_I)<<3;
+   1220          		*pData++=by_GZph;		
+   1221          		break;
+   1222          	case Para_Icd:	//xww 2011.1.14 差动后台没有相别
+   1223          		by_GZph=byPh&0x07;		//故障值属性对应tGZPHTab[]表
+   1224          		by_GZph|=(MODBUS_I)<<3;
+   1225          		*pData++=by_GZph;		
+   1226          		break;
+   1227          	case Para_I0:
+   1228          		*pData++=(MODBUS_Io)<<3;
+   1229          		break;
+   1230          	case Para_U0:
+   1231          		*pData++=(MODBUS_Uo)<<3;
+   1232          		break;
+   1233          	case Para_I2:
+   1234          		*pData++=(MODBUS_I2)<<3;		
+   1235          		break;
+   1236           
+   1237          	case Para_F:
+   1238          		*pData++=(MODBUS_F)<<3;
+   1239          		break;
+   1240          	case Para_U:
+   1241          		by_GZph=byPh&0x07;		//故障值属性对应tGZPHTab[]表
+   1242          		by_GZph|=(MODBUS_U)<<3;
+   1243          		*pData++=by_GZph;
+   1244          		break;
+   1245          	}
+   1246          	*/
+   1247          
+   1248          
+   1249          }
+   1250          ////////////////////////////////103协议时间同步装置应答函数/////////////////////////////
+   1251          //对时命令，数据依次为：
+   1252          //毫秒低，毫秒高，分，时，星期，日，月，年
+   1253          //所有数据都是二进格式
+   1254          void JK103_Set_clock(u8* BUFF103,u8 commaddress)
+   1255          {
+   1256          	R_CLOCK newdate;
+   1257           	u16  ms;
+   1258          
+   1259          	ms= (u16)*BUFF103++;
+   1260          	ms+= ((u16)*BUFF103++)<<8;
+   1261          	//900F采用外部时钟，以BCD格式保存到芯片，2015.9.6
+   1262          	 newdate.Second=Hex_Bcd((u8)(ms/1000));
+   1263          	 newdate.Micros=ms%1000;
+   1264          	 
+   1265          	newdate.Minute= Hex_Bcd(*BUFF103++);
+   1266          	newdate.Hour= Hex_Bcd(*BUFF103++);
+   1267          	BUFF103++;		//存放的是星期,本装置不用
+   1268          	newdate.Date= Hex_Bcd(*BUFF103++);
+   1269          	newdate.Month= Hex_Bcd(*BUFF103++);
+   1270          	newdate.Year= Hex_Bcd(*BUFF103);
+   1271          
+   1272          
+   1273           	Drive_Wirte_clock((u8 *)&newdate);
+   1274          	Drive_Read_clock((u8 *)&Rsys_clock);
+   1275              // t_Sys_Date=newdate;
+   1276           //    b_Need_GetTime=1;
+   1277           
+   1278          }
+   1279          //extern u8 AD_TEST[];
+   1280          
+   1281          
+   1282          u16 ModbusAC_TEST(u8 *rbuf,u8 *sbuf,u8 *buff103)
+   1283          {
+   1284          	/*
+   1285          	static u16 i,w_DataNum;
+   1286          
+   1287          	p_data=rbuf+2;	
+   1288           	w_DataNum=*p_data++;
+   1289          	//if(!CrcOk(rbuf,w_DataNum+7)) return 0;
+   1290          	 
+   1291           
+   1292          	//	if(w_DataLen>30) return Modbus_ProcessError(rbuf, MODBUS_ERR_DATAADDR, sbuf);
+   1293          	   for(i=0;i<w_DataNum;i++)
+   1294          		  AD_TEST[i]=*p_data++;
+   1295             
+   1296          	memcpy(sbuf,rbuf,6);
+   1297          	Lib_CRC16(sbuf,6);
+   1298          	*/ 
+   1299          	return 8;
+   1300          }
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       0   ChangToBCD
+      24   JK103_Set_clock
+        24   -> Drive_Read_clock
+        24   -> Drive_Wirte_clock
+        24   -> Hex_Bcd
+      12   Make_FaultData
+       0   ModbusAC_TEST
+      24   ModbusJK_Fugui
+        24   -> FG_Timer_Over
+        24   -> __aeabi_memcpy
+      48   ModbusJK_GetMore
+        48   -> Lib_CRC16
+        48   -> Modbus_ProcessError
+        48   -> YC_Change_CAN
+        48   -> sprintf
+        48   -> strlen
+      32   ModbusJK_GetSoe
+        32   -> ChangToBCD
+        32   -> Lib_CRC16
+        32   -> Make_FaultData
+     112   ModbusJK_GetYXYC
+       112   -> GetCRC16NOT
+       112   -> Modbus_ProcessError
+      40   ModbusJK_SetMore
+        40   -> CalSum16
+        40   -> JK103_Set_clock
+        40   -> Lib_CRC16
+        40   -> Modbus_ProcessError
+        40   -> SETFZ_Save
+        40   -> SET_Write_Set
+        40   -> Set_Check
+        40   -> UICL_set
+        40   -> __aeabi_memcpy
+      24   Modbus_ProcessError
+        24   -> GetCRC16NOT
+      72   PCOM_Answer
+        72   -> MEM_clear
+        72   -> Uart_Write
+        72   -> WDog_Clear
+        72   -> __aeabi_f2d
+        72   -> delay_ms
+        72   -> sprintf
+        72   -> strlen
+      56   PModBusS_AnswerData
+        56   -> GetCRC16NOT
+        56   -> Modbus_ProcessError
+        56   -> YC_Change_CAN
+        56   -> __aeabi_d2f
+        56   -> __aeabi_ddiv
+        56   -> __aeabi_dmul
+        56   -> __aeabi_i2d
+        56   -> __aeabi_ui2d
+      24   PModBusS_AnswerMYK
+        24   -> Modbus_ProcessError
+        24   -> Trip_F
+        24   -> Trip_P
+        24   -> __aeabi_memcpy
+      24   PModBusS_AnswerYK
+        24   -> EventManage_CZJL_Write
+        24   -> FG_Timer_Over
+        24   -> Modbus_ProcessError
+        24   -> Trip_F
+        24   -> Trip_P
+        24   -> __aeabi_memcpy
+        24   -> delay_ms
+     184   PModBusS_AnswerYX
+       184   -> GetCRC16NOT
+       184   -> Modbus_ProcessError
+       0   PModBusS_Initialize
+       8   PModBusS_buildPacket
+         8   -> ModbusAC_TEST
+         8   -> ModbusJK_Fugui
+         8   -> ModbusJK_GetMore
+         8   -> ModbusJK_GetSoe
+         8   -> ModbusJK_GetYXYC
+         8   -> ModbusJK_SetMore
+         8   -> Modbus_ProcessError
+         8   -> PModBusS_AnswerData
+         8   -> PModBusS_AnswerMYK
+         8   -> PModBusS_AnswerYK
+         8   -> PModBusS_AnswerYX
+       8   PModBusS_checkPacket
+         8   -> GetCRC16NOT
+       8   PModBus_ModbusS
+         8   -> PCOM_Answer
+         8   -> PModBusS_buildPacket
+         8   -> PModBusS_checkPacket
+         8   -> PONLSJ_analysisPacket
+         8   -> PONLSJ_buildPacket
+         8   -> PONLSJ_checkPacket
+         8   -> Trip_F
+         8   -> Trip_P
+         8   -> Uart_Read
+         8   -> Uart_Write
+         8   -> WDog_Clear
+       0   YC_Change_CAN
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable10
+       4  ??DataTable11
+       4  ??DataTable11_1
+       4  ??DataTable11_10
+       4  ??DataTable11_11
+       4  ??DataTable11_12
+       4  ??DataTable11_13
+       4  ??DataTable11_14
+       4  ??DataTable11_15
+       4  ??DataTable11_16
+       4  ??DataTable11_17
+       4  ??DataTable11_18
+       4  ??DataTable11_2
+       4  ??DataTable11_3
+       4  ??DataTable11_4
+       4  ??DataTable11_5
+       4  ??DataTable11_6
+       4  ??DataTable11_7
+       4  ??DataTable11_8
+       4  ??DataTable11_9
+       4  ??DataTable12
+       4  ??DataTable12_1
+       4  ??DataTable12_10
+       4  ??DataTable12_11
+       4  ??DataTable12_12
+       4  ??DataTable12_13
+       4  ??DataTable12_14
+       4  ??DataTable12_15
+       4  ??DataTable12_16
+       4  ??DataTable12_17
+       4  ??DataTable12_18
+       4  ??DataTable12_2
+       4  ??DataTable12_3
+       4  ??DataTable12_4
+       4  ??DataTable12_5
+       4  ??DataTable12_6
+       4  ??DataTable12_7
+       4  ??DataTable12_8
+       4  ??DataTable12_9
+       4  ??DataTable14
+       4  ??DataTable14_1
+       4  ??DataTable14_2
+       4  ??DataTable14_3
+       4  ??DataTable14_4
+       4  ??DataTable14_5
+       4  ??DataTable15
+       4  ??DataTable15_1
+       4  ??DataTable15_10
+       4  ??DataTable15_11
+       4  ??DataTable15_12
+       4  ??DataTable15_13
+       4  ??DataTable15_14
+       4  ??DataTable15_15
+       4  ??DataTable15_16
+       4  ??DataTable15_17
+       4  ??DataTable15_18
+       4  ??DataTable15_19
+       4  ??DataTable15_2
+       4  ??DataTable15_20
+       4  ??DataTable15_21
+       4  ??DataTable15_22
+       4  ??DataTable15_23
+       4  ??DataTable15_24
+       4  ??DataTable15_25
+       4  ??DataTable15_26
+       4  ??DataTable15_3
+       4  ??DataTable15_4
+       4  ??DataTable15_5
+       4  ??DataTable15_6
+       4  ??DataTable15_7
+       4  ??DataTable15_8
+       4  ??DataTable15_9
+       4  ??DataTable4
+       4  ??DataTable4_1
+       4  ??DataTable4_2
+       4  ??DataTable5
+       4  ??DataTable5_1
+       4  ??DataTable5_10
+       4  ??DataTable5_11
+       4  ??DataTable5_12
+       4  ??DataTable5_2
+       4  ??DataTable5_3
+       4  ??DataTable5_4
+       4  ??DataTable5_5
+       4  ??DataTable5_6
+       4  ??DataTable5_7
+       4  ??DataTable5_8
+       4  ??DataTable5_9
+       4  ??DataTable6
+       4  ??DataTable6_1
+       4  ??DataTable6_10
+       4  ??DataTable6_11
+       4  ??DataTable6_2
+       4  ??DataTable6_3
+       4  ??DataTable6_4
+       4  ??DataTable6_5
+       4  ??DataTable6_6
+       4  ??DataTable6_7
+       4  ??DataTable6_8
+       4  ??DataTable6_9
+       4  ??DataTable7
+       4  ??DataTable7_1
+       4  ??DataTable7_2
+       4  ??DataTable7_3
+       4  ??DataTable7_4
+       4  ??DataTable8
+       4  ??DataTable9
+       4  ??DataTable9_1
+       4  ??DataTable9_2
+       4  ??DataTable9_3
+       4  ??DataTable9_4
+       4  ??DataTable9_5
+       4  ??DataTable9_6
+      24  ?_0
+      28  ?_1
+      16  ?_10
+      24  ?_11
+      20  ?_12
+      20  ?_13
+      12  ?_14
+       8  ?_15
+      32  ?_2
+      28  ?_3
+      24  ?_4
+      24  ?_5
+      16  ?_6
+      16  ?_7
+      16  ?_8
+      16  ?_9
+       2  COM_TXLEN
+      40  ChangToBCD
+     134  JK103_Set_clock
+      84  Make_FaultData
+       6  ModbusAC_TEST
+      28  ModbusJK_Fugui
+    1574  ModbusJK_GetMore
+    1930  ModbusJK_GetSoe
+     690  ModbusJK_GetYXYC
+    1332  ModbusJK_SetMore
+      60  Modbus_ProcessError
+    1970  PCOM_Answer
+     742  PModBusS_AnswerData
+     330  PModBusS_AnswerMYK
+     318  PModBusS_AnswerYK
+     836  PModBusS_AnswerYX
+      34  PModBusS_Initialize
+     256  PModBusS_buildPacket
+      70  PModBusS_checkPacket
+     264  PModBus_ModbusS
+      20  YC_Change_CAN
+       1  by_BCD
+     128  by_Com103Buf
+       1  by_Ph
+       2  by_rptno
+       1  cmp
+       1  com_flag
+       1  i
+       2  i
+       2  i
+       1  m_ModSAddress
+       2  m_ModSRXLength
+       2  m_ModSTXLength
+       1  m_ModScurrRecvId
+    1200  m_pModSRXData
+    1200  m_pModSTXData
+       4  pData
+       4  p_Send
+       4  p_data
+       2  uLen
+       2  w_CRCLen
+       2  w_DataLen
+       2  w_DataNum
+       2  w_DataStart
+       2  w_OutLct
+       2  w_OutLct
+       2  w_OutSta
+       2  w_OutSta
+       2  w_Use
+       2  w_Val
+       2  w_YKjh
+       2  w_attrib
+
+ 
+  2 585 bytes in section .bss
+    324 bytes in section .rodata
+ 11 170 bytes in section .text
+ 
+ 11 170 bytes of CODE  memory
+    324 bytes of CONST memory
+  2 585 bytes of DATA  memory
+
+Errors: none
+Warnings: 30

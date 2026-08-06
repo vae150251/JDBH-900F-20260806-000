@@ -1,0 +1,1873 @@
+/* 
+* Title:	GlobeDef.c
+* Description:	全局变量及预定义
+* Function:
+
+*/
+
+#include "Drive.h"
+#include "GlobeDef.h"
+#include "stm32f10x.h"
+#include "rlycomm.h"
+
+
+#pragma location = ".xhtype"
+const char UIData[32]={"ZRR900FHYLCD"};
+
+
+ const SoftYxTable  *tEvtTab;  //事件描述指针
+ u8  NumOfEvent;
+ 
+ const TDOTABLE *tDITab;  //开入描述指针
+ u8 NumOfDI;
+ 
+ const YBTABLE *ybTab;   //压板描述指针
+ u8 NumOfYB;
+ u16 *P_YB_YX; 
+ 
+ u8	*szType;
+ 
+ 
+ u8     Numset;
+ u8    NumOfSet;
+ const FixValue *FixValueTable;  //定值描述指针
+
+ 
+u32 TestAtt7022E;
+u16   ADIntNum;			//AD中断次数
+u8    ADERRFlag;		//AD出错标志
+u8    Timer_100ms;
+
+u16  BOOTSET_len=sizeof(BOOTSETStr);
+
+BOOTSETStr BOOTRUN_SET,BOOTBAK_SET;
+
+u8  COMRXBUF[MAX_UART_NUM][MAX_UARTRX_BUFSIZE];
+u8  COMTXBUF[MAX_UART_NUM][MAX_UARTTX_BUFSIZE];
+u16  COMRXHEAD[MAX_UART_NUM];
+u16  COMRXTAIL[MAX_UART_NUM];
+u16  COMTXHEAD[MAX_UART_NUM];
+u16  COMTXTAIL[MAX_UART_NUM];
+u16 CharTimeOut[MAX_UART_NUM];		//字符间超时定时器
+u16  Flag_Tx_Busy[MAX_UART_NUM];
+u16  RTimeOut[MAX_UART_NUM];			//字符间超时定值，默认时间长，一旦开始接收后立即缩短以快速响应
+u32  RecvDelay[MAX_UART_NUM];
+u32 SYS_TickNum;		//软件ms计时器
+
+QFTZType  Set_QFTZ,Bak_QFTZ;
+u8  Setlen_QFTZ=sizeof(Set_QFTZ);
+u8  QFTZ_Flag;	//欠费跳闸动作标志
+u8  QFGJ_Flag;	//欠费告警动作标志
+
+/*************************************
+全局变量定义
+**************************************/
+//任务相关变量定义
+//OS_FLAG_GRP	*EngineStatus;
+
+//故障处理相关变量定义
+u16	 Timer_GZSZ;			// 故障时钟
+u16   YK_Pluse;
+u16	 uYk_OverTim;
+u16   Timer_FG;
+u8    Timer_1s;            // 一秒定时器
+u8    Timer_10ms;
+u16   Timer_500ms;
+u16   Power_flg;
+u16   Reset_cnt; 
+
+u16   ADERR; 
+u8    Tim_TEST;
+
+u16  LightTimer;
+u16  MMI_Timer;
+u8   EventTimer;
+u8   MenuTimer;
+u8   DisplyTimer;
+u8   MenuTimer_nom;
+u8	F485_Delay_Time;
+u8	F485_END_Bit;
+u8   SPI_work; 
+u8   Menu_nom=0;   // 
+
+u16    Timer_KC;
+
+//遥信及SOE相关变量
+ volatile u32 l_fRelayTrip;
+ volatile u32 l_fRelayAlarm;
+ volatile u32 l_fRelayBHkr;
+ volatile u32 l_fRelayYXkr;
+ 
+ volatile u32  l_KRprocessed;
+
+
+u8 	YX0_sts[16];
+u8 	YX1_sts[16];
+u8 	Modbus_YX_sts[8];
+u8	SOE_count;	        // SOE 流水号计数器
+//事件处理相关操作变量定义
+u8 Event_Send_Request;		// 事件操作请求	
+//FLASH相关操作变量定义
+u8	Fm_Operat_Request;     	// Flashrom操作请求
+u16 LockFlashWrite;
+
+
+
+//时钟缓冲定义
+R_CLOCK Rsys_clock;				// 实时时钟缓冲
+R_CLOCK Rsys_clk_buff;			// 校时暂存器
+u8 ClockReflashFlag;			//时钟读取标志
+
+//定值缓冲定义
+SetBuff RUN_SET,BAK_SET;				// 实际使用定值缓冲区,经过转换后,可直接进行比较.(64X2)
+
+FixValueBuff Cur_FixVal_Buff,ZJ_FixVal_Buff;			// EEPROM定值缓冲区 --保护读取区(78X2)
+
+FixStatus FixVal_Manage;			//定值管理管理区
+
+//SOE相关缓冲
+SoeBuff Soe_Buff;
+SoeBuff  CZJL_Buff;
+//保护动作/告警有关缓冲定义
+//const ActionTable  ActionTab[];
+//const ActionTable  AlarmTab[];
+ActionBuff Action_Buff;				//总事件缓冲区
+
+//事故及SOE管理区缓冲
+ManageList SgMagBuff;    //xww 0903 
+ManageList SoeMagBuff; 
+ManageList CZJLMagBuff; 
+//压板结构缓冲定义
+YB	RUN_YB,BAK_YB;
+
+//软信号缓冲区
+Signal	Run_Signal;
+//系统参数
+SysPar	RUN_Syspar,BAK_Syspar;
+syspatrUI	RUN_BHUIpar,BAK_BHUIpar;
+//开入缓冲
+KRBuf  KRBuf1;
+//键盘缓冲
+KEY_LIST KEY_Str;
+
+u8  KEY_err,RTC_ERR;
+
+u16 com_test_timer;
+u8 TEST_COM;
+//模拟量缓冲结构
+  UI_buffer_Struct	   UI_buffer;
+ UI_bufferjy_Struct    UI_bufferJY;
+ UI_bufferjy_Struct   UI_bufferJYtemp[16]; 
+ 
+
+//采样数据缓冲区
+s16  	SMP_buffer[12][SMP_NUM];
+ 
+
+//采样指针	
+s16 	 SMP_point=0;
+
+u8	TIM3_LifeFlag;		//TIM3活动标志
+
+char 	 text[80];
+u8    OperSection;
+u8    Normal;
+bool     Flag_Eep_Oper=FALSE;	//EEP正在操作标志
+
+
+u8    Err;
+u8     Flag_Eep_DZ;//写参数标志
+
+u16   Flag_BHER;
+u16   Flag_BHALM;
+ 
+   
+u16   Event;
+u16   EventLen,EventSum;
+u16   EventRead1,EventRead2;
+ 
+u16 VAR_crc1;
+
+
+u16 SampleTime;
+
+u16	ID_Sdata=0;
+u16	NET_R_cnt=0;
+u8	uGhOvertime=0;
+
+ s32  UICLXS[15],UIBHXS[15];
+u16   Soe_num;
+u16   Event_num;
+s32    TEMP_P,TEMP_Q;
+//////////////////////////////////
+SoeList     ReadSoeBuf;
+u16	  	SOENote_info;
+ActionList  ReadEvtBuf;
+u16      	EventNote_Info;
+//////////////////////////////////
+MENU_IDC            IDC; 
+KC_List				Sys_KC_Tab;
+YB_List				Sys_YB_Tab;
+//通讯相关变量定义
+
+u32   CT_inf;  //CT变比
+u32   PT_inf;  //PT变比
+u16   W_THWFCZB;  //开关位置
+u16   UL_DOORNUM;  //开关位置
+
+u8 by_103SOESta;
+u8 P_Phase;
+
+   ACT	ACT_buffer; 
+
+ long  l_MeaChanVal[20];		//测量通道有效值
+
+ 
+ long  l_MeaValBuf[20];		//测量通道有效值
+ 
+//无符号10进制
+ u8 asc_tab1[] =
+{11,'0','1','2','3','4','5','6','7','8','9',' '};
+//无符号16进制
+ u8 asc_tab2[] =
+{17,'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F',' '};
+
+
+
+//量纲表
+uc8 LG_tab[10][2] =
+{
+	{"V"},
+	{" A"},
+	{" S"},
+	{"度"},
+	{"分"},
+	{" W"},  
+	{"乏"},
+	{"  "},
+	{"ms"},
+	{"HZ"},
+	
+};
+ 
+ 
+//*********************************************************
+//19.****	    保护动作/告警的参数描述          **********
+//*********************************************************
+//描述规则：
+//描述-最多8个汉字的描述
+//数据类型:0-浮点数;1-相位;2-HEX;
+//动作参数描述
+const  ParaTable ParaTab[]=
+{
+	//条目号	//描述			   数据类型		量纲
+
+    {Para_I,		" I= ",	    1,},
+	{Para_I0,	"3I0=",   	1,},
+	{Para_IL0,	"3I0=",   	1,},
+	{Para_IH0,	"3I0=",   	1,},
+    
+	{Para_F,	" F= ",	   	9,},
+	{15,	"IF2=",     1,},	
+	{16,	"UBP=",    	0,},
+    {17,	" U= ",	  	0,},    	
+    {18,	"I2= ",	    1,},
+    {19,	"IE= ",		1,},
+    {20,	"IP= ",		1,},
+	{37,	"3U0=",   	0,},    
+	{41,	"I1= ",	   	1,},
+    {Para_U0II,	" U= ",	  	0,}, 
+    {Para_UII,	" U= ",	  	0,}, 
+    {Para_CQD,	" I= ",	  	1,}, 
+};
+const	u8	NumOfDZGJGZ1=sizeof(ParaTab)/sizeof(ParaTab[0]);
+ 
+
+ 
+
+u16   Imax_Val;
+u16   Umax_Val,UmaxII_Val;
+//遥测量缓冲结构
+YC  UIPQ_buffer;
+////////////////////////////////////////////////////////////////////////////////////
+//						
+//						NP510据结构定义表								      //
+//
+////////////////////////////////////////////////////////////////////////////////////
+//0.	保护名称
+//1.	定值描述表及缺省定值表
+//2.	采样描述表
+//3.	保护测量类型描述表
+//4.	保护动作事件描述定义表
+//5.    保护告警事件描述定义表
+//6.    保护压板描述定义表
+//7.    缺省压板表
+//8.    开出描述定义表
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//------------------------------ 条件编译------------------------------------//
+
+								#ifdef ZRR900F
+
+//------------------------------ 条件编译------------------------------------//
+ 
+SetBuffBYQ RUN_SETBYQ,BAK_SETBYQ;	// 实际使用定值缓冲区,经过转换后,可直接进行比较.(64X2)
+SetBuffMOTO RUN_SETMOTO,BAK_SETMOTO;	// 实际使用定值缓冲区,经过转换后,可直接进行比较.(64X2)
+YBBYQ	RUN_YBBYQ,BAK_YBBYQ;
+YBMOTO	RUN_YBMOTO,BAK_YBMOTO;
+UIBYQ_buffer_Struct	UIBYQ_buffer;
+UIMOTO_buffer_Struct  UIMOTO_buffer;
+
+//2017.7.10
+//V1.05：1、统一处理事故记录缓冲区溢出导致装置型号自动恢复默认值问题；
+//		主要改动2处：GlobeDef.h中ParaValue结构体u8 Phase;移到data定义前；参数项数量preActionParaNum由2改为1；
+
+const  u8 CUP_NAME[]  ={"  线路保护测控装置"};
+const  u8 CUP_NAMEBYQ[]  ={" 变压器保护测控装置 "};
+const  u8 CUP_NAMEMOTO[] ={" 电动机保护测控装置"};
+
+const  u8 name_date[]={"2026年03月16日"};
+const  u8 name_VAR[]={"版本号:ATF3.03"};
+  
+u8  szType_NAME[]={"ZRR911F "};  
+u8  szType_NAMEBYQ[]={"ZRR921F "}; 
+u8  szType_NAMEMOTO[]={"ZRR951F "}; 
+
+const char KG1[3][9]={"0-退出","1-跳闸","2-告警"};
+const char KG2[2][9]={"0-退出","1-投入"};
+const char KG3[2][9]={"0-退出","1-跳闸"};
+
+const char KG4[4][9]={"  退出  ","单纯过流","闭锁过流","方向过流"};
+const char KG5[2][9]={" 操作板 "," 开入板 "};
+
+const char KG6[3][9]={"  退出  ","断线闭锁","断线开放"};
+const char KG7[4][9]={"  退出  "," 1-一般 "," 2-非常 "," 3-极端 "};
+const char KG8[4][9]={"  退出  ","低压动作","低压告警","失压动作"};
+
+//定值控制字列表
+//默认值是由类型字节描述
+const FixValue FixValueTableLN[]=
+{
+    //序号 名称   子目录个数       数据类型  最小值 最大值  默认值  比率系数（暂没用） 量纲  控制描述
+	{ 1, "1.线路参数",6,
+	             {{0, "PT断线",     0x10,     0,      2,       0, KK_Do, KK_Do,   " ",(const char*)KG6},
+	              {1, "电压闭锁",   0x22,     1000,   9999,    9000, KT_Do, KT_Do,  "V",NULL},
+	              {2, "控回断线",   0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	              {3, "CT变比  ",   0x40,     1,   9999,    1, KI_Do, KI_Rtn,  " ",NULL},
+	              {4, "PT一次值",   0x22,     10,  4000,    10, KI_Do, KI_Rtn,  "kV",NULL},
+	              {5, "跳合位源",   0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG5}}},
+	{ 2, "2.相间过流I段",3,
+	             {{6, "控制字",    0x10,       0,         3,      0, KK_Do, KK_Do,   " ",(const char*)KG4},
+	              {7, "电流",      0x22,       10,    9999,  1000, KI_Do, KI_Rtn,  "A",NULL},
+	              {8, "时间",      0x22,       0,      1000,  0, KT_Do, KT_Do,   "S",NULL}}},	
+	{ 3, "3.相间过流II段",3,
+	             {{9, "控制字",    0x10,       0,         3,      0, KK_Do, KK_Do,   " ",(const char*)KG4},
+	              {10, "电流",      0x22,       10,    9999,  750, KI_Do, KI_Rtn,  "A",NULL},
+	              {11, "时间",     0x22,       0,      9999,  50, KT_Do, KT_Do,   "S",NULL}}},		
+	{ 4, "4.相间过流III段",3,
+	             {{12, "控制字",    0x10,       0,         3,      0, KK_Do, KK_Do,   " ",(const char*)KG4},
+	              {13, "电流",      0x22,       10,    9999,  500, KI_Do, KI_Rtn,  "A",NULL},
+	              {14, "时间",     0x22,       0,      9999,  200, KT_Do, KT_Do,   "S",NULL}}},		
+	{ 5, "5.反时限过流",3,
+	             {{15, "控制字",   0x10,       0,         3,      0, KK_Do, KK_Do,   " ",(const char*)KG7},
+	              {16, "电流",     0x22,       10,    9999,   100, KI_Do, KI_Rtn,  "A",NULL},
+	              {17, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+	{ 6, "6.过负荷保护",3,
+	             {{18, "控制字",   0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {19, "电流",     0x22,       10,    9999,   300, KI_Do, KI_Rtn,  "A",NULL},
+	              {20, "时间",     0x31,       10,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+	{ 7, "7.重合闸",2,
+	             {{21, "控制字",   0x10,       0,         1,      0, KK_Do, KK_Do,   " ",(const char*)KG2},
+                  {22, "动作延时",     0x22,       10,      9999,   100, KT_Do, KT_Do,  "S",NULL}}},
+	//              {22, "脉冲时间",     0x22,       0,       999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+	{ 8, "8.加速段过流",3,
+	             {{23, "控制字",   0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG4},
+	              {24, "电流",     0x22,       10,    9999,   500, KI_Do, KI_Rtn,  "A",NULL},
+	              {25, "时间",     0x22,       0,      9999,  30, KT_Do, KT_Do,   "S",NULL}}},	
+	{ 9, "9.充电保护",3,
+	             {{26, "控制字",   0x10,       0,         1,      0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	              {27, "电流",     0x22,       10,    9999,   500, KI_Do, KI_Rtn,  "A",NULL},
+	              {28, "时间",     0x22,       0,      9999,  30, KT_Do, KT_Do,   "S",NULL}}},	
+	{ 10, "10.零序过流I段",3,
+	             {{29, "控制字",   0x10,       0,     2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {30, "电流", 	   0x22,       10,    9999,   500, KI_Do, KI_Rtn,  "A",NULL},
+	              {31, "时间",     0x22,       0,     9999,  50, KT_Do, KT_Do,   "S",NULL}}},	                     
+ 	{ 11, "11.零序过流II段",3,
+	             {{32, "控制字",   0x10,       0,     2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {33, "电流", 	   0x22,       10,    9999,   500, KI_Do, KI_Rtn,  "A",NULL},
+	              {34, "时间",     0x22,       0,     9999,  50, KT_Do, KT_Do,   "S",NULL}}},	                     
+	
+	{12, "12.过电压保护",3,
+	             {{35, "控制字",  0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {36, "电压",    0x32,       1000,    15000,  11000, KI_Do, KI_Rtn,  "V",NULL},
+	              {37, "时间",    0x22,       5,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+	{13, "13.低电压保护",3,
+	             {{38, "控制字",  0x10,       0,         3,      0, KK_Do, KK_Do,   " ",(const char*)KG8},
+	              {39, "电压",    0x32,       1000,    10000,  8000, KI_Do, KI_Rtn,  "V",NULL},
+	              {40, "时间",    0x22,       5,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+	{ 14, "14.低频保护",4,
+	             {{41, "控制字",   0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {42, "频率",     0x22,       4300,    5000,   4900, KI_Do, KI_Rtn,  "HZ",NULL},
+	              {43, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL},	
+                  {44, "闭锁电流", 0x22,       10,    9999,   100, KI_Do, KI_Rtn,  "A",NULL}}},
+};
+uc8 NumOfSetLN=sizeof(FixValueTableLN)/sizeof(FixValueTableLN[0]);
+
+const FixValue FixBYQValueTable[]=
+{
+//序号 名称   子目录个数       数据类型  最小值 最大值  默认值  比率系数（暂没用） 量纲  控制描述
+		{ 1, "1.变压器参数",5,
+	             {{0, "PT断线",     0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	              {1, "控回断线",   0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	              {2, "CT变比  ",   0x40,     1,   9999,    1, KI_Do, KI_Rtn,  " ",NULL},
+	              {3, "PT一次值",   0x22,     10,  4000,    10, KI_Do, KI_Rtn,  "kV",NULL},
+	              {4, "跳合位源",   0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG5}}},
+	{ 2, "2.相间过流I段",3,
+	             {{5, "控制字",    0x10,       0,         1,      0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	              {6, "电流",      0x22,       10,    9999,  500, KI_Do, KI_Rtn,  "A",NULL},
+	              {7, "时间",      0x22,       0,      1000,  0, KT_Do, KT_Do,   "S",NULL}}},	
+	{ 3, "3.相间过流II段",3,
+	             {{8, "控制字",    0x10,       0,         1,      0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	              {9, "电流",      0x22,       10,    9999,  500, KI_Do, KI_Rtn,  "A",NULL},
+	              {10, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},		
+	{ 4, "4.反时限过流",3,
+	             {{11, "控制字",   0x10,       0,         3,      0, KK_Do, KK_Do,   " ",(const char*)KG7},
+	              {12, "电流",     0x22,       10,    9999,   500, KI_Do, KI_Rtn,  "A",NULL},
+	              {13, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+    {5, "5.过负荷保护",3,
+	             {{14, "控制字",   0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {15, "电流",     0x22,       10,    9999,   500, KI_Do, KI_Rtn,  "A",NULL},
+	              {16, "时间",     0x31,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+   { 6, "6.高压侧零序",3,
+	             {{17, "控制字",   0x10,       0,     2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {18, "电流", 	   0x22,       10,    9999,   500, KI_Do, KI_Rtn,  "A",NULL},
+	              {19, "时间",     0x22,       0,     9999,  50, KT_Do, KT_Do,   "S",NULL}}},	                     
+    { 7, "7.重瓦斯保护",2,
+	             {{20, "控制字",   0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {21, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+    { 8, "8.轻瓦斯保护",2,
+	             {{22, "控制字",   0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {23, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+    { 9, "9.超高温保护",2,
+	             {{24, "控制字",   0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {25, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+    { 10, "10.温度高保护",2,
+	             {{26, "控制字",   0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {27, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+	{11, "11.低电压保护",3,
+	             {{28, "控制字",  0x10,       0,         3,      0, KK_Do, KK_Do,   " ",(const char*)KG8},
+	              {29, "电压",    0x32,       1000,    10000,  8000, KI_Do, KI_Rtn,  "V",NULL},
+	              {30, "时间",    0x22,       5,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},		
+};
+uc8 NumOfSetBYQ=sizeof(FixBYQValueTable)/sizeof(FixBYQValueTable[0]);
+
+const FixValue FixMOTOValueTable[]=
+{
+    //序号 名称   子目录个数       数据类型  最小值 最大值  默认值  比率系数（暂没用） 量纲  控制描述
+ 	{ 1, "1.电动机参数",7,
+	             {{0, "PT断线",     0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	              {1, "额定电流",   0x22,     20,   9999,    1000, KT_Do, KT_Do,  "A",NULL},
+                  {2, "启动时间",   0x22,     0,   9999,    1000, KT_Do, KT_Do,  "S",NULL},	                    
+                  {3, "控回断线",   0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	              {4, "CT变比  ",   0x40,     1,   9999,    1, KI_Do, KI_Rtn,  " ",NULL},
+	              {5, "PT一次值",   0x22,     10,  4000,    10, KI_Do, KI_Rtn,  "kV",NULL},
+	              {6, "跳合位源",   0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG5}}},
+  	{ 2, "2.电流速断",4,
+	             {{7, "控制字",    0x10,       0,         1,      0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	              {8, "高电流",      0x22,       10,    9999, 800, KI_Do, KI_Rtn,  "A",NULL},	            
+	              {9, "低电流",      0x22,       10,    9999,  500, KI_Do, KI_Rtn,  "A",NULL},	              
+	              {10, "时间",      0x22,       0,      1000,  0, KT_Do, KT_Do,   "S",NULL}}},	
+	{ 3, "3.相间过流",3,
+	             {{11, "控制字",    0x10,       0,         1,      0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	              {12, "电流",      0x22,       10,    9999,  500, KI_Do, KI_Rtn,  "A",NULL},
+	              {13, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},		
+	{ 4, "4.负序过流",3,
+	             {{14, "控制字",    0x10,       0,         1,      0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	              {15, "负序电流",      0x22,       10,    9999,  500, KI_Do, KI_Rtn,  "A",NULL},
+	              {16, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},		
+	{ 5, "5.反时限过流",3,
+	             {{17, "控制字",   0x10,       0,         3,      0, KK_Do, KK_Do,   " ",(const char*)KG7},
+	              {18, "电流",     0x22,       10,    9999,   500, KI_Do, KI_Rtn,  "A",NULL},
+	              {19, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+	{ 6, "6.长启动保护",1,   
+                  {{20, "控制字",    0x10,       0,         1,      0, KK_Do, KK_Do,   " ",(const char*)KG2}}},
+    { 7, "7.堵转保护",3,
+	             {{21, "控制字",   0x10,       0,         1,      0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	              {22, "电流",     0x22,       10,    9999,   500, KI_Do, KI_Rtn,  "A",NULL},
+	              {23, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+	{ 8, "8.过负荷保护",3,
+	             {{24, "控制字",   0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {25, "电流",     0x22,       10,    9999,   500, KI_Do, KI_Rtn,  "A",NULL},
+	              {26, "时间",     0x31,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+	{ 9, "9.零序过流",3,
+	             {{27, "控制字",   0x10,       0,     2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {28, "电流", 	   0x22,       10,    9999,   500, KI_Do, KI_Rtn,  "A",NULL},
+	              {29, "时间",     0x22,       0,     9999,  50, KT_Do, KT_Do,   "S",NULL}}},	                     
+ 	{10, "10.过电压保护",3,
+	             {{30, "控制字",  0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {31, "电压",    0x32,       1000,    15000,  11000, KI_Do, KI_Rtn,  "V",NULL},
+	              {32, "时间",    0x22,       5,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+	{11, "11.欠电压保护",3,
+	             {{33, "控制字",  0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {34, "电压",    0x32,       1000,    10000,  8000, KI_Do, KI_Rtn,  "V",NULL},
+	              {35, "时间",    0x22,       5,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+   { 12, "12.本体保护1",2,
+	             {{36, "控制字",   0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {37, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+   { 13, "13.本体保护2",2,
+	             {{38, "控制字",   0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {39, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+   { 14, "14.本体保护3",2,
+	             {{40, "控制字",   0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {41, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	 
+};
+uc8 NumOfSetMOTO=sizeof(FixMOTOValueTable)/sizeof(FixMOTOValueTable[0]);
+
+//保护采样值描述表
+const MEATABLE MeaValTab[]=
+{
+	{	"Ia =",		" A  " ,MEAKIND_I  },
+	{	"Ib =",		" A  " ,MEAKIND_I  },
+	{ 	"Ic =",		" A  " ,MEAKIND_I  },
+	{	"3I0=",		" A  " ,MEAKIND_I  },
+	{ 	"Ua=",		" V  " ,MEAKIND_U  },
+	{  	"Ub=", 	    " V  " ,MEAKIND_U  },	
+	{ 	"Uc=",    	" V  " ,MEAKIND_U  },
+	{ 	"Uab=",		" V  " ,MEAKIND_U  },
+	{  	"Ubc=", 	" V  " ,MEAKIND_U  },	
+	{ 	"Uca=", 	" V  " ,MEAKIND_U  },
+	{ 	"  F=", 	" Hz " ,MEAKIND_F  },	
+};
+uc8 NumOfCY=sizeof(MeaValTab)/sizeof(MeaValTab[0]);
+ 
+//遥测表
+const MEATABLE MeaValTab1[]=
+{
+	{   	"Ia =",		" A  ",   MEAKIND_I,   MEA103_I },
+	{   	"Ib =",		" A  ",   MEAKIND_I,   MEA103_I },
+	{       "Ic =",		" A  ",   MEAKIND_I,   MEA103_I },
+	{       "Ua=",		" V  ",   MEAKIND_U,   MEA103_U },
+	{       "Ub=",   	" V  ",   MEAKIND_U,   MEA103_U },
+	{       "Uc=",		" V  ",   MEAKIND_U,   MEA103_U },
+	{       "Uab=", 	" V  ",   MEAKIND_U,   MEA103_U },	
+	{       "Ubc=",		" V  ",   MEAKIND_U,   MEA103_U },
+	{       "Uca=", 	" V  ",   MEAKIND_U,   MEA103_U },
+	{       " P =", 	" W  ",   MEAKIND_P,   MEA103_P },
+	{       " Q =", 	" VAR",   MEAKIND_P,   MEA103_P },
+	{       "COS=", 	"    ",   MEAKIND_K,   MEA103_K },
+	{       " F =", 	" Hz ",   MEAKIND_F,    MEA103_F },
+
+};
+uc8 NumOfYC1=sizeof(MeaValTab1)/sizeof(MeaValTab1[0]);
+
+const MEATABLE MeaValTabBYQ[]=
+{
+   	{	"Ia =",		" A  " ,MEAKIND_I  },
+	{	"Ib =",		" A  " ,MEAKIND_I  },
+	{ 	"Ic =",		" A  " ,MEAKIND_I  },
+	{	"IH0=",		" A  " ,MEAKIND_I  },
+	{ 	"Ua=",		" V  " ,MEAKIND_U  },
+	{  	"Ub=", 	    " V  " ,MEAKIND_U  },	
+	{ 	"Uc=",    	" V  " ,MEAKIND_U  },
+	{ 	"Uab=",		" V  " ,MEAKIND_U  },
+	{  	"Ubc=", 	" V  " ,MEAKIND_U  },	
+	{ 	"Uca=", 	" V  " ,MEAKIND_U  },
+	{ 	"  F=", 	" Hz " ,MEAKIND_F  },	
+};
+uc8 NumOfCYBYQ=sizeof(MeaValTabBYQ)/sizeof(MeaValTabBYQ[0]);
+
+ 
+const MEATABLE MeaValTabMOTO[]=
+{
+   	{	"Ia =",		" A  " ,MEAKIND_I  },
+	{	"Ib =",		" A  " ,MEAKIND_I  },
+	{ 	"Ic =",		" A  " ,MEAKIND_I  },
+	{	"3I0=",		" A  " ,MEAKIND_I  },
+	{	"IF2=",		" A  " ,MEAKIND_I  }, 
+	{ 	"Ua=",		" V  " ,MEAKIND_U  },
+	{  	"Ub=", 	    " V  " ,MEAKIND_U  },	
+	{ 	"Uc=",    	" V  " ,MEAKIND_U  },
+	{ 	"Uab=",		" V  " ,MEAKIND_U  },
+	{  	"Ubc=", 	" V  " ,MEAKIND_U  },	
+	{ 	"Uca=", 	" V  " ,MEAKIND_U  },
+	{ 	"  F=", 	" Hz " ,MEAKIND_F  },	
+};
+uc8 NumOfCYMOTO=sizeof(MeaValTabMOTO)/sizeof(MeaValTabMOTO[0]);
+
+
+ 
+//****************************************************
+//*******10、 保护压板描述定义表     ******
+//****************************************************
+
+const YBTABLE ybTab_LN[]={
+	{	"过流I段"},
+	{	"过流II段"},
+	{	"过流III段"},
+	{	"反时限过流"},    
+ 	{	"过负荷保护"},   
+ 	{	"重合闸"},   
+   	{	"加速保护"},	  
+ 	{	"充电保护"},	   
+	{	"零流I段"},		
+    {	"零流II段"},		
+
+	{	"过电压保护"},
+	{	"低电压保护"},
+	{	"低频保护  "},				
+};
+uc8 NumOfYBLN=sizeof(ybTab_LN)/sizeof(ybTab_LN[0]);
+
+const YBTABLE ybTab_BYQ[]={
+	{	"过流I段"},
+	{	"过流II段"},
+	{	"反时限过流"},	
+	{	"过负荷保护"},	    
+	{	"高压侧零流"},		
+	{	"重瓦斯保护"},		
+	{	"轻瓦斯保护"},				
+	{	"超高温保护"},			
+	{	"温度高保护"},		
+	{	"低电压保护"},			
+};
+uc8 NumOfYBBYQ=sizeof(ybTab_BYQ)/sizeof(ybTab_BYQ[0]);
+
+const YBTABLE ybTab_MOTO[]={
+	{	"电流速断"},
+    {	"相间过流"},
+	{	"负序过流" },
+	{	"反时限过流"},
+	{	"长启动保护"},
+	{	"堵转保护"},
+	{	"过负荷保护"},
+	{	"零序电流"},
+	{	"过电压保护"},
+	{	"欠电压保护"},
+	{	"本体1保护"},
+	{	"本体2保护"},
+	{	"本体3保护"},
+};
+uc8 NumOfYBMOTO=sizeof(ybTab_MOTO)/sizeof(ybTab_MOTO[0]);
+
+/**********************************************/
+//*******4、  保护动作事件描述及SOE定义表 ******//
+//***********************************************//
+const SoftYxTable tEvtTab_LN[]=
+{
+  
+ 	//条目号        描述         SOE编号         参数项数     参数类型1   	
+    {   TRIPEVENT|0,		"保护启动    ",	      SOE_DZ|0,      0,     	   },  
+	{   TRIPEVENT|1,	   	"过流I段动作",        SOE_DZ|1,     1,          Para_I,  	 },
+	{	TRIPEVENT|2,	   	"过流II段动作",       SOE_DZ|2,     1,          Para_I,      },
+	{	TRIPEVENT|3,	  	"过流III段动作",      SOE_DZ|3,     1,          Para_I,  	 },
+    {   TRIPEVENT|4,		"零流I段动作",	      SOE_DZ|4,     1,          Para_I0,   	 },
+    {   TRIPEVENT|5,		"零流II段动作",	      SOE_DZ|5,     1,          Para_I0,   	 },	
+    {   TRIPEVENT|6,		"电流加速动作",	      SOE_DZ|6,    1,          Para_I,    	 },
+    {   TRIPEVENT|7,		"过电压动作",	      SOE_DZ|7,    1,          Para_U,    	 },
+    {   TRIPEVENT|8,		"低电压动作",	      SOE_DZ|8,    1,          Para_U,    	 },       
+    {   TRIPEVENT|9,		"重合闸动作  ",	      SOE_DZ|9,    0,          Para_I,    	 },
+    {   TRIPEVENT|10,		"电流反时限动作",	  SOE_DZ|10,   1,          Para_IP,   	 },
+    {   TRIPEVENT|11,		"充电保护动作",	      SOE_DZ|11,     1,          Para_I,    	 },
+    {   TRIPEVENT|12,		"低频保护动作",	      SOE_DZ|12,      1,          Para_F,    	 },
+    {   TRIPEVENT|13,		"过负荷动作",	      SOE_DZ|13,      1,         Para_I,    	 },
+ 	{   TRIPEVENT|14,		"失压保护动作",	      SOE_DZ|14,      1,         Para_U, },
+ 	{   TRIPEVENT|15,		"备用       ",	      SOE_DZ|15,      0,                 },
+ 	{   TRIPEVENT|16,		"备用       ",	      SOE_DZ|16,      0,                 },
+ 	{   TRIPEVENT|17,		"备用       ",	      SOE_DZ|17,      0,                 },
+ 	{   TRIPEVENT|18,		"备用       ",	      SOE_DZ|18,      0,                 },
+ 	{   TRIPEVENT|19,		"备用       ",	      SOE_DZ|19,      0,                 },
+ 	{   TRIPEVENT|20,		"备用       ",	      SOE_DZ|20,      0,                 },
+ 	{   TRIPEVENT|21,		"备用       ",	      SOE_DZ|21,      0,                 },
+ 	{   TRIPEVENT|22,		"备用       ",	      SOE_DZ|22,      0,                 },
+ 	{   TRIPEVENT|23,		"备用       ",	      SOE_DZ|23,      0,                 },
+ 	{   TRIPEVENT|24,		"备用       ",	      SOE_DZ|24,      0,                 },
+ 	{   TRIPEVENT|25,		"备用       ",	      SOE_DZ|25,      0,                 },
+ 	{   TRIPEVENT|26,		"备用       ",	      SOE_DZ|26,      0,                 },
+ 	{   TRIPEVENT|27,		"备用       ",	      SOE_DZ|27,      0,                 },
+ 	{   TRIPEVENT|28,		"备用       ",	      SOE_DZ|28,      0,                 },
+ 	{   TRIPEVENT|29,		"备用       ",	      SOE_DZ|29,      0,                 },
+ 	{   TRIPEVENT|30,		"备用       ",	      SOE_DZ|30,      0,                 },     
+  	{   TRIPEVENT|31,	   	"事故总信号  ",	      SOE_DZ|31,      0, 	             },
+    
+  	{   FAILEVENT|0,	   "存储器出错  ",	        SOE_GJ|0,      0,			    	},
+	{	FAILEVENT|1,	   "定值校验出错",          SOE_GJ|1,      0,				    },
+	{	FAILEVENT|2,	   "AD检测出错 ",           SOE_GJ|2,       0,					},	
+	{	FAILEVENT|3,	   "备用        ",          SOE_GJ|3,       0, 				},
+	{	FAILEVENT|4,	   "备用        ",          SOE_GJ|4,       0, 				},
+	{	FAILEVENT|5,	   "低频保护告警",          SOE_GJ|5,      0, 				},
+	{	FAILEVENT|6,	   "过负荷告警  ",          SOE_GJ|6,      0, 				},
+	{	FAILEVENT|7,	   "TWJ异常     ",          SOE_GJ|7,      0,					},
+	{	FAILEVENT|8,	   "PT断线告警  ",          SOE_GJ|8,      0,					},
+	{	FAILEVENT|9,	   "弹簧未储能  ",          SOE_GJ|9,      0,					},
+	{	FAILEVENT|10,	   "控制回路断线",          SOE_GJ|10,       0,				},
+	{	FAILEVENT|11,	   "过电压告警  ",          SOE_GJ|11,       0,	    		},
+	{	FAILEVENT|12,	   "低电压告警  ",          SOE_GJ|12,       0, 				},
+	{	FAILEVENT|13,	   "零流I段告警",           SOE_GJ|13,       0, 				},
+	{	FAILEVENT|14,	   "零流II段告警",          SOE_GJ|14,       0, 				},
+	{	FAILEVENT|15,	   "备用        ",          SOE_GJ|15,       0, 				},
+	{	FAILEVENT|16,	   "备用        ",          SOE_GJ|16,       0, 				},
+	{	FAILEVENT|17,	   "备用        ",          SOE_GJ|17,       0, 				},
+	{	FAILEVENT|18,	   "备用        ",          SOE_GJ|18,       0, 				},
+	{	FAILEVENT|19,	   "备用        ",          SOE_GJ|19,       0, 				},
+	{	FAILEVENT|20,	   "备用        ",          SOE_GJ|20,       0, 				},
+	{	FAILEVENT|21,	   "备用        ",          SOE_GJ|21,       0, 				},
+	{	FAILEVENT|22,	   "备用        ",          SOE_GJ|22,       0, 				},
+	{	FAILEVENT|23,	   "备用        ",          SOE_GJ|23,       0, 				},
+	{	FAILEVENT|24,	   "备用        ",          SOE_GJ|24,       0, 				},
+	{	FAILEVENT|25,	   "备用        ",          SOE_GJ|25,       0, 				},
+	{	FAILEVENT|26,	   "备用        ",          SOE_GJ|26,       0, 				},
+	{	FAILEVENT|27,	   "备用        ",          SOE_GJ|27,       0, 				},
+	{	FAILEVENT|28,	   "备用        ",          SOE_GJ|28,       0, 				},
+	{	FAILEVENT|29,	   "备用        ",          SOE_GJ|29,       0, 				},
+	{	FAILEVENT|30,	   "备用        ",          SOE_GJ|30,       0, 				},
+	{	FAILEVENT|31,	   "告警总信号  ",          SOE_GJ|31,       0,				},	 
+  
+              
+
+	
+};
+uc8 NumOfEventLN=sizeof(tEvtTab_LN)/sizeof(tEvtTab_LN[0]);
+
+
+ 
+//变压器保护动作事件描述及SOE定义表
+const SoftYxTable tEvtTab_BYQ[]=
+{
+  	//条目号        描述         SOE编号              参数项数     参数类型1   
+   {    TRIPEVENT|0,		"保护启动    ",	      SOE_DZ|0,       0,     	      },
+	{   TRIPEVENT|1,	   	"过流I段动作 ",       SOE_DZ|1,       1,          Para_I,  	 },
+	{	TRIPEVENT|2,	   	"过流II段动作",       SOE_DZ|2,       1,          Para_I,      },
+    {   TRIPEVENT|3,		"反时限动作  ",	      SOE_DZ|3,       1,          Para_IP,   	 },
+    {   TRIPEVENT|4,		"过负荷动作  ",	      SOE_DZ|4,       1,          Para_I,   	 },   
+    {   TRIPEVENT|5,		"高侧零序动作",	      SOE_DZ|5,       1,          Para_IH0,   	 },
+    {   TRIPEVENT|6,		"备用        ",	      SOE_DZ|6,       1,          Para_IL0,   	 }, 
+    {   TRIPEVENT|7,		"重瓦斯动作  ",	      SOE_DZ|7,       0,                 	 },
+    {   TRIPEVENT|8,		"轻瓦斯动作  ",	      SOE_DZ|8,       0,                 	 },
+    {   TRIPEVENT|9,		"超高温动作  ",	      SOE_DZ|9,       0,                 	 },
+    {   TRIPEVENT|10,		"温度高动作  ",	      SOE_DZ|10,      0,                 	 },
+    {   TRIPEVENT|11,		"低电压动作",	      SOE_DZ|11,      1,          Para_U,    	 },
+ 	{   TRIPEVENT|12,		"失压保护动作",	      SOE_DZ|12,      1,          Para_U, },    
+ 	{   TRIPEVENT|13,		"备用       ",	      SOE_DZ|13,      0,                 },
+ 	{   TRIPEVENT|14,		"备用       ",	      SOE_DZ|14,      0,                 },
+ 	{   TRIPEVENT|15,		"备用       ",	      SOE_DZ|15,      0,                 },
+ 	{   TRIPEVENT|16,		"备用       ",	      SOE_DZ|16,      0,                 },
+ 	{   TRIPEVENT|17,		"备用       ",	      SOE_DZ|17,      0,                 },
+ 	{   TRIPEVENT|18,		"备用       ",	      SOE_DZ|18,      0,                 },
+ 	{   TRIPEVENT|19,		"备用       ",	      SOE_DZ|19,      0,                 },
+ 	{   TRIPEVENT|20,		"备用       ",	      SOE_DZ|20,      0,                 },
+ 	{   TRIPEVENT|21,		"备用       ",	      SOE_DZ|21,      0,                 },
+ 	{   TRIPEVENT|22,		"备用       ",	      SOE_DZ|22,      0,                 },
+ 	{   TRIPEVENT|23,		"备用       ",	      SOE_DZ|23,      0,                 },
+ 	{   TRIPEVENT|24,		"备用       ",	      SOE_DZ|24,      0,                 },
+ 	{   TRIPEVENT|25,		"备用       ",	      SOE_DZ|25,      0,                 },
+ 	{   TRIPEVENT|26,		"备用       ",	      SOE_DZ|26,      0,                 },
+ 	{   TRIPEVENT|27,		"备用       ",	      SOE_DZ|27,      0,                 },
+ 	{   TRIPEVENT|28,		"备用       ",	      SOE_DZ|28,      0,                 },
+ 	{   TRIPEVENT|29,		"备用       ",	      SOE_DZ|29,      0,                 },
+ 	{   TRIPEVENT|30,		"备用       ",	      SOE_DZ|30,      0,                 },
+  	{   TRIPEVENT|31,	   	"事故总信号  ",	      SOE_DZ|31,      0, 	             },
+	
+	{   FAILEVENT|0,	   	"存储器出错  ",	       SOE_GJ|0,   0,			    		},
+	{	FAILEVENT|1,	   	"定值校验出错",        SOE_GJ|1,     0,				     	},
+	{	FAILEVENT|2,	   	"AD1检测出错 ",        SOE_GJ|2,     0,						},
+	{	FAILEVENT|3,	   	"低电压告警 ",         SOE_GJ|3,     0,						},
+     {	FAILEVENT|4,	   	"重瓦斯告警  ",        SOE_GJ|4,    0,						},
+    {	FAILEVENT|5,	   	"轻瓦斯告警  ",        SOE_GJ|5,     0,						},
+    {	FAILEVENT|6,	   	"超高温告警  ",        SOE_GJ|6,     0,						},
+    {	FAILEVENT|7,	   	"温度高告警  ",        SOE_GJ|7,     0,						},
+    {	FAILEVENT|8,	   	"TWJ异常     ",        SOE_GJ|8,    0,						},
+	{	FAILEVENT|9,	   	"PT断线告警  ",        SOE_GJ|9,    0,						},
+	{	FAILEVENT|10,	  	"弹簧未储能  ",        SOE_GJ|10,    0,						},
+	{	FAILEVENT|11,	  	"控制回路断线",        SOE_GJ|11,   0,						},
+	{	FAILEVENT|12,	  	"过负荷告警  ",        SOE_GJ|12,    0,	    		},
+	{	FAILEVENT|13,	  	"高侧零序告警",        SOE_GJ|13,   0, 				},
+	{	FAILEVENT|14,	  	"备用        ",        SOE_GJ|14,   0, 				},
+	{	FAILEVENT|15,	    "备用        ",        SOE_GJ|15,       0, 				},
+	{	FAILEVENT|16,	    "备用        ",        SOE_GJ|16,       0, 				},
+	{	FAILEVENT|17,	    "备用        ",        SOE_GJ|17,       0, 				},
+	{	FAILEVENT|18,	    "备用        ",        SOE_GJ|18,       0, 				},
+	{	FAILEVENT|19,	    "备用        ",        SOE_GJ|19,       0, 				},
+	{	FAILEVENT|20,	    "备用        ",        SOE_GJ|20,       0, 				},
+	{	FAILEVENT|21,	    "备用        ",        SOE_GJ|21,       0, 				},
+	{	FAILEVENT|22,	    "备用        ",        SOE_GJ|22,       0, 				},
+	{	FAILEVENT|23,	    "备用        ",        SOE_GJ|23,       0, 				},
+	{	FAILEVENT|24,	    "备用        ",        SOE_GJ|24,       0, 				},
+	{	FAILEVENT|25,	    "备用        ",        SOE_GJ|25,       0, 				},
+	{	FAILEVENT|26,	    "备用        ",        SOE_GJ|26,       0, 				},
+	{	FAILEVENT|27,	    "备用        ",        SOE_GJ|27,       0, 				},
+	{	FAILEVENT|28,	    "备用        ",        SOE_GJ|28,       0, 				},
+	{	FAILEVENT|29,	    "备用        ",        SOE_GJ|29,       0, 				},
+	{	FAILEVENT|30,	    "备用        ",        SOE_GJ|30,       0, 				},
+	{	FAILEVENT|31,	   	"告警总信号  ",        SOE_GJ|31,       0,				},	
+  
+	
+};
+uc8 NumOfEventBYQ=sizeof(tEvtTab_BYQ)/sizeof(tEvtTab_BYQ[0]);
+
+
+//电动机保护动作事件描述及SOE定义表
+const SoftYxTable tEvtTab_MOTO[]=
+{
+  //条目号        描述         SOE编号         参数项数     参数类型1 
+    {   TRIPEVENT|0,		"保护启动    ",	      SOE_DZ|0,       0,     	 },  		
+	{   TRIPEVENT|1,	   	"电流速断动作",       SOE_DZ|1,       1,          Para_I,   	 },
+	{	TRIPEVENT|2,	   	"相间过流动作",       SOE_DZ|2,       1,          Para_I,        },	
+	{	TRIPEVENT|3,	  	"负序电流动作",       SOE_DZ|3,       1,          Para_I2,       },
+    {   TRIPEVENT|4,		"反时限动作  ",	      SOE_DZ|4,       1,          Para_IP,   	 },
+    {   TRIPEVENT|5,		"电机堵转动作",	      SOE_DZ|5,       1,          Para_I,    	 },
+ 	{	TRIPEVENT|6,	   	"过负荷动作  ",       SOE_DZ|6,       1,          Para_I,        },
+    {   TRIPEVENT|7,		"零序电流动作",	      SOE_DZ|7,       1,          Para_I0,   	 },
+    {   TRIPEVENT|8,		"过电压动作  ",	      SOE_DZ|8,       1,          Para_U,    	 },
+    {   TRIPEVENT|9,		"欠电压动作  ",	      SOE_DZ|9,       1,          Para_U,    	 },
+    {   TRIPEVENT|10,		"长启动动作  ",	      SOE_DZ|10,      1,          Para_CQD,    	 },
+    {   TRIPEVENT|11,		"本体保护1   ",	      SOE_DZ|11,      0,      	             },
+    {   TRIPEVENT|12,		"本体保护2   ",	      SOE_DZ|12,      0,                 	 },
+    {   TRIPEVENT|13,		"本体保护3   ",	      SOE_DZ|13,      0,                 	 },  
+ 	{   TRIPEVENT|14,		"备用       ",	      SOE_DZ|14,      0,                 },
+ 	{   TRIPEVENT|15,		"备用       ",	      SOE_DZ|15,      0,                 },
+ 	{   TRIPEVENT|16,		"备用       ",	      SOE_DZ|16,      0,                 },
+ 	{   TRIPEVENT|17,		"备用       ",	      SOE_DZ|17,      0,                 },
+ 	{   TRIPEVENT|18,		"备用       ",	      SOE_DZ|18,      0,                 },
+ 	{   TRIPEVENT|19,		"备用       ",	      SOE_DZ|19,      0,                 },
+ 	{   TRIPEVENT|20,		"备用       ",	      SOE_DZ|20,      0,                 },
+ 	{   TRIPEVENT|21,		"备用       ",	      SOE_DZ|21,      0,                 },
+ 	{   TRIPEVENT|22,		"备用       ",	      SOE_DZ|22,      0,                 },
+ 	{   TRIPEVENT|23,		"备用       ",	      SOE_DZ|23,      0,                 },
+ 	{   TRIPEVENT|24,		"备用       ",	      SOE_DZ|24,      0,                 },
+ 	{   TRIPEVENT|25,		"备用       ",	      SOE_DZ|25,      0,                 },
+ 	{   TRIPEVENT|26,		"备用       ",	      SOE_DZ|26,      0,                 },
+ 	{   TRIPEVENT|27,		"备用       ",	      SOE_DZ|27,      0,                 },
+ 	{   TRIPEVENT|28,		"备用       ",	      SOE_DZ|28,      0,                 },
+ 	{   TRIPEVENT|29,		"备用       ",	      SOE_DZ|29,      0,                 },
+ 	{   TRIPEVENT|30,		"备用       ",	      SOE_DZ|30,      0,                 },
+    {   TRIPEVENT|31,	   	"事故总信号  ",	      SOE_DZ|31,      0, 	                 },
+  
+	{   FAILEVENT|0,		"存储器出错  ",	      SOE_GJ|0,       0,			    		},
+	{	FAILEVENT|1,		"定值校验出错",       SOE_GJ|1,       0,				     	},
+	{	FAILEVENT|2,		"AD1检测出错 ",       SOE_GJ|2,       0,						}, 
+	{	FAILEVENT|3,	    "备用        ",       SOE_GJ|3,       0, 				},    
+    {	FAILEVENT|4,		"本体保护1告警",      SOE_GJ|4,       0,						},
+    {	FAILEVENT|5,		"本体保护2告警",      SOE_GJ|5,      0,						},
+    {	FAILEVENT|6,		"本体保护3告警",      SOE_GJ|6,      0,						},
+    {	FAILEVENT|7,	    "过电压告警   ",      SOE_GJ|7,     0,	    		},
+	{	FAILEVENT|8,	    "欠电压告警   ",      SOE_GJ|8,     0, 				},
+    {	FAILEVENT|9,		"TWJ异常      ",      SOE_GJ|9,      0,						},
+	{	FAILEVENT|10,		"PT断线告警   ",      SOE_GJ|10,      0,						},
+	{	FAILEVENT|11,	    "弹簧未储能   ",      SOE_GJ|11,      0,						},
+	{	FAILEVENT|12,	    "控制回路断线 ",      SOE_GJ|12,      0,						},
+    {	FAILEVENT|13,	    "过负荷告警   ",      SOE_GJ|13,     0, 				},
+    {	FAILEVENT|14,	    "零序电流告警 ",      SOE_GJ|14,     0, 				},    
+	{	FAILEVENT|15,	    "备用        ",       SOE_GJ|15,       0, 				},
+	{	FAILEVENT|16,	    "备用        ",       SOE_GJ|16,       0, 				},
+	{	FAILEVENT|17,	    "备用        ",       SOE_GJ|17,       0, 				},
+	{	FAILEVENT|18,	    "备用        ",       SOE_GJ|18,       0, 				},
+	{	FAILEVENT|19,	    "备用        ",       SOE_GJ|19,       0, 				},
+	{	FAILEVENT|20,	    "备用        ",       SOE_GJ|20,       0, 				},
+	{	FAILEVENT|21,	    "备用        ",       SOE_GJ|21,       0, 				},
+	{	FAILEVENT|22,	    "备用        ",       SOE_GJ|22,       0, 				},
+	{	FAILEVENT|23,	    "备用        ",       SOE_GJ|23,       0, 				},
+	{	FAILEVENT|24,	    "备用        ",       SOE_GJ|24,       0, 				},
+	{	FAILEVENT|25,	    "备用        ",       SOE_GJ|25,       0, 				},
+	{	FAILEVENT|26,	    "备用        ",       SOE_GJ|26,       0, 				},
+	{	FAILEVENT|27,	    "备用        ",       SOE_GJ|27,       0, 				},
+	{	FAILEVENT|28,	    "备用        ",       SOE_GJ|28,       0, 				},
+	{	FAILEVENT|29,	    "备用        ",       SOE_GJ|29,       0, 				},
+	{	FAILEVENT|30,	    "备用        ",       SOE_GJ|30,       0, 				},
+   	{	FAILEVENT|31,		"告警总信号  ",       SOE_GJ|31,       0,						},		              
+
+
+};
+uc8 NumOfEventMOTO=sizeof(tEvtTab_MOTO)/sizeof(tEvtTab_MOTO[0]);
+
+
+
+
+//****************************************************
+//*******11、 开入描述定义表(MMI)               ******
+//****************************************************
+const TDOTABLE tDITab_Default[]={
+ 	{	0, "闭锁重合闸"},
+    {	1, "备用开入1"},
+    {	2, "备用开入2"},
+    {	3, "备用开入3"},
+    {	4, "备用开入4"},
+    {	5, "备用开入5"},
+    {	6, "备用开入6"},
+    {	7, "弹簧未储能"},
+    {	8, "远方就地"},
+    {	9,"手跳开入"},
+    {	10, "开入合位"},
+    {	11, "开入跳位"},
+    {	12, "操作板合位"},
+    { 	13, "操作板跳位"},
+
+};
+uc8 NumOfDI_Default=sizeof(tDITab_Default)/sizeof(tDITab_Default[0]);
+
+const TDOTABLE tDITab_DefaultBYQ[]={
+ 	{	0, "备用开入1"},  
+    {	1, "重瓦斯/备用"},
+    {	2, "轻瓦斯/备用"},
+    {	3, "超高温/备用"},
+    {	4, "高温/备用"},
+    {	5, "备用开入6"},
+    {	6, "备用开入7"},
+    {	7, "弹簧未储能"},
+    {	8, "远方就地"},
+    {	9, "手跳开入"},
+    {	10, "开入合位"},
+    {	11, "开入跳位"},
+    {	12, "操作板合位"},
+    { 	13, "操作板跳位"},
+
+};
+uc8 NumOfDI_DefaultBYQ=sizeof(tDITab_DefaultBYQ)/sizeof(tDITab_DefaultBYQ[0]);
+
+const TDOTABLE tDITab_DefaultMOTO[]={
+ 	{	0, "转速接点"},
+    {	1, "本体1/备用"},
+    {	2, "本体2/备用"},
+    {	3, "本体3/备用"},
+    {	4, "备用开入4"},
+    {	5, "备用开入5"},
+    {	6, "备用开入6"},
+    {	7, "弹簧未储能"},
+    {	8, "远方就地"},
+    {	9, "手跳开入"},
+    {	10, "开入合位"},
+    {	11, "开入跳位"},
+    {	12, "操作板合位"},
+    { 	13, "操作板跳位"},
+
+};
+uc8 NumOfDI_DefaultMOTO=sizeof(tDITab_DefaultMOTO)/sizeof(tDITab_DefaultMOTO[0]);
+
+//****************************************************
+//*******11、 开出描述定义表(MMI)               ******
+//****************************************************
+const TDOTABLE tDoTab_Default[]={
+ 	{KC_BHTZ,	"保护跳闸"},
+    {KC_BHHZ,	"保护合闸"},
+    {KC_GJ,	    "告警出口"},
+    {KC_DZ, 	"动作出口"},
+    {KC_YKH,	"遥控合闸"},
+    {KC_YKT,	"遥控跳闸"},
+    {KC_BY1,	"备用出口"},
+ 	{KC_LCD_BL, 	"背光控制"},
+};
+uc8 NumOfDoOut1_Default=sizeof(tDoTab_Default)/sizeof(tDoTab_Default[0]);
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+                      #endif 
+//                                                  
+//
+/////////////////////////////////////////////////////////////////////////////////////
+ 
+//------------------------------ 条件编译------------------------------------//
+
+								#ifdef	ZRR941F
+
+//------------------------------ 条件编译------------------------------------//
+ 
+
+const  u8 CUP_NAME[] ={"母联保护及备投装置"};
+const  u8 name_date[]={"2023年05月05日"};
+const  u8 name_VAR[]={"版本号:ATF3.00 "};
+ 
+u8  szType_NAME[]={"ZRR941F "};  
+  
+u16   Imax;
+u16   Umax;
+
+ 
+ //遥测量缓冲结构
+YC  UIPQ_buffer;
+//*********************************************************
+//1.*****        定值描述                        **********
+//*********************************************************
+const char KG1[3][9]={"0-退出","1-跳闸","2-告警"};
+const char KG2[2][9]={"0-退出","1-投入"};
+const char KG3[2][9]={"0-退出","1-跳闸"};
+
+const char KG4[3][9]={" 0-退出 ","单纯过流","闭锁过流"};
+const char KG5[2][9]={" 操作板 "," 开入板 "};
+const char KG6[2][9]={" 0-退出 "," 1-告警 "};
+const char KG7[3][9]={" 0-退出 ","断线闭锁","断线开放"};
+const char KG8[2][9]={" 0-100V "," 1-380V "};
+
+//定值控制字列表
+//默认值是由类型字节描述
+const FixValue FixValueTableLN[]=
+{
+  //条目号  描述	  	  数据      默认值  默认值 量纲
+	//					  类型      低位    高位      
+	{ 1, "1.线路参数",7,
+	             {{0, "PT断线",     0x10,     0,      2,       0, KK_Do, KK_Do,   " ",(const char*)KG7},
+	              {1, "电压闭锁",   0x22,     20,   40000,    8000, KT_Do, KT_Do,  "V",NULL},
+	              {2, "控回断线",   0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	              {3, "CT变比 ",    0x40,     1,   1000,    1, KI_Do, KI_Rtn,  " ",NULL},
+	              {4, "PT一次值",   0x22,     10,  4000,    10, KI_Do, KI_Rtn,  "kV",NULL},
+				  {5, "跳合位源",   0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG5},
+				  {6, "电压UN",     0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG8}}},
+   { 2, "2.备自投功能",6,               
+  	             {{7, "母联BZT ",     0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG2},
+  	              {8, "有压定值",    0x32,       1000,    40000,  9000, KI_Do, KI_Rtn,  "V",NULL},
+  	              {9, "无压定值",    0x32,       1000,    40000,  5000, KI_Do, KI_Rtn,  "V",NULL},
+ 	              {10, "无流定值",    0x22,       5,	 600,  50, KI_Do, KI_Rtn,  "A",NULL},
+                  {11, "跳DL延时",    0x22,       5,      9999,  100, KT_Do, KT_Do,   "S",NULL},        
+                  {12, "合DL延时",    0x22,       5,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	                
+                                 
+    { 3, "3.相间过流I段",3,
+	             {{13, "控制字",    0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG4},
+	              {14, "电流",      0x22,       10,    9999,  1000, KI_Do, KI_Rtn,  "A",NULL},
+	              {15, "时间",      0x22,       0,      1000,  0, KT_Do, KT_Do,   "S",NULL}}},	
+	{ 4, "4.相间过流II段",3,
+	             {{16, "控制字",    0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG4},
+	              {17, "电流",      0x22,       10,    9999,  800, KI_Do, KI_Rtn,  "A",NULL},
+	              {18, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},		
+	{ 5, "5.相间过流III段",3,
+	             {{19, "控制字",    0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG4},
+	              {20, "电流",      0x22,       10,    9999,  500, KI_Do, KI_Rtn,  "A",NULL},
+	              {21, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},		
+                 
+ 	{ 6, "6.过负荷闭锁",3,
+	             {{22, "控制字",   0x10,       0,         1,      0, KK_Do, KK_Do,   " ",(const char*)KG6},
+	              {23, "电流",     0x22,       10,    9999,   300, KI_Do, KI_Rtn,  "A",NULL},
+	              {24, "时间",     0x22,       10,      9999,  200, KT_Do, KT_Do,   "S",NULL}}},	
+
+  	{ 7, "7.充电保护",3,
+	             {{25, "控制字",   0x10,       0,         1,      0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	              {26, "电流",     0x22,       10,    9999,   500, KI_Do, KI_Rtn,  "A",NULL},
+	              {27, "时间",     0x22,       0,      9999,  50, KT_Do, KT_Do,   "S",NULL}}},	
+  	{ 8, "8.零序过流",3,
+	             {{28, "控制字",   0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {29, "电流",     0x22,       10,    9999,   300, KI_Do, KI_Rtn,  "A",NULL},
+	              {30, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+  	{ 9, "9.零序加速",3,
+	             {{31, "控制字",   0x10,       0,         1,      0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	              {32, "电流",     0x22,       10,    9999,   300, KI_Do, KI_Rtn,  "A",NULL},
+	              {33, "时间",     0x22,       0,      9999,  50, KT_Do, KT_Do,   "S",NULL}}},	
+
+};
+uc8 NumOfSetLN=sizeof(FixValueTableLN)/sizeof(FixValueTableLN[0]);
+
+
+//***********************************************
+//*******2、  采样值类型描述表               ******
+//***********************************************
+
+const MEATABLE MeaValTab[]=
+{
+	{	"Ia =",		" A  " ,MEAKIND_I   },
+	{	"Ib =",		" A  " ,MEAKIND_I   },
+	{ 	"Ic =",		" A  " ,MEAKIND_I   },
+	{	"IL1=",		" A  " ,MEAKIND_I   },
+  	{	"IL2=",		" A  " ,MEAKIND_I   },
+	{ 	"3I0=",		" A  " ,MEAKIND_I   },
+
+	{ 	"Uab1",		" V  " ,MEAKIND_U   },
+	{  	"Ubc1", 	" V  " ,MEAKIND_U   },
+	{ 	"Uca1", 	" V  " ,MEAKIND_U   },
+  { 	"Uab2",		" V  " ,MEAKIND_U   },
+ 	{  	"Ubc2", 	" V  " ,MEAKIND_U   }, 
+  { 	"Uca2",		" V  " ,MEAKIND_U   },
+	
+};
+uc8 NumOfCY=sizeof(MeaValTab)/sizeof(MeaValTab[0]);
+
+
+
+//****************************************************
+//*******10、 保护压板描述定义表     ******
+//****************************************************
+
+const YBTABLE ybTab_LN[]={
+  
+	{	"备自投压板"},  
+	{	"过流 I段"},
+	{	"过流II段"},
+	{	"过流III段"},
+ 	{	"充电保护"},   
+ 	{	"零序过流"}, 
+  	{	"零序加速"}, 
+ 	
+};
+
+uc8 NumOfYBLN=sizeof(ybTab_LN)/sizeof(ybTab_LN[0]);
+
+
+//***********************************************
+//*******3、  遥测类型描述表               ******
+//***********************************************
+const MEATABLE MeaValTab1[]=
+{
+
+		
+	{   	"Ia =",		" A  ",   MEAKIND_I,   MEA103_I },
+	{   	"Ib =",		" A  ",   MEAKIND_I,   MEA103_I },
+	{       "Ic =",		" A  ",   MEAKIND_I,   MEA103_I },
+	{       "Uab=",		" V  ",   MEAKIND_U,   MEA103_U },
+	{       "Ubc=", 	" V  ",   MEAKIND_U,   MEA103_U },
+	{       "Uca=", 	" V  ",   MEAKIND_U,   MEA103_U },
+
+	{       " P =", 	" W  ",   MEAKIND_P,   MEA103_P },
+	{       " Q =", 	" VAR",   MEAKIND_P,   MEA103_P },
+	{       "COS=", 	"    ",   MEAKIND_K,   MEA103_K },
+
+};
+
+uc8 NumOfYC1=sizeof(MeaValTab1)/sizeof(MeaValTab1[0]);
+
+/**********************************************/
+//*******4、  保护动作事件描述及SOE定义表 ******//
+//***********************************************//
+const SoftYxTable tEvtTab_LN[]=
+{
+	//条目号        描述         SOE编号         参数项数     参数类型1   		
+    {    TRIPEVENT|0,		"保护启动    ",	       0xff,   0,     	 },  			
+    {    TRIPEVENT|1,	   	"过流一段动作",       SOE_DZ|0,      1,          Para_I,  	 },
+	{	 TRIPEVENT|2,	   	"过流二段动作",       SOE_DZ|1,      1,          Para_I,      },
+	{	 TRIPEVENT|3,	  	"过流三段动作",       SOE_DZ|2,      1,          Para_I,  	 },
+    {    TRIPEVENT|4,		"充电保护动作",	      SOE_DZ|3,     1,          Para_I,    	 },
+    {    TRIPEVENT|5,		"零序过流动作",	      SOE_DZ|4,     1,          Para_I0,    	 },
+    {    TRIPEVENT|6,		"零序加速动作",	      SOE_DZ|5,     1,          Para_I0,    	 },
+
+ 	{    TRIPEVENT|7,	   	"备投跳#1开关",       SOE_DZ|6,     0,          0,   	 },
+	{	 TRIPEVENT|8,	   	"备投合#1开关",       SOE_DZ|7,     0,          0,       },
+	{	 TRIPEVENT|9,	  	"备投跳#2开关",       SOE_DZ|8,     0,          0,       },
+    {    TRIPEVENT|10,		"备投合#2开关",	      SOE_DZ|9,     0,          0,   	 },
+    {    TRIPEVENT|11,		"备投跳母联  ",	      SOE_DZ|10,     0,          0,    	 },
+    {    TRIPEVENT|12,		"备投合母联  ",	      SOE_DZ|11,     0,          0,    	 },
+
+  	{    TRIPEVENT|15,	   	"事故总信号  ",	       SOE_DZ|15,  0, 	    },
+ 
+    {   FAILEVENT|0,	   		"存储器出错  ",	        SOE_GJ|0,       0,			    		},
+	{	FAILEVENT|1,	   	"定值校验出错",             SOE_GJ|1,        0,				     	},
+	{	FAILEVENT|2,	   	"AD1检测出错 ",             SOE_GJ|2,        0,						},
+ 	
+	{	FAILEVENT|6,	   	"零序过流告警 ",             SOE_GJ|6,        0,						},	  
+ 	{	FAILEVENT|7,	  	"过负荷闭锁备投",           SOE_GJ|7,        0, 			        },
+    {	FAILEVENT|8,	   	"TWJ异常      ",            SOE_GJ|8,       0,						},
+	{	FAILEVENT|9,	   	"I母PT断线    ",             SOE_GJ|9,      0,						},
+	{	FAILEVENT|10,	  	"II母PT断线   ",             SOE_GJ|10,     0, 				        },	   
+    {	FAILEVENT|11,	  	"弹簧未储能   ",            SOE_GJ|11,      0,						},
+	{	FAILEVENT|12,	  	"控制回路断线 ",            SOE_GJ|12,       0,						},
+ 	{	FAILEVENT|13,	  	"跳闸失败    ",             SOE_GJ|13,       0,						},
+	{	FAILEVENT|14,	  	"合闸失败    ",             SOE_GJ|14,       0,	            		},
+
+    {	FAILEVENT|15,	   	"告警总信号  ",             SOE_GJ|15,       0,			    	    },		              
+
+};
+uc8 NumOfEventLN=sizeof(tEvtTab_LN)/sizeof(tEvtTab_LN[0]);
+
+
+ 
+
+
+//****************************************************
+//*******11、 开出描述定义表(MMI)               ******
+//****************************************************
+const TDOTABLE tDoTab_Default[]={
+
+ 	{KC_BHTML,	     "母联跳闸"},
+    {KC_BHHML,	     "母联合闸"},
+    {KC_GJ,	         "告警出口"},
+    {KC_DZ, 	     "动作出口"},
+    {KC_BHTZJX1,	"进线1跳闸"},
+    {KC_BHTZJX2,	"进线2跳闸"},
+    {KC_BY1,	    "过负荷出口"},
+
+	{KC_LCD_BL, 	"背光控制"},
+
+};
+uc8 NumOfDoOut1_Default=sizeof(tDoTab_Default)/sizeof(tDoTab_Default[0]);
+//****************************************************
+//*******11、 开入描述定义表(MMI)               ******
+//****************************************************
+const TDOTABLE tDITab_Default[]={
+    {	0, "闭锁备自投"},
+    {	1, "进线1跳位"},
+    {	2, "进线2跳位"},
+    {	3, "母联跳位"},
+    {	4, "闭锁开入1"},  
+    {	5, "闭锁开入2"},
+    {	6, "开入7"},  
+    {	7, "弹簧未储能"},     
+    {	8, "远方就地"},     
+    {	9,"手跳开入"},     
+    {	10,"备用开入"},
+    { 	11,"备用开入"},
+    {	12,"合闸位置(内)"},
+    { 	13,"跳闸位置(内)"},
+
+};
+uc8 NumOfDI_Default=sizeof(tDITab_Default)/sizeof(tDITab_Default[0]);
+//////////////////////////////////////////////////////////////////////////////////////
+//
+                      #endif 
+//                    NP624B                               
+//
+/////////////////////////////////////////////////////////////////////////////////////
+ 
+//------------------------------ 条件编译------------------------------------//
+
+								#ifdef	ZRR942F
+
+//------------------------------ 条件编译------------------------------------//
+ 
+
+const  u8 CUP_NAME[] ={"   进线备自投装置"};
+const  u8 name_date[]={"2023年05月05日"};
+const  u8 name_VAR[]={"版本号:ATF3.00 "};
+ 
+u8  szType_NAME[]={"ZRR942F "};  
+  
+u16   Imax;
+u16   Umax;
+
+ 
+ //遥测量缓冲结构
+YC  UIPQ_buffer;
+//*********************************************************
+//1.*****        定值描述                        **********
+//*********************************************************
+const char KG1[3][9]={" 0-退出 ","1-跳闸","2-告警"};
+const char KG2[2][9]={"0-退出","1-投入"};
+const char KG3[2][9]={"0-退出","1-跳闸"};
+
+const char KG4[3][9]={" 0-退出 "," 1#进线 "," 2#进线 "};
+ const char KG6[2][9]={" 0-退出 ","1-告警"};
+const char KG7[3][9]={" 0-退出 ","断线闭锁","断线开放"};
+
+//定值控制字列表
+//默认值是由类型字节描述
+const FixValue FixValueTableLN[]=
+{
+  //条目号  描述	  	  数据      默认值  默认值 量纲
+	//					  类型      低位    高位      
+	{ 1, "1.线路参数",3,
+	             {{0, "PT断线",     0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	              {1, "CT变比 ",    0x40,     1,   1000,    1, KI_Do, KI_Rtn,  " ",NULL},
+	              {2, "PT一次值",   0x22,     10,  4000,    10, KI_Do, KI_Rtn,  "kV",NULL}}},
+   { 2, "2.备自投功能",10,               
+   				 {{3, "2进线BZT",     0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG2},
+  	              {4, "1进线BZT",     0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG2},
+  	              {5, "自恢复",     0x10,     0,      2,       0, KK_Do, KK_Do,   " ",(const char*)KG4},		  
+	              {6, "有压定值",    0x32,       1000,    40000,  9000, KI_Do, KI_Rtn,  "V",NULL},
+  	              {7, "无压定值",    0x32,       1000,    40000,  5000, KI_Do, KI_Rtn,  "V",NULL},
+ 	              {8, "无流定值",    0x22,       5,	  9999,  100, KI_Do, KI_Rtn,  "A",NULL},
+      	          {9, "有压闭锁",     0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG2},
+	 	          {10, "无压闭锁",     0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG2},
+                  {11, "跳DL延时",    0x22,       5,      9999,  100, KT_Do, KT_Do,   "S",NULL},        
+                  {12, "合DL延时",    0x22,       5,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	                
+                               
+  
+};
+uc8 NumOfSetLN=sizeof(FixValueTableLN)/sizeof(FixValueTableLN[0]);
+
+
+//***********************************************
+//*******2、  采样值类型描述表               ******
+//***********************************************
+
+const MEATABLE MeaValTab[]=
+{
+	{	"IL1=",		" A  " ,MEAKIND_I   },
+  	{	"IL2=",		" A  " ,MEAKIND_I   },
+ 	{	"UL1=",		" V  " ,MEAKIND_U   },
+  	{	"UL2=",		" V  " ,MEAKIND_U   },
+
+	{ 	"Uab1",		" V  " ,MEAKIND_U   },
+	{  	"Ubc1", 	" V  " ,MEAKIND_U   },
+	{ 	"Uca1", 	" V  " ,MEAKIND_U   },
+
+	
+};
+uc8 NumOfCY=sizeof(MeaValTab)/sizeof(MeaValTab[0]);
+
+
+
+//****************************************************
+//*******10、 保护压板描述定义表     ******
+//****************************************************
+
+const YBTABLE ybTab_LN[]={
+  
+	{	"备自投压板"},  
+
+ 	
+};
+
+uc8 NumOfYBLN=sizeof(ybTab_LN)/sizeof(ybTab_LN[0]);
+
+
+//***********************************************
+//*******3、  遥测类型描述表               ******
+//***********************************************
+const MEATABLE MeaValTab1[]=
+{
+
+		
+	{   	"Ia =",		" A  ",   MEAKIND_I,   MEA103_I },
+
+
+};
+
+uc8 NumOfYC1=0;
+
+/**********************************************/
+//*******4、  保护动作事件描述及SOE定义表 ******//
+//***********************************************//
+const SoftYxTable tEvtTab_LN[]=
+{
+	//条目号        描述         SOE编号         参数项数     参数类型1   		
+    {    TRIPEVENT|0,		"保护启动    ",	       0xff,   0,     	 },  			
+ 	{    TRIPEVENT|1,	   	"备投跳#1开关",       SOE_DZ|0,     0,          0,   	 },
+	{	 TRIPEVENT|2,	   	"备投合#1开关",       SOE_DZ|1,     0,          0,       },
+	{	 TRIPEVENT|3,	  	"备投跳#2开关",       SOE_DZ|2,     0,          0,       },
+    {    TRIPEVENT|4,		"备投合#2开关",	      SOE_DZ|3,     0,          0,   	 },
+    {    TRIPEVENT|5,		"备投跳母联  ",	      SOE_DZ|4,     0,          0,    	 },
+    {    TRIPEVENT|6,		"备投合母联  ",	      SOE_DZ|5,     0,          0,    	 },
+
+  	{    TRIPEVENT|15,	   	"事故总信号  ",	       SOE_DZ|15,  0, 	    },
+ 
+    {   FAILEVENT|0,	   		"存储器出错  ",	        SOE_GJ|0,       0,			    		},
+	{	FAILEVENT|1,	   	"定值校验出错",             SOE_GJ|1,        0,				     	},
+	{	FAILEVENT|2,	   	"AD1检测出错 ",             SOE_GJ|2,        0,						},
+ 	
+ 	{	FAILEVENT|6,	   	"母线PT断线  ",            SOE_GJ|6,      0,						},
+ 	{	FAILEVENT|7,	  	"跳闸失败    ",             SOE_GJ|7,       0,						},
+	{	FAILEVENT|8,	  	"合闸失败    ",             SOE_GJ|8,       0,	            		},
+
+    {	FAILEVENT|15,	   	"告警总信号  ",             SOE_GJ|15,       0,			    	    },		              
+
+};
+uc8 NumOfEventLN=sizeof(tEvtTab_LN)/sizeof(tEvtTab_LN[0]);
+
+
+ 
+
+
+//****************************************************
+//*******11、 开出描述定义表(MMI)               ******
+//****************************************************
+const TDOTABLE tDoTab_Default[]={
+
+ 	{KC_BHHZJX1,	     "进线1合闸"},
+    {KC_BHTZJX1,	     "进线1跳闸"},
+    {KC_GJ,	         "告警出口"},
+    {KC_DZ, 	     "动作出口"},
+    {KC_BHHZJX2,	"进线2合闸"},
+    {KC_BHTZJX2,	"进线2跳闸"},
+    {KC_BY1,	    "过负荷出口"},
+
+	{KC_LCD_BL, 	"背光控制"},
+
+};
+uc8 NumOfDoOut1_Default=sizeof(tDoTab_Default)/sizeof(tDoTab_Default[0]);
+//****************************************************
+//*******11、 开入描述定义表(MMI)               ******
+//****************************************************
+const TDOTABLE tDITab_Default[]={
+    {	0, "闭锁备自投"},
+    {	1, "进线1跳位"},
+    {	2, "进线2跳位"},
+    {	3, "母联跳位"},
+    {	4, "闭锁开入1"},  
+    {	5, "闭锁开入2"},
+    {	6, "备用开入7"},  
+    {	7, "备用开入8"},     
+    {	8, "备用开入9"},     
+    {	9, "备用开入10"},     
+    {	10,"备用开入11"},
+    { 	11,"备用开入12"},
+ 
+
+};
+uc8 NumOfDI_Default=sizeof(tDITab_Default)/sizeof(tDITab_Default[0]);
+//////////////////////////////////////////////////////////////////////////////////////
+//
+                      #endif 
+//                                                   
+//
+/////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//						
+//						数据结构定义表								      //
+//
+////////////////////////////////////////////////////////////////////////////////////
+//0.	保护名称
+//1.	定值描述表及缺省定值表
+//2.	采样描述表
+//3.	保护测量类型描述表
+//4.	保护动作事件描述定义表
+//5.    保护告警事件描述定义表
+//6.    保护压板描述定义表
+//7.    缺省压板表
+//8.    开出描述定义表
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//------------------------------ 条件编译------------------------------------//
+
+								#ifdef	ZRR961F
+
+//------------------------------ 条件编译------------------------------------//
+
+ const  u8 CUP_NAME[] ={"  PT保护测控装置  "};
+const  u8 name_date[]={"2023年05月05日"};
+const  u8 name_VAR[]={"版本号:ATF3.00 "};
+u8  szType_NAME[]={"ZRR961F "};  
+
+YC  UIPQ_buffer;
+//*********************************************************
+//1.*****        定值描述                        **********
+//*********************************************************
+const char KG1[3][9]={"0-退出","1-跳闸","2-告警"};
+const char KG2[2][9]={"0-退出","1-投入"};
+const char KG3[2][9]={"0-退出","1-跳闸"};
+const char KG4[4][9]={"0-退出","低压跳闸","低压告警","失压跳闸"};
+
+const FixValue FixValueTableLN[]=
+{
+  //条目号  描述	  	  数据      默认值  默认值 量纲
+	//					  类型      低位    高位      
+	{ 1, "1.PT参数",2,
+	             {{0, "PT断线",     0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG2},
+		      {1, "PT一次值",   0x22,     10,  4000,    10, KI_Do, KI_Rtn,   "kV",NULL}}},
+
+	{2, "2.过电压保护",3,
+	             {{2, "控制字",  0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+ 	              {3, "电压",    0x32,       1000,    15000,  11000, KI_Do, KI_Rtn,  "V",NULL},
+	              {4, "时间",    0x22,       5,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+
+    {3, "3.低电压保护",3,
+	             {{5, "控制字",  0x10,       0,         3,      0, KK_Do, KK_Do,   " ",(const char*)KG4},
+	              {6, "电压",    0x32,       500,    10000,  8000, KI_Do, KI_Rtn,  "V",NULL},
+	              {7, "时间",    0x22,       5,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+
+     {4, "4.3U0过压保护",3,
+	             {{8, "控制字",  0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+	              {9, "电压",    0x32,       1000,    10000,  8000, KI_Do, KI_Rtn,  "V",NULL},
+	              {10, "时间",    0x22,       5,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+     {5, "5.出口逻辑",4,            
+ 	             {{11, "出口1",  0x40,       0,         15,      7, KK_Do, KK_Do,   " ",NULL},
+	 	      {12, "出口2",  0x40,       0,         15,      7, KK_Do, KK_Do,   " ",NULL},	
+	 	      {13, "出口3",  0x40,       0,         15,      1, KK_Do, KK_Do,   " ",NULL},	
+	 	      {14, "出口4",  0x40,       0,         15,      2, KK_Do, KK_Do,   " ",NULL}}},	                       
+};
+uc8 NumOfSetLN=sizeof(FixValueTableLN)/sizeof(FixValueTableLN[0]);
+
+
+//***********************************************
+//*******2、  采样值类型描述表               ******
+//***********************************************
+
+const MEATABLE MeaValTab[]=
+{
+
+     {	"Ua  ",		" V  " ,MEAKIND_U  },
+	{	"Ub  ",		" V  " ,MEAKIND_U  },
+	{ 	"Uc  ",		" V  " ,MEAKIND_U  },
+	{	"Uab ",		" V  " ,MEAKIND_U  },
+	{	"Ubc ",		" V  " ,MEAKIND_U  }, 
+	{ 	"Uca ",		" V  " ,MEAKIND_U  },
+ 	{  	"3U0 ", 	" V  " ,MEAKIND_U  },
+
+};
+uc8 NumOfCY=sizeof(MeaValTab)/sizeof(MeaValTab[0]);
+
+ 
+
+//***********************************************
+//*******3、  遥测类型描述表               ******
+//***********************************************
+ const MEATABLE MeaValTab1[]=
+{
+					
+     {	"Ua ",		" V  " ,MEAKIND_U,   MEA103_U  },
+	{	"Ub ",		" V  " ,MEAKIND_U,   MEA103_U  },
+	{ 	"Uc ",		" V  " ,MEAKIND_U,   MEA103_U  },
+	{	"Uab",		" V  " ,MEAKIND_U,   MEA103_U  },
+	{	"Ubc",		" V  " ,MEAKIND_U,   MEA103_U  }, 
+	{ 	"Uca",		" V  " ,MEAKIND_U,   MEA103_U  },
+	{  	"3U0", 	" V  " ,MEAKIND_U,   MEA103_U  },
+
+ 	{  	" F1 ", 	" Hz " ,MEAKIND_F,   MEA103_F  },
+
+};
+uc8 NumOfYC1=sizeof(MeaValTab1)/sizeof(MeaValTab1[0]);
+ 
+
+/**********************************************/
+//*******4、  保护动作事件描述及SOE定义表 ******//
+//***********************************************//
+const SoftYxTable tEvtTab_LN[]=
+{
+	//条目号        描述         SOE编号         参数项数     参数类型1   		
+    {    TRIPEVENT|0,		"保护启动    ",	       0xff,   0,     	 },  		
+
+    {   TRIPEVENT|1,	   	"低电压保护动作",          SOE_DZ|0,     1,          Para_U,   	 },
+    {	TRIPEVENT|2,	  	"过电压保护动作",        SOE_DZ|1,     1,          Para_U,      },
+    {   TRIPEVENT|3,		"3U0过压保护动作",	     SOE_DZ|2,     1,          Para_U0,   	 }, 
+    {   TRIPEVENT|4,		"失压保护动作",	         SOE_DZ|3,     1,          Para_U,   	 },
+	{	TRIPEVENT|5,	    "备用          ",        SOE_DZ|4,      0,						}, 
+	{	TRIPEVENT|6,	    "备用          ",        SOE_DZ|5,      0,						}, 
+	{	TRIPEVENT|7,	    "备用          ",        SOE_DZ|6,      0,						}, 
+	{	TRIPEVENT|8,	    "备用          ",        SOE_DZ|7,      0,						}, 
+	{	TRIPEVENT|9,	    "备用          ",        SOE_DZ|8,      0,						}, 
+	{	TRIPEVENT|10,	    "备用          ",        SOE_DZ|9,      0,						}, 
+	{	TRIPEVENT|11,	    "备用          ",        SOE_DZ|10,      0,						}, 
+	{	TRIPEVENT|12,	    "备用          ",        SOE_DZ|11,      0,						}, 
+	{	TRIPEVENT|13,	    "备用          ",        SOE_DZ|12,      0,						}, 
+	{	TRIPEVENT|14,	    "备用          ",        SOE_DZ|13,      0,						}, 
+ 
+   	{   TRIPEVENT|15,	   	"事故总信号  ",	         SOE_DZ|14,  0, 	 },
+ 
+	{   FAILEVENT|0,	    "存储器出错  ",	          SOE_GJ|0,       0,			    		},
+	{	FAILEVENT|1,	    "定值校验出错",           SOE_GJ|1,       0,				     	},
+	{	FAILEVENT|2,	    "AD1检测出错 ",           SOE_GJ|2,        0,						},
+	{	FAILEVENT|3,	    "备用          ",        SOE_GJ|3,      0,						},
+	{	FAILEVENT|4,	    "备用          ",        SOE_GJ|4,      0,						},
+	{	FAILEVENT|5,	    "备用          ",        SOE_GJ|5,      0,						},
+	{	FAILEVENT|6,	    "备用          ",        SOE_GJ|6,      0,						},
+                             
+	{	FAILEVENT|7,	    "PT断线告警",          SOE_GJ|7, 	  0,						},
+ 	{	FAILEVENT|8,	    "备用1          ",         SOE_GJ|8,  	  0,						},
+ 	{	FAILEVENT|9,	    "过电压告警",          SOE_GJ|9,       0,	    		},
+	{	FAILEVENT|10,	    "备用2          ",         SOE_GJ|10,      0,	    		},   
+	{	FAILEVENT|11,	    "低电压告警",          SOE_GJ|11,      0,	    		},
+       {	FAILEVENT|12,	    "备用          ",         SOE_GJ|12,      0,	    		},
+	{	FAILEVENT|13,	    "3U0过压告警",         SOE_GJ|13,      0,						},   
+	{	FAILEVENT|14,	    "备用          ",        SOE_GJ|14,      0,						},
+                            
+    {	FAILEVENT|15,	    "告警总信号  ",           SOE_GJ|15,       0,						},		              
+                            
+
+
+};
+uc8 NumOfEventLN=sizeof(tEvtTab_LN)/sizeof(tEvtTab_LN[0]);
+
+ 
+//****************************************************
+//*******6、 保护压板描述定义表     ******
+const YBTABLE ybTab_LN[]={
+  
+	{	"过压保护"},
+ 	{	"低压保护"},
+	 
+	{	"3U0过压保护"},
+
+ 	
+};
+
+uc8 NumOfYBLN=sizeof(ybTab_LN)/sizeof(ybTab_LN[0]);
+
+
+//****************************************************
+//*******8、 开出描述定义表(MMI)               ******
+//****************************************************
+const TDOTABLE tDoTab_Default[]={
+   
+ 	{KC_YKH,	"出口1"},
+    {KC_YKT,	"出口2"},
+    {KC_GJ,	    "告警出口"},
+    {KC_DZ, 	"动作出口"},
+    {KC_BHHZ,	"出口3"},  
+    {KC_BHTZ,	"出口4"},
+  //  {KC_BY1,	"出口5"},  
+	{KC_LCD_BL, 	"背光控制"},   
+	
+ 
+
+};
+uc8 NumOfDoOut1_Default=sizeof(tDoTab_Default)/sizeof(tDoTab_Default[0]);
+
+//****************************************************
+//*******11、 开入描述定义表(MMI)               ******
+//****************************************************
+const TDOTABLE tDITab_Default[]={
+    {	0, "PT刀闸位置"},
+    {	1, "备用开入2"},
+    {	2, "备用开入3"},
+    {	3, "备用开入4"},
+    {	4, "备用开入5"},  
+    {	5, "备用开入6"},
+    {	6, "备用开入7"},  
+    {	7, "备用开入8"},     
+    {	8, "备用开入9"},     
+    {	9,"备用开入10"},     
+    {	10,"备用开入11"},
+    { 	11,"备用开入12"},
+ 
+
+};
+uc8 NumOfDI_Default=sizeof(tDITab_Default)/sizeof(tDITab_Default[0]);
+//////////////////////////////////////////////////////////////////////////////////////
+//
+                      #endif 
+//                     ZRR961F                               
+//
+/////////////////////////////////////////////////////////////////////////////////////
+ 
+////////////////////////////////////////////////////////////////////////////////////
+//						
+//						数据结构定义表								      //
+//
+////////////////////////////////////////////////////////////////////////////////////
+//0.	保护名称
+//1.	定值描述表及缺省定值表
+//2.	采样描述表
+//3.	保护测量类型描述表
+//4.	保护动作事件描述定义表
+//5.    保护告警事件描述定义表
+//6.    保护压板描述定义表
+//7.    缺省压板表
+//8.    开出描述定义表
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//------------------------------ 条件编译------------------------------------//
+
+								#ifdef	ZRR931F
+
+//------------------------------ 条件编译------------------------------------//
+
+ 
+ 
+const  u8 CUP_NAME[] ={" 电容器保护测控装置 "};
+const  u8 name_date[]={"2022年04月20日"};
+const  u8 name_VAR[]={"版本号:ATF2.00 "};
+u8    szType_NAME[]={"ZRR931F "};  
+
+//*********************************************************
+//1.*****        定值描述                        **********
+//*********************************************************
+
+const char KG1[3][9]={" 0-退出 "," 1-跳闸 "," 2-告警 "};
+const char KG2[2][9]={" 0-退出 "," 1-投入 "};
+const char KG3[2][9]={" 0-退出 "," 1-跳闸 "};
+
+const char KG4[2][9]={" 操作板 "," 开入板 "};
+
+ 
+const FixValue FixValueTableLN[]=
+{
+      
+//序号 名称   子目录个数       数据类型  最小值 最大值  默认值  比率系数（暂没用） 量纲  控制描述
+{ 1, "1.电容器参数",5,
+             {{0, "PT断线",     0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG2},
+              {1, "控回断线",   0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG2},
+               {2, "CT变比 ",   0x40,     1,   9999,    1, KI_Do, KI_Rtn,  " ",NULL},
+              {3, "PT一次值",   0x22,     10,  4000,    10, KI_Do, KI_Rtn,  "KV",NULL},
+              {4, "跳合位源",   0x10,     0,      1,       0, KK_Do, KK_Do,   " ",(const char*)KG4}}},
+   
+{ 2, "2.相间过流I段",3,
+             {{5, "控制字",    0x10,       0,         1,      0, KK_Do, KK_Do,   " ",(const char*)KG2},
+              {6, "电流",      0x22,       10,    9999,  1000, KI_Do, KI_Rtn,  "A",NULL},
+              {7, "时间",      0x22,       0,      1000,  0, KT_Do, KT_Do,   "S",NULL}}},	
+{ 3, "3.相间过流II段",3,
+             {{8, "控制字",    0x10,       0,         1,      0, KK_Do, KK_Do,   " ",(const char*)KG2},
+              {9, "电流",      0x22,       10,    9999,  700, KI_Do, KI_Rtn,  "A",NULL},
+              {10, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},		
+{ 4, "4.反时限过流",3,
+             {{11, "控制字",   0x10,       0,         1,      0, KK_Do, KK_Do,   " ",(const char*)KG2},
+              {12, "电流",     0x22,       10,    9999,   100, KI_Do, KI_Rtn,  "A",NULL},
+              {13, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+              
+{ 5, "5.零序过流",3,
+             {{14, "控制字",   0x10,       0,     2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+              {15, "电流", 	   0x22,       10,    9999,   300, KI_Do, KI_Rtn,  "A",NULL},
+              {16, "时间",     0x22,       0,     9999,  50, KT_Do, KT_Do,   "S",NULL}}},	                     
+{6, "6.过电压保护",3,
+             {{17, "控制字",  0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+              {18, "电压",    0x32,       500,    15000,  11000, KI_Do, KI_Rtn,  "V",NULL},
+              {19, "时间",    0x22,       5,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+{7, "7.低电压保护",3,
+             {{20, "控制字",  0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+              {21, "电压",    0x32,       500,    10000,  8000, KI_Do, KI_Rtn,  "V",NULL},
+              {22, "时间",    0x22,       5,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+              
+{8, "8.不平衡电压",3,
+             {{23, "控制字",  0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+              {24, "电压",    0x32,       500,    15000,  11000, KI_Do, KI_Rtn,  "V",NULL},
+              {25, "时间",    0x22,       5,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+/*{9, "9.不平衡电流",3,
+             {{26, "控制字",  0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+              {27, "电流", 	   0x22,       10,    9999,   500, KI_Do, KI_Rtn,  "A",NULL},
+              {28, "时间",    0x22,       5,      9999,  100, KT_Do, KT_Do,   "S",NULL}}},	
+*/
+{ 9, "9.低频保护",4,
+             {{26, "控制字",   0x10,       0,         2,      0, KK_Do, KK_Do,   " ",(const char*)KG1},
+              {27, "频率",     0x22,       4300,    5000,   4900, KI_Do, KI_Rtn,  "HZ",NULL},
+              {28, "时间",     0x22,       0,      9999,  100, KT_Do, KT_Do,   "S",NULL},	
+              {29, "闭锁电流", 0x22,       10,    9999,   100, KI_Do, KI_Rtn,  "A",NULL}}},
+
+};
+
+uc8 NumOfSetLN=sizeof(FixValueTableLN)/sizeof(FixValueTableLN[0]);
+
+
+//***********************************************
+//*******2、  采样值类型描述表               ******
+//***********************************************
+
+const MEATABLE MeaValTab[]=
+{
+  	{	"Ia =",		" A  " ,MEAKIND_I  },
+	{	"Ib =",		" A  " ,MEAKIND_I  },
+	{ 	"Ic =",		" A  " ,MEAKIND_I  },
+	{	"3I0=",		" A  " ,MEAKIND_I  },
+ 	{ 	"UBP=",		" V  " ,MEAKIND_U  },     	
+	{ 	"Ua=",		" V  " ,MEAKIND_U  },
+	{  	"Ub=", 	    " V  " ,MEAKIND_U  },	
+	{ 	"Uc=",    	" V  " ,MEAKIND_U  },
+	{ 	"Uab=",		" V  " ,MEAKIND_U  },
+	{  	"Ubc=", 	" V  " ,MEAKIND_U  },	
+	{ 	"Uca=", 	" V  " ,MEAKIND_U  },
+	{ 	"  F=", 	" Hz " ,MEAKIND_F  },	
+
+	
+};
+
+
+uc8 NumOfCY=sizeof(MeaValTab)/sizeof(MeaValTab[0]);
+
+
+ 
+
+const YBTABLE ybTab_LN[]={
+	{	"过流I段   "},
+	{	"过流II段  "},
+	{	"反时限过流"},
+ 	{	"零序电流  "},	   
+	{	"过电压保护"},
+	{	"低电压保护"},		
+	{	"不平衡电压"},
+	//{	"不平衡电流"},
+	{	"低频保护  "},				
+};
+
+
+uc8 NumOfYBLN=sizeof(ybTab_LN)/sizeof(ybTab_LN[0]);
+
+//***********************************************
+//*******3、  遥测类型描述表               ******
+//***********************************************
+const MEATABLE MeaValTab1[]=
+{
+
+	{   	"Ia =",		" A  ",   MEAKIND_I,   MEA103_I },
+	{   	"Ib =",		" A  ",   MEAKIND_I,   MEA103_I },
+	{       "Ic =",		" A  ",   MEAKIND_I,   MEA103_I },
+	{       "Ua=",		" V  ",   MEAKIND_U,   MEA103_U },
+	{       "Ub=",   	" V  ",   MEAKIND_U,   MEA103_U },
+	{       "Uc=",		" V  ",   MEAKIND_U,   MEA103_U },
+	{       "Uab=", 	" V  ",   MEAKIND_U,   MEA103_U },	
+	{       "Ubc=",		" V  ",   MEAKIND_U,   MEA103_U },
+	{       "Uca=", 	" V  ",   MEAKIND_U,   MEA103_U },
+	{       " P =", 	" W  ",   MEAKIND_P,   MEA103_P },
+	{       " Q =", 	" VAR",   MEAKIND_P,   MEA103_P },
+	{       "COS=", 	"    ",   MEAKIND_K,   MEA103_K },
+	{       " F =", 	" Hz ",   MEAKIND_F,    MEA103_F },
+
+};
+
+uc8 NumOfYC1=sizeof(MeaValTab1)/sizeof(MeaValTab1[0]);
+
+
+/**********************************************/
+//*******6、  保护动作事件描述及SOE定义表 ******//
+//***********************************************//
+const SoftYxTable tEvtTab_LN[]=
+{
+	//条目号        描述         SOE编号              参数项数     参数类型1   	
+    {   TRIPEVENT|0,		"保护启动    ",	       0xff,   0,     	 },   
+	{   TRIPEVENT|1,	   	"过流I段动作 ",        SOE_DZ|0,      1,          Para_I,  	 },
+	{	TRIPEVENT|2,	   	"过流II段动作",        SOE_DZ|1,      1,          Para_I,      },
+    {   TRIPEVENT|3,		"反时限动作  ",	       SOE_DZ|2,      1,          Para_IP,   	 },
+    {   TRIPEVENT|4,		"零序电流动作",	       SOE_DZ|3,      1,          Para_I0,   	 },   
+    {   TRIPEVENT|5,		"过电压动作  ",	       SOE_DZ|4,      1,          Para_U,    	 },
+    {   TRIPEVENT|6,		"低电压动作  ",	       SOE_DZ|5,      1,          Para_U,    	 }, 
+    {   TRIPEVENT|7,		"不平衡电压  ",	       SOE_DZ|6,      1,          Para_Ubp,   	 },    
+    {   TRIPEVENT|8,		"不平衡电流  ",	       SOE_DZ|7,       1,          Para_Ibp,   	 },
+    {   TRIPEVENT|9,		"低频保护动作",	       SOE_DZ|8,      1,            Para_F,    	 },
+        
+        
+  	{   TRIPEVENT|15,	   	"事故总信号  ",	         SOE_DZ|15,  0, 	 },
+        
+	{   FAILEVENT|0,	   		"存储器出错  ",	     SOE_GJ|0,    0,			    		},
+	{	FAILEVENT|1,	   		"定值校验出错",      SOE_GJ|1,    0,				     	},
+	{	FAILEVENT|2,	   		"AD1检测出错 ",      SOE_GJ|2,    0,						},
+	{	FAILEVENT|3,	   		"AD2检测出错 ",      SOE_GJ|3,    0,						},
+ 	{	FAILEVENT|5,	  		"低频保护告警  ",    SOE_GJ|5,    0, 				},
+     {	FAILEVENT|6,	   		"不平衡电压告警",    SOE_GJ|6,    0,						},
+    {	FAILEVENT|7,	   		"不平衡电流告警",    SOE_GJ|7,    0,						},
+    {	FAILEVENT|8,	   		"TWJ异常     ",      SOE_GJ|8,    0,						},
+	{	FAILEVENT|9,	   		"PT断线告警  ",      SOE_GJ|9,    0,						},
+	{	FAILEVENT|10,	  		"弹簧未储能  ",      SOE_GJ|10,   0,						},
+	{	FAILEVENT|11,	  		"控制回路断线",      SOE_GJ|11,   0,						},
+	{	FAILEVENT|12,	  		"过电压告警  ",      SOE_GJ|12,   0,	    		},
+	{	FAILEVENT|13,	  		"低电压告警  ",      SOE_GJ|13,   0, 				},
+	{	FAILEVENT|14,	  		"零序电流告警",      SOE_GJ|14,   0, 				},
+	{	FAILEVENT|15,	   		"告警总信号  ",      SOE_GJ|15,   0,						},		              
+
+};
+uc8 NumOfEventLN=sizeof(tEvtTab_LN)/sizeof(tEvtTab_LN[0]);
+
+
+//****************************************************
+//*******11、 开入描述定义表(MMI)               ******
+//****************************************************
+const TDOTABLE tDITab_Default[]={
+ 	{	0, "备用开入1"},
+    {	1, "备用开入2"},
+    {	2, "备用开入3"},
+    {	3, "备用开入4"},
+    {	4, "备用开入5"},
+    {	5, "备用开入6"},
+    {	6, "备用开入7"},
+    {	7, "弹簧未储能"},
+    {	8, "远方就地"},
+    {	9,"备用开入10"},
+    {	10, "开入合位"},
+    {	11, "开入跳位"},
+    {	12, "操作板合位"},
+    { 	13, "操作板跳位"},
+
+};
+uc8 NumOfDI_Default=sizeof(tDITab_Default)/sizeof(tDITab_Default[0]);
+
+//****************************************************
+//*******8、 开出描述定义表(MMI)               ******
+//****************************************************
+const TDOTABLE tDoTab_Default[]={
+  
+ 	{KC_BHTZ,	"保护跳闸"},
+    {KC_BHHZ,	"备用出口1"},
+    {KC_GJ,	    "告警出口"},
+    {KC_DZ, 	"动作出口"},
+    {KC_YKH,	"遥控合闸"},
+    {KC_YKT,	"遥控跳闸"},
+    {KC_BY1,	"备用出口2"},
+ 	{KC_LCD_BL, 	"背光控制"},
+
+};
+uc8 NumOfDoOut1_Default=sizeof(tDoTab_Default)/sizeof(tDoTab_Default[0]);
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+                      #endif 
+//                                                   
+//
+/////////////////////////////////////////////////////////////////////////////////////
+
+
+

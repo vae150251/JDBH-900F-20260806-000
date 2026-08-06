@@ -1,0 +1,501 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.70.2.11706/W32 for ARM       17/Jun/2026  08:45:29
+# Copyright 1999-2016 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Flash.c
+#    Command line =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Flash.c
+#        -D ATF403AVCT7 -D LIBRARY_VERSION -D USE_STDPERIPH_DRIVER -D
+#        AT_START_F403A_V1_0 -lcN
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List
+#        -lA
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List
+#        -o
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\Obj
+#        --no_cse --no_unroll --no_inline --no_code_motion --no_tbaa
+#        --no_clustering --no_scheduling --debug --endian=little
+#        --cpu=Cortex-M4 -e --char_is_signed --enable_multibytes --fpu=VFPv4_sp
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.5\arm\INC\c\DLib_Config_Full.h" -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\STM32F10x_StdPeriph_Driver\inc\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\CMSIS\CM4\CoreSupport\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\CMSIS\CM4\DeviceSupport\
+#        -On --use_c++_inline
+#    Locale       =  Chinese (Simplified)_China.936
+#    List file    =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List\Flash.lst
+#    Object file  =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\Obj\Flash.o
+#
+###############################################################################
+
+D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Flash.c
+      1          /* 
+      2          * Title:	Flash.c
+      3          * Description:	Flash处理任务及相关函数
+      4          * Function:
+      5          
+      6          */
+      7          
+      8          
+      9          #include "Drive.h"
+     10          #include "GlobeDef.h"
+     11          #include "Eep.h"
+     12          #include "Flash.h"
+     13          #include "EventManage.h"
+     14          #include "Bhjdq.h"
+     15          #include "stm32f10x.h"
+     16          
+     17          u8  Tem_data[FM_SECTORSIZE];
+     18          
+     19          bool FL_Erase_Sector_ss(u16 wSector)
+     20          {
+     21           
+     22              if(!SST25V_ER(wSector,wSector+8))
+     23                 return true; 
+     24                 else
+     25                return false  ;   
+     26           
+     27          }
+     28          bool FL_Erase_Sector(u16 wSector )
+     29          {
+     30              if(!SST25V_ER(wSector,wSector+4))
+     31                 return true; 
+     32                 else
+     33                 return false  ;   
+     34          }
+     35          
+     36          //擦除一个页 约506ms
+     37          bool FL_Erase_Sector_page(u16 wSector)
+     38          {
+     39              if(SST25V_ER(wSector,wSector))
+     40                 return true; 
+     41                 else
+     42                 return false ;   	 
+     43          }
+     44          
+     45          void	Flash_task ()
+     46          {
+     47              Flash_Operat_edit();                    	// FlashRom写操作	
+     48          }
+     49          //================================初始化报告区===================================================
+     50          void FM_Init_Rpt()
+     51          {
+     52          	static u16  i;
+     53          	static bool  b_checkover;
+     54          	static u32 p_InitRptData,d_check;
+     55          	 
+     56              	
+     57          	//====跳闸报告
+     58           
+     59          	b_checkover=false;
+     60          		
+     61          	for(SgMagBuff.wUseMark=pre_FmPage-1;SgMagBuff.wUseMark>0;SgMagBuff.wUseMark--)
+     62          	{
+     63          		 WDog_Clear();	
+     64          		 p_InitRptData=SgAddr_flash+SgMagBuff.wUseMark*EVT_FmOne;//计算偏移地址
+     65          	 
+     66          		for(i=0;i<(preSgSize_FmOne/4);i++)
+     67          		{
+     68          			W25Q_ReadMultiBytes((u8 *)&d_check,p_InitRptData,4);
+     69                        p_InitRptData+=4;
+     70          			if(d_check!=0xffffffff) 
+     71          			{
+     72          				SgMagBuff.wUseMark++;  b_checkover=true;
+     73          				break;
+     74          			}
+     75          		}
+     76          		if(b_checkover) break;
+     77          		if(SgMagBuff.wUseMark==0) break;
+     78          	}
+     79          
+     80          	//====SOE报告
+     81           
+     82          	b_checkover=false;
+     83          	
+     84          	for(SoeMagBuff.wUseMark=pre_FmPage-1;SoeMagBuff.wUseMark>0;SoeMagBuff.wUseMark--)
+     85          	{
+     86          		WDog_Clear();	
+     87          	      p_InitRptData=SoeAddr_flash+SoeMagBuff.wUseMark*EVT_FmOne;//计算偏移地址
+     88          		for(i=0;i<(preSoeSize_FmOne/4);i++)
+     89          		{
+     90                          W25Q_ReadMultiBytes((u8 *)&d_check,p_InitRptData,4);
+     91                          p_InitRptData++;                     
+     92          			if(d_check!=0xffffffff) 
+     93          			{
+     94          				SoeMagBuff.wUseMark++;  b_checkover=true;
+     95          				break;
+     96          			}
+     97          		}
+     98          		if(b_checkover) break;
+     99          		if(SoeMagBuff.wUseMark==0) break;
+    100          	}
+    101          
+    102          	//====操作记录报告
+    103           
+    104          	b_checkover=false;
+    105          	
+    106          	for(CZJLMagBuff.wUseMark=pre_FmPage-1;CZJLMagBuff.wUseMark>0;CZJLMagBuff.wUseMark--)
+    107          	{
+    108          		WDog_Clear();	
+    109          	      p_InitRptData=CZJLAddr_flash+CZJLMagBuff.wUseMark*EVT_FmOne;//计算偏移地址
+    110          		for(i=0;i<(preSoeSize_FmOne/4);i++)
+    111          		{
+    112                          W25Q_ReadMultiBytes((u8 *)&d_check,p_InitRptData,4);
+    113                          p_InitRptData++;                     
+    114          			if(d_check!=0xffffffff) 
+    115          			{
+    116          				CZJLMagBuff.wUseMark++;  b_checkover=true;
+    117          				break;
+    118          			}
+    119          		}
+    120          		if(b_checkover) break;
+    121          		if(CZJLMagBuff.wUseMark==0) break;
+    122          	}
+    123          }
+    124          /*
+    125          *******************************************************************
+    126          * Title:		void	Flash_Write_EventFun()
+    127          * Description:		将事件记录写入相应flashrom区及EEP
+    128          * InputParameter:		
+    129          
+    130          *******************************************************************
+    131          */
+    132          void	Flash_Write_EventFun()							// 写事件记录
+    133          {
+    134          	//
+    135          	u8 *pbuff;
+    136          	u32 dwAddr;
+    137           	
+    138          	if(Action_Buff.ActionManList[D_FLASH].uReadPt!=Action_Buff.uWritePt)
+    139          	{
+    140          	  
+    141          		if(SgMagBuff.wUseMark>=pre_FmPage)//报文已经写满，擦除扇区，将扇区中最后64条报文移至扇区首址，
+    142          		{
+    143          					dwAddr=SgAddr_flash+ (Flash_Page-1)*Flash_Sec;//计算偏移地址		
+    144          						
+    145          					W25Q_ReadMultiBytes(Tem_data,dwAddr,Flash_Sec);
+    146          	  
+    147          					FL_Erase_Sector(SEC_SG);	
+    148          					W25Q_WritePageBytes(Tem_data,SgAddr_flash,Flash_Sec);    
+    149          			SgMagBuff.wUseMark=MOVE_NUM;
+    150          		}
+    151                	dwAddr=SgAddr_flash+SgMagBuff.wUseMark*EVT_FmOne;//计算偏移地址		
+    152          		
+    153              	pbuff=(u8 *)&Action_Buff.ActionBuff[Action_Buff.ActionManList[D_FLASH].uReadPt];
+    154          
+    155          	   W25Q_WritePageBytes(pbuff,dwAddr,sizeof(ActionList));
+    156          
+    157          	   SgMagBuff.wUseMark++;	
+    158           	   Action_Buff.ActionManList[D_FLASH].uReadPt++;
+    159          	   Action_Buff.ActionManList[D_FLASH].uReadPt %=TRIPRPT_NUM;
+    160           
+    161          	} 
+    162          }
+    163          /*
+    164          *******************************************************************
+    165          * Title:		void	Flash_Write_SoeFun()
+    166          * Description:		将soe记录写入相应flashrom区及EEP
+    167          * InputParameter:		
+    168          
+    169          *******************************************************************
+    170          */
+    171          void	Flash_Write_SoeFun()			
+    172          {
+    173          	//
+    174          	u8 *pbuff;
+    175          	u32 dwAddr;
+    176          	
+    177          	if(Soe_Buff.SoeManList[D_FLASH].uReadPt!=Soe_Buff.uWritePt)
+    178          	{	//读写指针不等,则有报文需填写
+    179          	
+    180          	  
+    181          		if(SoeMagBuff.wUseMark>=pre_FmPage)//报文已经写满，擦除扇区，将扇区中最后64条报文移至扇区首址，
+    182          		{
+    183          					dwAddr=SoeAddr_flash+ (Flash_Page-1)*Flash_Sec;//计算偏移地址		
+    184          						
+    185          					W25Q_ReadMultiBytes(Tem_data,dwAddr,Flash_Sec);
+    186          					
+    187          					FL_Erase_Sector(SEC_SOE);	
+    188          					W25Q_WritePageBytes(Tem_data,SoeAddr_flash,Flash_Sec);     
+    189          			        SoeMagBuff.wUseMark=MOVE_NUM;
+    190          		}
+    191                  	dwAddr=SoeAddr_flash+SoeMagBuff.wUseMark*EVT_FmOne;//计算偏移地址		
+    192          		
+    193          		   pbuff=(u8 *)&Soe_Buff.SoeB[Soe_Buff.SoeManList[D_FLASH].uReadPt];
+    194          
+    195          		    W25Q_WritePageBytes(pbuff,dwAddr,preSoeSize_FmOne);
+    196          
+    197          			SoeMagBuff.wUseMark++;		
+    198          			Soe_Buff.SoeManList[D_FLASH].uReadPt++;
+    199          			Soe_Buff.SoeManList[D_FLASH].uReadPt %=TRIPRPT_NUM;
+    200             
+    201          	  
+    202          	   
+    203          	}
+    204          }
+    205          
+    206          /*
+    207          *******************************************************************
+    208          * Title:		void	Flash_Write_CZJLFun()
+    209          * Description:		将CZJL记录写入相应flashrom区及EEP
+    210          * InputParameter:		
+    211          
+    212          *******************************************************************
+    213          */
+    214          void	Flash_Write_CZJLFun()			
+    215          {
+    216          	//
+    217          	u8 *pbuff;
+    218          	u32 dwAddr;
+    219          	
+    220          	if(CZJL_Buff.SoeManList[D_FLASH].uReadPt!=CZJL_Buff.uWritePt)
+    221          	{	//读写指针不等,则有报文需填写	  
+    222          		if(CZJLMagBuff.wUseMark>=pre_FmPage)//报文已经写满，擦除扇区，将扇区中最后64条报文移至扇区首址，
+    223          		{
+    224                      dwAddr=CZJLAddr_flash+ (Flash_Page-1)*Flash_Sec;//计算偏移地址		
+    225                          
+    226                      W25Q_ReadMultiBytes(Tem_data,dwAddr,Flash_Sec);
+    227          
+    228                      FL_Erase_Sector(SEC_CZJL);	
+    229                      W25Q_WritePageBytes(Tem_data,CZJLAddr_flash,Flash_Sec);     
+    230                      CZJLMagBuff.wUseMark=MOVE_NUM;
+    231          		}
+    232                  dwAddr=CZJLAddr_flash+CZJLMagBuff.wUseMark*EVT_FmOne;//计算偏移地址		
+    233              
+    234                  pbuff=(u8 *)&CZJL_Buff.SoeB[CZJL_Buff.SoeManList[D_FLASH].uReadPt];
+    235          
+    236                  W25Q_WritePageBytes(pbuff,dwAddr,preSoeSize_FmOne);
+    237          
+    238                  CZJLMagBuff.wUseMark++;		
+    239                  CZJL_Buff.SoeManList[D_FLASH].uReadPt++;
+    240                  CZJL_Buff.SoeManList[D_FLASH].uReadPt %=TRIPRPT_NUM; 	   
+    241          	}
+    242           }
+    243          /*
+    244          *******************************************************************
+    245          * Title:		void	Flash__Operat_edit()
+    246          * Description:		FlashRom操作编辑函数
+    247          * InputParameter:		
+    248          
+    249          *******************************************************************
+    250          */
+    251          void	Flash_Operat_edit()                    	// FlashRom写操作
+    252          {
+    253              if(Fm_Operat_Request&Fm_Write_EventData)           // 写事件记录
+    254              {
+    255                  //if(Action_Buff.ActionManList[D_FLASH].uReadPt==Action_Buff.uWritePt)
+    256                      //Fm_Operat_Request &=~Fm_Write_EventData;
+    257                  Flash_Write_EventFun();			   // 写事件记录	
+    258              }
+    259              else if(Fm_Operat_Request&Fm_Write_SoeData)         // 写soe记录
+    260              {
+    261                  //if(Soe_Buff.SoeManList[D_FLASH].uReadPt==Soe_Buff.uWritePt)
+    262                      //Fm_Operat_Request &=~Fm_Write_SoeData;
+    263                  Flash_Write_SoeFun();								// 写soe记录				
+    264              }
+    265          	else if(Fm_Operat_Request&Fm_Write_CZJLData)         // 写soe记录
+    266          	{
+    267                	//if(CZJL_Buff.SoeManList[D_FLASH].uReadPt==CZJL_Buff.uWritePt)
+    268          	          	//Fm_Operat_Request &=~Fm_Write_CZJLData;
+    269          		Flash_Write_CZJLFun();								// 写soe记录				
+    270          	}
+    271              //else
+    272                  //Fm_Operat_Request=0;
+    273          }
+    274          
+    275          /*
+    276          *******************************************************************
+    277          * Title:		u16	Flash_Read_EventSum()
+    278          * Description:		从RAM读事件记录总数
+    279          * InputParameter:		
+    280          
+    281          *******************************************************************
+    282          */
+    283          u16	Flash_Read_EventSum(u8 num)							// 读事件记录总数
+    284          {
+    285              u16 wEventSum=0;
+    286              
+    287              if(num==0)
+    288              {
+    289                  wEventSum =SgMagBuff.wUseMark;	
+    290              }
+    291              if(num==1)
+    292              {
+    293                  wEventSum=SoeMagBuff.wUseMark;	
+    294              }
+    295              if(num==2)
+    296              {
+    297                  wEventSum=CZJLMagBuff.wUseMark;	
+    298              }
+    299              return wEventSum;	
+    300          }
+    301          /*
+    302          *******************************************************************
+    303          * Title:		bool	Flash_Read_EventFun(u16 wReacordNo,ActionList *ReadEventBuff)
+    304          * Description:		读1条事件记录  wReacordNo 记录号从1开始,注意
+    305          * InputParameter:	u16 wReacordNo	<输入需读出的记录号>	
+    306          			ActionList *ReadEventBuff<读出的事件记录需放至的缓冲>
+    307          
+    308          *******************************************************************
+    309          */
+    310          bool	Flash_Read_EventFun(u16 wReacordNo,u8 *ReadEventBuff,u8 num)							// 读1条事件记录
+    311          {
+    312              u32 Offset;
+    313           
+    314              if(num==0)
+    315              {
+    316                  Offset=SgAddr_flash +wReacordNo*EVT_FmOne;//计算偏移地址
+    317                  W25Q_ReadMultiBytes(ReadEventBuff,Offset,preSgSize_FmOne);
+    318              }
+    319              if(num==1)
+    320              {
+    321                  Offset=SoeAddr_flash +wReacordNo*EVT_FmOne;//计算偏移地址
+    322                  W25Q_ReadMultiBytes(ReadEventBuff,Offset,preSoeSize_FmOne);
+    323              }
+    324              if(num==2)
+    325              {
+    326                  Offset=CZJLAddr_flash +wReacordNo*EVT_FmOne;//计算偏移地址
+    327                  W25Q_ReadMultiBytes(ReadEventBuff,Offset,preSoeSize_FmOne);
+    328              } 
+    329              return TRUE;
+    330          }
+    331          
+    332          
+    333          /*
+    334          *******************************************************************
+    335          * Title:		bool Flash_Earse()
+    336          * Description:		擦除记录区  0-事件记录 1-SOE 2-操作记录
+    337          * InputParameter:		
+    338          
+    339          *******************************************************************
+    340          */
+    341          bool Flash_Earse(u8 num)			// 擦除记录区
+    342          {
+    343          
+    344             if(num==0)
+    345             {
+    346          		SgMagBuff.wStatus=' ';
+    347          		SgMagBuff.wUseMark=0;	
+    348           	 
+    349          		if(FL_Erase_Sector(SEC_SG))
+    350          			return true; 
+    351          		   else
+    352          		   return false  ;
+    353           
+    354             }
+    355             if(num==1)
+    356             {
+    357          	 
+    358          		SoeMagBuff.wStatus=' ';
+    359          		SoeMagBuff.wUseMark=0;	
+    360           
+    361          		if(FL_Erase_Sector(SEC_SOE))
+    362          			return true; 
+    363          		   else
+    364          		   return false  ;	 
+    365             }		
+    366             if(num==2)
+    367             {
+    368          	 
+    369          		CZJLMagBuff.wStatus=' ';
+    370          		CZJLMagBuff.wUseMark=0;	
+    371          		if(FL_Erase_Sector(SEC_CZJL))
+    372          			return true; 
+    373          		   else
+    374          		   return false  ;
+    375             }	
+    376           
+    377              return false  ;  
+    378          }
+    379          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       8   FL_Erase_Sector
+         8   -> SST25V_ER
+       8   FL_Erase_Sector_page
+         8   -> SST25V_ER
+       8   FL_Erase_Sector_ss
+         8   -> SST25V_ER
+       8   FM_Init_Rpt
+         8   -> W25Q_ReadMultiBytes
+         8   -> WDog_Clear
+       8   Flash_Earse
+         8   -> FL_Erase_Sector
+       8   Flash_Operat_edit
+         8   -> Flash_Write_CZJLFun
+         8   -> Flash_Write_EventFun
+         8   -> Flash_Write_SoeFun
+      24   Flash_Read_EventFun
+        24   -> W25Q_ReadMultiBytes
+       0   Flash_Read_EventSum
+      16   Flash_Write_CZJLFun
+        16   -> FL_Erase_Sector
+        16   -> W25Q_ReadMultiBytes
+        16   -> W25Q_WritePageBytes
+      16   Flash_Write_EventFun
+        16   -> FL_Erase_Sector
+        16   -> W25Q_ReadMultiBytes
+        16   -> W25Q_WritePageBytes
+      16   Flash_Write_SoeFun
+        16   -> FL_Erase_Sector
+        16   -> W25Q_ReadMultiBytes
+        16   -> W25Q_WritePageBytes
+       8   Flash_task
+         8   -> Flash_Operat_edit
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable6
+       4  ??DataTable6_1
+       4  ??DataTable6_10
+       4  ??DataTable6_11
+       4  ??DataTable6_2
+       4  ??DataTable6_3
+       4  ??DataTable6_4
+       4  ??DataTable6_5
+       4  ??DataTable6_6
+       4  ??DataTable6_7
+       4  ??DataTable6_8
+       4  ??DataTable6_9
+      28  FL_Erase_Sector
+      28  FL_Erase_Sector_page
+      30  FL_Erase_Sector_ss
+     554  FM_Init_Rpt
+     116  Flash_Earse
+      44  Flash_Operat_edit
+      90  Flash_Read_EventFun
+      44  Flash_Read_EventSum
+     146  Flash_Write_CZJLFun
+     144  Flash_Write_EventFun
+     146  Flash_Write_SoeFun
+       8  Flash_task
+    4096  Tem_data
+       1  b_checkover
+       4  d_check
+       2  i
+       4  p_InitRptData
+
+ 
+ 4 107 bytes in section .bss
+ 1 426 bytes in section .text
+ 
+ 1 426 bytes of CODE memory
+ 4 107 bytes of DATA memory
+
+Errors: none
+Warnings: 3

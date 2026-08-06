@@ -1,0 +1,371 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.70.2.11706/W32 for ARM       17/Jun/2026  08:45:29
+# Copyright 1999-2016 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Eep.c
+#    Command line =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Eep.c
+#        -D ATF403AVCT7 -D LIBRARY_VERSION -D USE_STDPERIPH_DRIVER -D
+#        AT_START_F403A_V1_0 -lcN
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List
+#        -lA
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List
+#        -o
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\Obj
+#        --no_cse --no_unroll --no_inline --no_code_motion --no_tbaa
+#        --no_clustering --no_scheduling --debug --endian=little
+#        --cpu=Cortex-M4 -e --char_is_signed --enable_multibytes --fpu=VFPv4_sp
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.5\arm\INC\c\DLib_Config_Full.h" -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\STM32F10x_StdPeriph_Driver\inc\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\CMSIS\CM4\CoreSupport\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\CMSIS\CM4\DeviceSupport\
+#        -On --use_c++_inline
+#    Locale       =  Chinese (Simplified)_China.936
+#    List file    =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List\Eep.lst
+#    Object file  =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\Obj\Eep.o
+#
+###############################################################################
+
+D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Eep.c
+      1          /* 
+      2          ******************************************************************
+      3          * Title:	Eep.c
+      4          * Description:	Eep操作的具体应用函数
+      5          * Function:
+      6          
+      7          ******************************************************************
+      8          */
+      9          #include "Drive.h"
+     10          #include "GlobeDef.h"
+     11          #include "Eep.h"
+     12          #include "stm32f10x.h"
+     13          #include "W25Q64.h"
+     14          
+     15          bool	Eep_Write( u8* pBuffer, u16 length, u32 WriteAddress );
+     16          
+     17          //向指定扇区的指定地址写入一个字节(unsigned char)数组
+     18          u8 FL_Write_Arry(u32 wOffset,unsigned char *pSrc,u16 wLen)
+     19          {
+     20          	u16 i;
+     21          	u8 *pFrom,temp0,temp1;
+     22              u32  pTo;
+     23          
+     24          	pTo=wOffset;
+     25          	pFrom=pSrc;
+     26          	for(i =wLen; i > 0; i--)
+     27          	{
+     28                  temp0=*pFrom;
+     29           
+     30           		Drive_Eep_write_one(pTo,temp0);
+     31           		temp1=Drive_Eep_read_one(pTo);
+     32          		if(temp0!=temp1) 
+     33          			return FALSE;
+     34          		pFrom++;
+     35          		pTo++;
+     36          	}
+     37          	return TRUE;
+     38          }
+     39          
+     40          
+     41          bool	Eep_Write( u8* pBuffer, u16 length, u32 WriteAddress )						 
+     42          {
+     43          	u8 buff[210],i;
+     44          	u8 *ptr; 
+     45          	
+     46          	W25Q_WritePageBytes(pBuffer, WriteAddress, length);
+     47          	delay_us(20);
+     48          	W25Q_ReadMultiBytes(buff, WriteAddress, length);
+     49          	  ptr=pBuffer;
+     50          	  for(i=0;i<length;i++)
+     51          	  {
+     52          		if(*ptr++!=buff[i])
+     53          		     return FALSE;
+     54          	  }
+     55           
+     56          	return TRUE;
+     57          
+     58          }
+     59          
+     60          
+     61          
+     62          
+     63          /*
+     64          *******************************************************************
+     65          * Title:		void	Eep_Read_EventMange()
+     66          * Description:		读出事件管理区
+     67          * InputParameter:			
+     68          
+     69          *******************************************************************
+     70          */
+     71          void	Eep_Read_EventMange()						//读出事件管理区	
+     72          {
+     73          
+     74          	u32 wAddr;	
+     75              wAddr=SgAddr_flash;
+     76          	    
+     77          		SgMagBuff.wSts=Drive_Eep_read_one(wAddr)*0x100+Drive_Eep_read_one(wAddr+1);
+     78                 	wAddr+=2;
+     79              	SgMagBuff.wStatus=Drive_Eep_read_one(wAddr)*0x100+Drive_Eep_read_one(wAddr+1);
+     80          		wAddr+=2;	
+     81          		SgMagBuff.wUseMark=Drive_Eep_read_one(wAddr)*0x100+Drive_Eep_read_one(wAddr+1);		
+     82          		wAddr+=2;
+     83          		SgMagBuff.wUseSart=Drive_Eep_read_one(wAddr)*0x100+Drive_Eep_read_one(wAddr+1);		
+     84          		wAddr+=2;
+     85          		SgMagBuff.wCrc=Drive_Eep_read_one(wAddr)*0x100+Drive_Eep_read_one(wAddr+1);		
+     86          		wAddr+=2;
+     87          			
+     88          }
+     89          /*
+     90          *******************************************************************
+     91          * Title:		bool	Eep_Write_EventMange()
+     92          * Description:		写事件管理区
+     93          * InputParameter:			
+     94          
+     95          *******************************************************************
+     96          */
+     97          bool	Eep_Write_EventMange()						//写事件管理区
+     98          {
+     99          
+    100          	u32 wAddr;
+    101              	wAddr=SgAddr_flash;
+    102          		
+    103          		if(!Drive_Eep_WriteOne(wAddr,SgMagBuff.wSts))
+    104          			return FALSE;
+    105          		wAddr+=2;
+    106          		if(!Drive_Eep_WriteOne(wAddr,SgMagBuff.wStatus))
+    107          			return FALSE;
+    108          		wAddr+=2;
+    109          		if(!Drive_Eep_WriteOne(wAddr,SgMagBuff.wUseMark))
+    110          			return FALSE;
+    111          		wAddr+=2;		
+    112          		if(!Drive_Eep_WriteOne(wAddr,SgMagBuff.wUseSart))
+    113          			return FALSE;		
+    114          		wAddr+=2;		
+    115          		SgMagBuff.wCrc=SgMagBuff.wStatus;
+    116          		SgMagBuff.wCrc +=SgMagBuff.wUseMark;
+    117          		SgMagBuff.wCrc +=SgMagBuff.wUseSart;		
+    118          		if(!Drive_Eep_WriteOne(wAddr,SgMagBuff.wCrc))
+    119          			return FALSE;
+    120          		wAddr+=2;
+    121          	
+    122          	return TRUE;
+    123          }
+    124          /*
+    125          *******************************************************************
+    126          * Title:		void	Eep_Read_SoeMange()
+    127          * Description:		读出soe管理区
+    128          * InputParameter:			
+    129          
+    130          *******************************************************************
+    131          */
+    132          void	Eep_Read_SoeMange()						//读出soe管理区	
+    133          {
+    134          
+    135          	u32 wAddr;
+    136              	wAddr=SoeAddr_flash;
+    137          		SoeMagBuff.wSts=Drive_Eep_read_one(wAddr)*0x100+Drive_Eep_read_one(wAddr+1);
+    138          		wAddr+=2;
+    139          		SoeMagBuff.wStatus=Drive_Eep_read_one(wAddr)*0x100+Drive_Eep_read_one(wAddr+1);
+    140          		wAddr+=2;
+    141          		SoeMagBuff.wUseMark=Drive_Eep_read_one(wAddr)*0x100+Drive_Eep_read_one(wAddr+1);		
+    142          		wAddr+=2;
+    143          		SoeMagBuff.wUseSart=Drive_Eep_read_one(wAddr)*0x100+Drive_Eep_read_one(wAddr+1);		
+    144          		wAddr+=2;		
+    145          		SoeMagBuff.wCrc=Drive_Eep_read_one(wAddr)*0x100+Drive_Eep_read_one(wAddr+1);	
+    146          		wAddr+=2;
+    147          			
+    148          }
+    149          /*
+    150          *******************************************************************
+    151          * Title:		bool	Eep_Write_SoeMange()
+    152          * Description:		写soe管理区
+    153          * InputParameter:			
+    154          
+    155          *******************************************************************
+    156          */
+    157          bool	Eep_Write_SoeMange()					//写soe管理区
+    158          {
+    159          
+    160          	u32 wAddr;
+    161              wAddr=SoeAddr_flash;
+    162          			
+    163          		if(!Drive_Eep_WriteOne(wAddr,SoeMagBuff.wSts))
+    164          			return FALSE;		
+    165          		wAddr+=2;
+    166          		if(!Drive_Eep_WriteOne(wAddr,SoeMagBuff.wStatus))
+    167          			return FALSE;
+    168          		wAddr+=2;
+    169          		if(!Drive_Eep_WriteOne(wAddr,SoeMagBuff.wUseMark))
+    170          			return FALSE;
+    171          		wAddr+=2;
+    172          		if(!Drive_Eep_WriteOne(wAddr,SoeMagBuff.wUseSart))
+    173          			return FALSE;		
+    174          		wAddr+=2;
+    175          		SoeMagBuff.wCrc=SoeMagBuff.wStatus;
+    176          		SoeMagBuff.wCrc +=SoeMagBuff.wUseMark;
+    177          		SoeMagBuff.wCrc +=SoeMagBuff.wUseSart;
+    178          				
+    179          		if(!Drive_Eep_WriteOne(wAddr,SoeMagBuff.wCrc))
+    180          			return FALSE;
+    181          		wAddr+=2;
+    182          	
+    183          	return TRUE;
+    184          }
+    185          /*
+    186          *******************************************************************
+    187          * Title:		void	Eep_Read_FixValue(FixValueBuff *pReadFixvalBuff)
+    188          * Description:		读某一定值区定值
+    189          * InputParameter:	FixValueBuff *pReadFixvalBuff <定值区缓冲指针>
+    190          
+    191          *******************************************************************
+    192          */
+    193          void	Eep_Read_FixValue(FixValueBuff *pReadFixvalBuff)               //读某一定值区定值
+    194          {
+    195          	u32 wStartAddr;
+    196          	 
+    197          	wStartAddr=preFixVal_SAddr+110*pReadFixvalBuff->uSectionNo;		//定值表长度为110
+    198           
+    199          	W25Q_ReadMultiBytes((u8 *)pReadFixvalBuff, wStartAddr, sizeof(FixValueBuff));
+    200          }
+    201          
+    202          /*
+    203          *******************************************************************
+    204          * Title:		void	Eep_Write_FixValue(FixValueBuff *pWriteFixvalBuff)
+    205          * Description:		写某一定值区定值
+    206          * InputParameter:	FixValueBuff *pWriteFixvalBuff <定值区缓冲指针>
+    207          
+    208          *******************************************************************
+    209          */
+    210          void	Eep_Write_FixValue(FixValueBuff *pWriteFixvalBuff)	            //写某一定值区定值
+    211          {
+    212          	u32 wStartAddr;
+    213            
+    214          	wStartAddr=preFixVal_SAddr+110*pWriteFixvalBuff->uSectionNo;
+    215          
+    216          	Eep_Write((u8 *)pWriteFixvalBuff,sizeof(FixValueBuff),wStartAddr);
+    217          }
+    218          
+    219          
+    220          /*
+    221          *******************************************************************
+    222          * Title:		void	Eep_Read_FixValueMag(FixStatus *pReadFixvalMag)
+    223          * Description:		读某一定值区管理
+    224          * InputParameter:	FixStatus *pReadFixvalMag <定值区管理缓冲指针>
+    225          
+    226          *******************************************************************
+    227          */
+    228          void	Eep_Read_FixValueMag(FixStatus *pReadFixvalMag)               //读某一定值区管理 
+    229          {
+    230          	W25Q_ReadMultiBytes((u8 *)pReadFixvalMag, preFValMagStartAdrEep, sizeof(FixStatus));
+    231          }
+    232          /*
+    233          *******************************************************************
+    234          * Title:		void	Eep_Write_FixValueMag(FixStatus *pWriteFixvalMag)
+    235          * Description:		写某一定值区管理
+    236          * InputParameter:	FixStatus *pWriteFixvalMag <定值区管理缓冲指针>
+    237          
+    238          *******************************************************************
+    239          */
+    240          void	Eep_Write_FixValueMag(FixStatus *pWriteFixvalMag)               //写某一定值区管理 
+    241          {
+    242          	 Eep_Write((u8 *)pWriteFixvalMag,sizeof(FixStatus),preFValMagStartAdrEep);
+    243          }
+    244          /*
+    245          *******************************************************************
+    246          * Title:		void	Eep_Read_Signal(Signal *pReadSignal)
+    247          * Description:		读软信号区
+    248          * InputParameter:	Signal *pReadSignal <软信号缓冲区指针>
+    249          
+    250          *******************************************************************
+    251          */
+    252          void	Eep_Read_Signal(Signal *pReadSignal)               //读软信号区
+    253          {
+    254          	W25Q_ReadMultiBytes((u8 *)pReadSignal, preSignalStartAdrEep, sizeof(Signal));
+    255          }
+    256          /*
+    257          *******************************************************************
+    258          * Title:		void	Eep_Write_Signal(Signal *pWriteSignal)
+    259          * Description:		写软信号区
+    260          * InputParameter:	Signal *pWriteSignal <软信号缓冲区指针>
+    261          
+    262          *******************************************************************
+    263          */
+    264          void	Eep_Write_Signal(Signal *pWriteSignal)               //写软信号区 
+    265          {
+    266          	Eep_Write((u8 *)pWriteSignal,sizeof(Signal),preSignalStartAdrEep);
+    267          }
+    268          
+    269          
+    270          		
+    271          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+      16   Eep_Read_EventMange
+        16   -> Drive_Eep_read_one
+      16   Eep_Read_FixValue
+        16   -> W25Q_ReadMultiBytes
+       8   Eep_Read_FixValueMag
+         8   -> W25Q_ReadMultiBytes
+       8   Eep_Read_Signal
+         8   -> W25Q_ReadMultiBytes
+      16   Eep_Read_SoeMange
+        16   -> Drive_Eep_read_one
+     240   Eep_Write
+       240   -> W25Q_ReadMultiBytes
+       240   -> W25Q_WritePageBytes
+       240   -> delay_us
+       8   Eep_Write_EventMange
+         8   -> Drive_Eep_WriteOne
+      16   Eep_Write_FixValue
+        16   -> Eep_Write
+       8   Eep_Write_FixValueMag
+         8   -> Eep_Write
+       8   Eep_Write_Signal
+         8   -> Eep_Write
+       8   Eep_Write_SoeMange
+         8   -> Drive_Eep_WriteOne
+      40   FL_Write_Arry
+        40   -> Drive_Eep_read_one
+        40   -> Drive_Eep_write_one
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable3
+       4  ??DataTable3_1
+     160  Eep_Read_EventMange
+      28  Eep_Read_FixValue
+      18  Eep_Read_FixValueMag
+      18  Eep_Read_Signal
+     160  Eep_Read_SoeMange
+      94  Eep_Write
+     148  Eep_Write_EventMange
+      28  Eep_Write_FixValue
+      18  Eep_Write_FixValueMag
+      18  Eep_Write_Signal
+     148  Eep_Write_SoeMange
+      80  FL_Write_Arry
+
+ 
+ 926 bytes in section .text
+ 
+ 926 bytes of CODE memory
+
+Errors: none
+Warnings: none

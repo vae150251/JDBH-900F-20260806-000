@@ -1,0 +1,1044 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.70.2.11706/W32 for ARM       17/Jun/2026  08:45:30
+# Copyright 1999-2016 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\lcd_drv.c
+#    Command line =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\lcd_drv.c
+#        -D ATF403AVCT7 -D LIBRARY_VERSION -D USE_STDPERIPH_DRIVER -D
+#        AT_START_F403A_V1_0 -lcN
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List
+#        -lA
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List
+#        -o
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\Obj
+#        --no_cse --no_unroll --no_inline --no_code_motion --no_tbaa
+#        --no_clustering --no_scheduling --debug --endian=little
+#        --cpu=Cortex-M4 -e --char_is_signed --enable_multibytes --fpu=VFPv4_sp
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.5\arm\INC\c\DLib_Config_Full.h" -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\STM32F10x_StdPeriph_Driver\inc\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\CMSIS\CM4\CoreSupport\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\CMSIS\CM4\DeviceSupport\
+#        -On --use_c++_inline
+#    Locale       =  Chinese (Simplified)_China.936
+#    List file    =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List\lcd_drv.lst
+#    Object file  =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\Obj\lcd_drv.o
+#
+###############################################################################
+
+D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\lcd_drv.c
+      1          #include "Drive.h"
+      2          #include "lcd_drv.h"
+      3          #include "GlobeDef.h"
+      4          #include "lib.h"
+      5          #include "bhjdq.h"
+      6          
+      7          
+      8          void LCD_Clear()
+      9          {
+     10          	if(IDC.bReflash==0x5a)
+     11          	{
+     12          		Lcd_clrram();
+     13          		IDC.bReflash=0;	
+     14          	}
+     15          #ifdef	ZRR900F	
+     16          	if((RUN_YB.YB_CHZ==YBON) && (!Set_QFTZ.Type))
+     17          	{
+     18                    if(FLAG_FZ&FLG_CHcm)
+     19                       Lcd_printstr(0,19,"`");
+     20                     else
+     21                       Lcd_printstr(0,19,"^");
+     22          	}
+     23          	
+     24          	if(Set_QFTZ.Type==2)
+     25          	{
+     26                 if(FLAG_FZ&FLG_DDJYQD)
+     27                       Lcd_printstr(0,19,"`");
+     28                     else
+     29                       Lcd_printstr(0,19,"^");
+     30          	}
+     31          #endif
+     32          #ifdef	ZRR940	 
+     33                   if(FLAG_FZ&FLG_CDcm)
+     34                       Lcd_printstr(0,19,"`");
+     35                     else
+     36                       Lcd_printstr(0,19,"^");
+     37          	 
+     38          #endif
+     39          	
+     40          	
+     41          }
+     42          //在指定行和列显示一个长整数
+     43          //参数：行、列、长整数值(最大不超过999999999)、是否取反显示
+     44          void Lcd_WriteDWORD(u16 wLine,u16 wColum,u32 dData,bool bMirror) 
+     45          {  
+     46          	static u16   i,wNo,wWRDat[10];
+     47          	static u32  dDat,dK;
+     48          	dDat=dData;
+     49          	if(dDat> 999999999)	dDat=999999999;
+     50          	if(dDat>=100000000)		{wNo=9;dK=100000000;}
+     51          	else if(dDat>=10000000)	{wNo=8;dK=10000000;}
+     52          	else if(dDat>=1000000)	{wNo=7;dK=1000000;}
+     53          	else if(dDat>=100000)	{wNo=6;dK=100000;}
+     54          	else if(dDat>=10000)	{wNo=5;dK=10000;}
+     55          	else if(dDat>=1000)		{wNo=4;dK=1000;}
+     56          	else if(dDat>=100)		{wNo=3;dK=100;}
+     57          	else if(dDat>=10)		{wNo=2;dK=10;}
+     58          	else					{wNo=1;dK=1;}
+     59          	
+     60          	for(i=0;i<wNo;i++)
+     61          	{	
+     62          		wWRDat[i]=(u16)(dDat/dK);
+     63          		dDat%=dK;
+     64          		dK/=10;
+     65          		Lcd_wrchar_T(wLine*2,i+wColum,wWRDat[i]+0x30,bMirror);
+     66          	}
+     67          }
+     68          
+     69          //在指定行和列显示一个整数
+     70          //参数：行、列、整数值、是否取反显示
+     71          void Lcd_WriteWORD(u16 wLine,u16 wColum,u16 wData,bool bMirror) 
+     72          {  
+     73          	u16 w_No=0;
+     74          	u16 w_Dat,w_K,w_Col;
+     75          	
+     76          	w_Dat=wData;
+     77          	w_Col=wColum;
+     78          	
+     79          	if(w_Dat>=10000)		{w_No=5;w_K=10000;}
+     80          	else if(w_Dat>=1000)	{w_No=4;w_K=1000;}
+     81          	else if(w_Dat>=100)		{w_No=3;w_K=100;}
+     82          	else if(w_Dat>=10)		{w_No=2;w_K=10;}
+     83          	else					{w_No=1;w_K=1;}
+     84          
+     85          	while (w_No>0)
+     86          	{	
+     87          		Lcd_wrchar_T(wLine*2,w_Col,(u16)(w_Dat/w_K)+0x30,bMirror);
+     88          		w_Dat%=w_K;
+     89          		w_K/=10;
+     90          		w_No--;
+     91          		w_Col++;
+     92          	}
+     93          }
+     94          
+     95          void Lcd_Write(u8 *lcd_buf,u16 wColum,u16 wData) 
+     96          {  
+     97          	u16 w_No=0;
+     98          	u16 w_Dat,w_K;
+     99          	u8 *lcd_temp;
+    100          	w_Dat=wData;
+    101          
+    102          	lcd_temp=lcd_buf+wColum;
+    103          	if(w_Dat>=10000)		{w_No=5;w_K=10000;}
+    104          	else if(w_Dat>=1000)	{w_No=4;w_K=1000;}
+    105          	else if(w_Dat>=100)		{w_No=3;w_K=100;}
+    106          	else if(w_Dat>=10)		{w_No=2;w_K=10;}
+    107          	else					{w_No=1;w_K=1;}
+    108          
+    109          	while (w_No>0)
+    110          	{	
+    111              	*lcd_temp=(w_Dat/w_K)+0x30;
+    112                  lcd_temp++;
+    113            		w_Dat%=w_K;
+    114          		w_K/=10;
+    115          		w_No--;
+    116          
+    117          	}
+    118          }
+    119          
+    120           
+    121          //专用于测量值显示(只显示正数，不显示负数)，数据整数部分显示3位小数部分显示4位连小数点位共显示8位
+    122          void  Lcd_WR_MEAVALUE(u16 wLine,u16 wColum,long dData,u32 dScale)//专用于测量值显示(只显示正数，不显示负数)，数据整数部分显示3位小数部分显示4位连小数点位共显示8位
+    123          {
+    124          	static  u16  i,wZS,wXS[4];
+    125          	static  long  dXS;
+    126          	
+    127              
+    128              if(dData&0x80000000)
+    129              {
+    130                Lcd_WriteStr(wLine,wColum,1,"-",false);
+    131                dData=~dData+1;
+    132              }
+    133              else
+    134              {
+    135                 Lcd_WriteStr(wLine,wColum,1," ",false);
+    136              }
+    137          	for(i=1;i<16;i++)
+    138          	{
+    139          		dXS=0x7fffffff/dScale;
+    140          		if(dXS>=10000)	break;
+    141          		else
+    142          		{
+    143          			dData >>=i;	dScale>>=i;
+    144          		}
+    145          	}
+    146          	wZS = dData/dScale;	//整数部分最大为9999
+    147          	if(wZS>9999)	wZS=9999;
+    148          	dXS=dData%dScale;
+    149          	dXS=dXS*10000/dScale;
+    150          	wXS[0] = dXS/1000;
+    151          	wXS[1] = (dXS%1000)/100;
+    152          	dXS = (dXS%1000)%100;
+    153          	wXS[2] = dXS/10;
+    154          	wXS[3] = dXS%10;
+    155             
+    156          	WDog_Clear();
+    157              Lcd_WriteStr(wLine,wColum+1,7,"        ",false);
+    158          	if(wZS>999)
+    159          	{
+    160          		Lcd_WriteDWORD(wLine,wColum+1,(u32)wZS,false);
+    161          		Lcd_WriteStr(wLine,wColum+5,4,".00",false);
+    162          		Lcd_WriteDWORD(wLine,wColum+6,(u32)wXS[0],false);
+    163          	//	Lcd_WriteDWORD(wLine,wColum+6,(u32)wXS[1],false); 
+    164          	}
+    165          	else if(wZS>99)
+    166          	{
+    167          		Lcd_WriteDWORD(wLine,wColum+1,(u32)wZS,false);
+    168          		Lcd_WriteStr(wLine,wColum+4,4,".00",false);
+    169          		Lcd_WriteDWORD(wLine,wColum+5,(u32)wXS[0],false); 
+    170          		Lcd_WriteDWORD(wLine,wColum+6,(u32)wXS[1],false); 
+    171          	//	Lcd_WriteDWORD(wLine,wColum+6,(u32)wXS[2],false); 
+    172          	}
+    173          	else
+    174          	{
+    175          		if(wZS>9)	Lcd_WriteDWORD(wLine,wColum+1,(u32)wZS,false);
+    176          		else		Lcd_WriteDWORD(wLine,wColum+2,(u32)wZS,false);
+    177          		if(dScale==10000)	//4位小数点
+    178          		{
+    179          			Lcd_WriteStr(wLine,wColum+3,4,".000",false);
+    180          			Lcd_WriteDWORD(wLine,wColum+4,(u32)wXS[0],false); 
+    181          			Lcd_WriteDWORD(wLine,wColum+5,(u32)wXS[1],false); 
+    182          			Lcd_WriteDWORD(wLine,wColum+6,(u32)wXS[2],false); 
+    183          		}
+    184          		else if(dScale==1000)	//3位小数点
+    185          		{
+    186          			Lcd_WriteStr(wLine,wColum+3,4,".000",false);
+    187          			Lcd_WriteDWORD(wLine,wColum+4,(u32)wXS[0],false); 
+    188          			Lcd_WriteDWORD(wLine,wColum+5,(u32)wXS[1],false); 
+    189          			Lcd_WriteDWORD(wLine,wColum+6,(u32)wXS[2],false); 
+    190          		}
+    191          		else if(dScale==100)	//2位小数点
+    192          		{
+    193          			Lcd_WriteStr(wLine,wColum+3,4,".00",false);
+    194          			Lcd_WriteDWORD(wLine,wColum+4,(u32)wXS[0],false); 
+    195          			Lcd_WriteDWORD(wLine,wColum+5,(u32)wXS[1],false); 
+    196          		}
+    197          		else if(dScale==10)	//1位小数点
+    198          		{
+    199          			Lcd_WriteStr(wLine,wColum+3,4,".0",false);
+    200          			Lcd_WriteDWORD(wLine,wColum+4,(u32)wXS[0],false); 
+    201          		}
+    202          		
+    203          	}
+    204          }
+    205          UI_buffer_Struct UI_buff;
+    206          #ifdef	ZRR900F	
+    207          UIBYQ_buffer_Struct UIBYQ_buff;
+    208          UIMOTO_buffer_Struct UIMOTO_buff;
+    209          #endif
+    210          void Lcd_WriteBH(u8 pTitle,u8 wLine ,u8 page)
+    211          {
+    212          	u8	i,j,ChanLct,pLct,con_MeaNum;
+    213          	u16	Tdata0,Tdata1;
+    214          	u32	*pt;
+    215          	u32 tempd;
+    216          	char b_text[16];
+    217          	MEATABLE *MEA_TABLE;
+    218          	
+    219          		if(!Set_QFTZ.Type)		//线路保护
+    220          		{
+    221                  UI_buff=UI_buffer;
+    222          	   UI_ANG((UI_Struct *)&UI_buff); 
+    223          		   pt=(u32*)&UI_buff;
+    224          	       MEA_TABLE=(MEATABLE *)&MeaValTab;
+    225          		   con_MeaNum=NumOfCY;
+    226          		}
+    227          #ifdef	ZRR900F	
+    228          		else if(Set_QFTZ.Type==1)		//变压器保护
+    229                  {
+    230          		 UIBYQ_buff=UIBYQ_buffer;
+    231          	   UI_ANG((UI_Struct *)&UIBYQ_buff); 
+    232          		   pt=(u32*)&UIBYQ_buff;
+    233          	         MEA_TABLE=(MEATABLE *)&MeaValTabBYQ;
+    234          		   con_MeaNum=NumOfCYBYQ;	  
+    235          		}
+    236                   else if(Set_QFTZ.Type==2)		//电动机保护
+    237          	   {
+    238          		   UIMOTO_buff=UIMOTO_buffer;
+    239          	       UI_ANG((UI_Struct *)&UIMOTO_buff); 
+    240          		   pt=(u32*)&UIMOTO_buff;
+    241          		 
+    242          	         MEA_TABLE=(MEATABLE *)&MeaValTabMOTO;
+    243          		   con_MeaNum=NumOfCYMOTO;	  
+    244          		}	
+    245          #endif
+    246          		
+    247          	pt=pt+page*36;   
+    248            
+    249          	 
+    250          	pLct=page*9;
+    251          	for (j=wLine; j<10; j++)
+    252          	{
+    253          	    ChanLct=pLct++;
+    254          		if(ChanLct>=con_MeaNum) break;	
+    255          		Lcd_printstr(j,1,(char *)MEA_TABLE[ChanLct].szName);	
+    256          		Lcd_printstr(j,12,(char *)MEA_TABLE[ChanLct].szUnit);	
+    257          	    for (i=0;i<16;i++) b_text[i]=0; 	            
+    258          
+    259                  tempd=*pt++; 
+    260           
+    261          			//先将数据转为完整hex格式,结果始终放大100倍存放
+    262          			 
+    263          			
+    264          				//最大允许显示9999
+    265          		 
+    266          			Tdata0 = tempd/100;
+    267          		Tdata1 = tempd%100;
+    268          	    sprintf(&b_text[0], "%4d.%02d", Tdata0,Tdata1);
+    269            
+    270                   Lcd_printstr(j,6,(char *)b_text);
+    271          		pt+=2;
+    272          		Tdata0=*pt++;
+    273                  if(MEA_TABLE[ChanLct].Kind!=MEAKIND_F)	
+    274                  {
+    275                      if(Tdata0&0x8000)
+    276                      {
+    277                          Tdata0=~Tdata0;
+    278                         sprintf(&b_text[7], "-%3d", Tdata0);
+    279                      }
+    280                      else
+    281                      {
+    282                         sprintf(&b_text[7], " %3d", Tdata0);	
+    283                      }
+    284                      Lcd_printstr(j,15,(char *)&b_text[7]);
+    285          		   Lcd_printstr(j,19,"@");	
+    286          
+    287                   }
+    288          
+    289                 
+    290              }
+    291          }
+    292          
+    293          
+    294          //写入测量值
+    295          void Lcd_WriteMeasure(u8 pTitle,u8 wLine ,u8 pshow)
+    296          {
+    297          	u8   i,ChanLct,pLct;
+    298          	long  *port,tempd,tempb;
+    299           	 
+    300          
+    301          	if(pTitle)      
+    302          		port=(long *)&UIPQ_buffer; 
+    303          	else
+    304          		port=&UICLXS[0];
+    305          	pLct=pshow;
+    306          	for(i=wLine;i<10;i++)
+    307          	{	
+    308          		ChanLct=pLct++;
+    309          		WDog_Clear();
+    310          		if(ChanLct>=NumOfYC1) break;	
+    311          		Lcd_printstr(i,1,(char *)&MeaValTab1[ChanLct].szName);	
+    312          		Lcd_printstr(i,15,(char *)&MeaValTab1[ChanLct].szUnit);
+    313          		if(MeaValTab1[ChanLct].Kind==MEAKIND_I) 
+    314          		{
+    315               
+    316          			tempb=*(port+ChanLct);
+    317          			if(pTitle&&CT_inf)
+    318          				tempd = tempb*CT_inf;
+    319          			else
+    320          				tempd =tempb;
+    321          			Lcd_WR_MEAVALUE(i,6,tempd,1000);
+    322           
+    323          		}  
+    324          		else   if(MeaValTab1[ChanLct].Kind==MEAKIND_U)     
+    325          		{
+    326                    
+    327          			tempb=*(port+ChanLct);
+    328          			tempd = tempb*PT_inf;		//先计算再判量纲
+    329          			if(tempd>=1000000)		//大于999.99时显示KV
+    330          			{
+    331          				tempd = tempd/1000;
+    332          				Lcd_WriteStr(i,15,1,"k",false);
+    333          				Lcd_WR_MEAVALUE(i,6,tempd,1000);	//保留3位小数
+    334          			}
+    335          			else
+    336          			{
+    337          				tempd = tempd/10;
+    338          				Lcd_WR_MEAVALUE(i,6,tempd,100);		//保留2位小数
+    339          			}
+    340                     
+    341          
+    342          		}
+    343          		else if(MeaValTab1[ChanLct].Kind==MEAKIND_P)
+    344          		{
+    345                         
+    346          			tempb=*(port+ChanLct);
+    347          			tempd=CT_inf*PT_inf;
+    348          			tempd = tempd/10;
+    349          				if(tempd>20660)		//会导致超出32位
+    350          				{
+    351          					tempd = tempd/100;
+    352          					tempd = tempd*tempb;
+    353          					if(tempd>999999||tempd<-999999)	//大于999.999kW时显示MW/Mvar
+    354          					{
+    355          						tempd = tempd/1000;
+    356          						Lcd_WriteStr(i,15,1,"M",false);
+    357          						Lcd_WR_MEAVALUE(i,6,tempd,1000);
+    358          					}
+    359          					else if(tempd>999||tempd<-999)	//大于999.99W时显示KW/Kvar
+    360          					{
+    361          						Lcd_WriteStr(i,15,1,"k",false);
+    362          						Lcd_WR_MEAVALUE(i,6,tempd,1000);
+    363          					}
+    364          					else					//显示W/var
+    365          					{
+    366          						Lcd_WR_MEAVALUE(i,6,tempd,100);
+    367          					}
+    368          				}
+    369          				else
+    370          				{
+    371          					tempd = tempd*tempb;
+    372          					if(tempd>99999999||tempd<-99999999)	//大于999.999kW时显示MW/Mvar
+    373          					{
+    374          						tempd = tempd/100000;
+    375          						Lcd_WriteStr(i,15,1,"M",false);
+    376          						Lcd_WR_MEAVALUE(i,6,tempd,1000);
+    377          					}
+    378          					else if(tempd>99999||tempd<-99999)	//大于999.99W时显示KW/Kvar
+    379          					{
+    380          						tempd = tempd/100;
+    381          						Lcd_WriteStr(i,15,1,"k",false);
+    382          						Lcd_WR_MEAVALUE(i,6,tempd,1000);
+    383          					}
+    384          					else					//显示W/var
+    385          					{
+    386          						Lcd_WR_MEAVALUE(i,6,tempd,100);
+    387          					}
+    388          				}
+    389          			 
+    390                       
+    391          		}
+    392          		else if(MeaValTab1[ChanLct].Kind==MEAKIND_K)
+    393          			Lcd_WR_MEAVALUE(i,6,*(port+ChanLct),10000);
+    394          		else 
+    395                  	Lcd_WR_MEAVALUE(i,6,*(port+ChanLct),1000);
+    396          	} 
+    397          }
+    398          
+    399          //对输入数据进行小数点位置判别
+    400          //dislen——显示宽度,data——显示数据,仅支持正数;dp——数据data精确度,0表示精确到个位,1表示精确到十分位,2表示精确到百分位,3——表示精确到千分位
+    401          //r_hz——返回的单位量纲,0——原单位,1——K级,2——M级;r_dp——返回的小数位数,0——没有小数点,1/2/3——1/2/3位小数点;R_data——返回的数据
+    402          void CalZptr(u8 dislen, u32 dDat, u8 dp, u8 *r_hz, u8 *r_zs, u8 *r_dp, u32 *r_data)
+    403          {
+    404          	s32 wNo,dK;
+    405          	u8 i;
+    406          	
+    407          	if(dDat> 999999999)	dDat=999999999;
+    408          	if(dDat>=100000000)		{wNo=9;dK=100000000;}
+    409          	else if(dDat>=10000000)	{wNo=8;dK=10000000;}
+    410          	else if(dDat>=1000000)	{wNo=7;dK=1000000;}
+    411          	else if(dDat>=100000)	{wNo=6;dK=100000;}
+    412          	else if(dDat>=10000)	{wNo=5;dK=10000;}
+    413          	else if(dDat>=1000)		{wNo=4;dK=1000;}
+    414          	else if(dDat>=100)		{wNo=3;dK=100;}
+    415          	else if(dDat>=10)		{wNo=2;dK=10;}
+    416          	else					{wNo=1;dK=1;}
+    417          	
+    418          	if(wNo<=(dp+dislen)) *r_hz=0;
+    419          	else if((wNo-(dp+dislen))<=3) *r_hz=1;
+    420          	else *r_hz=2;
+    421          	
+    422          	if(wNo<=dislen) *r_dp=dp;
+    423          	else if((wNo-dislen)<=dp) *r_dp=dp-(wNo-dislen);
+    424          	else if(((wNo-dislen)>dp) && ((wNo-dislen-dp)<=3)) *r_dp=3-(wNo-dislen-dp);
+    425          	else if(((wNo-dislen)>dp) && ((wNo-dislen-dp)>3)) *r_dp=6-(wNo-dislen-dp);
+    426          	
+    427          	*r_data = dDat;
+    428          	for(i=wNo; i>dislen; i--)
+    429          	{
+    430          		*r_data = *r_data/10;
+    431          	}
+    432          	if(i>*r_dp) *r_zs=i-*r_dp;
+    433          	else *r_zs=1;
+    434          }
+    435          
+    436          //转换定值结构型的数据到指定行列
+    437          //参数：1、行；2、列；3、定值数据；4、定值属性值
+    438          u8 SET_TER[16];
+    439          void Lcd_WR_TSETER(u16 wLine,u16 wColum,u16 wSet,u8 byAttrib)
+    440          {
+    441           
+    442            u8 by_ZS_bit,by_XS_bit,by_Scale,i;
+    443          	  u16 wZS,wXS,wCol,w_user;
+    444              for(i=0;i<16;i++) SET_TER[i]=0;
+    445          	by_ZS_bit = (byAttrib & 0x70)>>4;	//取整数位数
+    446          	by_XS_bit = byAttrib & 0x0f;		//取小数位数
+    447          	switch(by_XS_bit){					//计算出整数和小数的数值
+    448          	case 0:
+    449          		wZS=wSet;		wXS=0;
+    450          		break;
+    451          	case 1:
+    452          		wZS=wSet/10;	wXS=wSet%10;
+    453          		break;
+    454          	case 2:
+    455          		wZS=wSet/100;	wXS=wSet%100;
+    456          		break;
+    457          	case 3:
+    458          		wZS=wSet/1000;	wXS=wSet%1000;
+    459          		break;
+    460          	case 4:
+    461          		wZS=wSet/10000;	wXS=wSet%10000;
+    462          		break;
+    463          	default:
+    464          		wZS=0;			wXS=0;
+    465          	}
+    466          	
+    467          	wCol=0;  
+    468          	if(by_ZS_bit==0)//根据整数位数写整数
+    469                   SET_TER[0]=0x30;
+    470          	 
+    471          	else if(by_ZS_bit<=5)
+    472          	{		
+    473              	if(byAttrib & 0x80)  //十六进制显示
+    474          		{
+    475                     for(i=0;i<4;i++) SET_TER[i]=0x20;
+    476                  	HEX_ASC32 (wSet, &SET_TER[0]);
+    477          		}
+    478          		else
+    479          		{
+    480          	          for(i=0;i<4;i++) SET_TER[i]=0x30;
+    481          	 			w_user=wZS;   by_Scale=0;
+    482          			while (w_user>9)
+    483          			{
+    484          				w_user=w_user/10;
+    485          				by_Scale++;
+    486          			}
+    487          			wCol=wCol+by_ZS_bit-1-by_Scale;
+    488          	        Lcd_Write(SET_TER,wCol,wZS);
+    489          		 			
+    490          		}
+    491          	}
+    492          	else
+    493          		return;
+    494          
+    495          	wCol=wCol+1+by_Scale;
+    496          	if(by_XS_bit==0) 
+    497          		Lcd_WriteStr(wLine,wCol+wColum,1," ",false);
+    498          	else if(by_XS_bit<5) 
+    499          	{
+    500          	 
+    501                      SET_TER[wCol]='.';
+    502                    for(i=1;i<(5-wCol);i++) SET_TER[i+wCol]=0x30;
+    503          		w_user=wXS;   by_Scale=0;
+    504          		while (w_user>9)
+    505          		{
+    506          			w_user=w_user/10;
+    507          			by_Scale++;
+    508          		}
+    509          		wCol=wCol+by_XS_bit-by_Scale;
+    510          		Lcd_Write(SET_TER,wCol,wXS);
+    511               by_XS_bit=by_XS_bit+1;
+    512          	}
+    513              	Lcd_WriteStr(wLine,wColum,6,(char *)SET_TER,false);	
+    514          
+    515          }
+    516          
+    517          
+    518          
+    519          
+    520          void  Lcd_WriteFixname(u8 pTitle,u8 pshow,u8 len)
+    521          {
+    522          	u8   i,ChanLct,pLct; 
+    523          	LCD_Clear();     
+    524          
+    525          	pLct=pshow*len;
+    526           
+    527          		for(i=0;i<9;i++)
+    528          		{	
+    529          			ChanLct=pLct++;	
+    530          			if(ChanLct>=NumOfSet) break;		
+    531          			if(ChanLct==pTitle)
+    532          				Lcd_printstr_W(i,0,(char *)&FixValueTable[ChanLct].sFixValueName);	
+    533          			else
+    534          				Lcd_printstr(i,0,(char *)&FixValueTable[ChanLct].sFixValueName);	
+    535          		}
+    536           
+    537          }
+    538          
+    539          void  Lcd_WriteValname(u8 bySetLct,u8 pTitle,u8 pshow,FixValue *pName,u16 *wSet ,u8 len) 
+    540          {
+    541             	  u8   i,ChanLct,pLct,*KG_Name; 
+    542                 
+    543                    LCD_Clear();      
+    544                  Lcd_printstr(0,0,(char *)&pName->sFixValueName);
+    545               
+    546                   pLct=pshow*len; 
+    547               for(i=1;i<10;i++)
+    548          	    {	
+    549          		   ChanLct=pLct++;	
+    550                          
+    551          	 	   if(ChanLct>=pName->uNum) break;		
+    552           
+    553                          
+    554                        if(ChanLct==pTitle)
+    555          		          Lcd_WriteStr(i,0,9,(char *)&pName->MENU[ChanLct].szName,true);	
+    556                         else
+    557                            Lcd_WriteStr(i,0,9,(char *)&pName->MENU[ChanLct].szName,false);	
+    558                            
+    559                            Lcd_WriteStr(i,15,2,(char *)&pName->MENU[ChanLct].szUnit,false);	         
+    560          		 
+    561                  if(pName->MENU[ChanLct].KG_name!=NULL)
+    562          		     {
+    563          			  if(*(wSet+pName->MENU[ChanLct].Number)>(pName->MENU[ChanLct].wMax))
+    564          				    *(wSet+pName->MENU[ChanLct].Number)=0;
+    565          				 KG_Name=(u8 *)pName->MENU[ChanLct].KG_name;
+    566          				 KG_Name=KG_Name+*(wSet+pName->MENU[ChanLct].Number)*9;
+    567          			//  if((page*SETPAGE+i)==bySetLct)
+    568          				  Lcd_printstr(i,9,(char *)KG_Name);	
+    569          			//  else		
+    570          				// Lcd_WriteStr(7+i*SETPAGE,23,8,(char *)KG_Name,false);	
+    571           
+    572          			  }
+    573          			  else
+    574          			  {
+    575          			//if(ChanLct==pTitle)
+    576          				   Lcd_WR_TSETER(i,9,*(wSet+pName->MENU[ChanLct].Number),pName->MENU[ChanLct].byAttrib);
+    577          			//  else		
+    578          				//  Lcd_WR_TSETER(7+i*SETPAGE,30,*(wSet+pName->Number),byAttrib,0xff);
+    579          		  }     
+    580                           
+    581                          
+    582                          
+    583          	} 
+    584            
+    585          }
+    586          
+    587          
+    588          
+    589          /******************************************************************
+    590          * Title:		u8 ActiveX (u8 x,u8 y,u8 len,u8 *p1,u8 save,u8 *ptr,u8 DZtype)
+    591          * Description:	整定控制字位控件,该控件可实现用户在LCD上整定一个控制字位
+    592          * InputParameter: x 为控件显示行坐标
+    593          				  y 为控件显示纵坐标
+    594          				  Indat 为整定前输入值			  
+    595          				  retval 为整定后输出值	
+    596          ******************************************************************/
+    597          u8 ActiveCTL (u8 bySetLct,u8 pshow,FixValue *pName,u16 *wSet)
+    598          {
+    599          	  u8 *KG_Name;
+    600                    u32 tmpval;
+    601          	 KG_Name=(u8 *)pName->MENU[pshow].KG_name;
+    602          	tmpval = *wSet;
+    603          	if(KEY_Str.touch)//有按键
+    604          	{			
+    605          		MenuTimer=60;
+    606          		switch (KEY_Str.Value)
+    607          		{
+    608          		case UP_KEY:
+    609          		case DOWN_KEY:
+    610                          case LEFT_KEY:
+    611                          case RIGHT_KEY: 
+    612                                tmpval++;
+    613                                  if(tmpval>pName->MENU[pshow].wMax)
+    614                                              tmpval=0;
+    615          			break;
+    616          		case SET_KEY:
+    617          			KEY_Str.Value = 0;
+    618          			KEY_Str.touch = 0;	
+    619                                  KG_Name=KG_Name+tmpval*9;
+    620                                  Lcd_printstr(pshow%9+1,9,(char *)KG_Name);	
+    621          			*wSet = tmpval;
+    622          			return  Available;
+    623          		case ESC_KEY:
+    624          			KEY_Str.Value = 0;
+    625          			KEY_Str.touch = 0;
+    626                                  KG_Name=KG_Name+*wSet*9;
+    627                                  Lcd_printstr(pshow%9+1,9,(char *)KG_Name);	
+    628          			return DisAvailable;
+    629          		default:
+    630          			KEY_Str.Value = 0;
+    631          			KEY_Str.touch = 0;
+    632          			break;
+    633          		}//switch
+    634          		KEY_Str.Value = 0;
+    635          		KEY_Str.touch = 0;
+    636          		
+    637          	}//if
+    638          	
+    639          	KG_Name=KG_Name+tmpval*9;
+    640          	Lcd_printstr_W((pshow%9+1),9,(char *)KG_Name);	
+    641          	*wSet = tmpval;
+    642          	return tmpval;
+    643            
+    644             
+    645          }
+    646          
+    647          
+    648          
+    649          /*
+    650          *******************************************************************
+    651          * Title:		u8 ActiveX (u8 x,u8 y,u8 len,u8 *p1,u8 save,u8 *ptr,u8 DZtype)
+    652          * Description:	整定数据控件,该控件可实现用户在LCD上整定一个参数
+    653          * InputParameter: x 为控件显示行坐标
+    654          				  y 为控件显示纵坐标
+    655          				  len 为控件可整定字符长度
+    656          				  *p1 为每个字节循环显示的ASC数组指针
+    657          				  save 为整定后控件存储的方式			  
+    658          				  *ptr 为整定后输出的缓冲	
+    659          
+    660          *******************************************************************
+    661          */
+    662          
+    663          u8 ActiveXset ( u8 pshow,u8 count,u8 *p1,FixValue *pName,u16 *ptr)
+    664          {	
+    665          	u8	i,j,qq,temp,utemp,utemp1,utemp2,utemp3,displen,countg;
+    666          		
+    667          	u8	*pdisp,len;
+    668          	u8	Tdata[5];	
+    669          	u16 w_set,*w_PTR;
+    670                  
+    671          	u8 byAttrib;
+    672          	byAttrib=pName->MENU[pshow].byAttrib;
+    673                  
+    674          	for (i=0;i<32;i++)
+    675          	text[i]=0;
+    676          	w_PTR=(u16 *)ptr;
+    677          	countg=0;
+    678                 //数据格式为压缩bcd码或16进制存储(10进制显示)
+    679                 
+    680          	w_set=*w_PTR;
+    681          	len=(byAttrib>>4)+(byAttrib&0x07);
+    682          	temp = byAttrib&0x07;
+    683          	
+    684          	if (temp==0)			//没有小数
+    685          	{	//没有小数			
+    686          		BCD5_ASC32 (w_set, text);
+    687          		displen = len;
+    688          	}
+    689          	else 
+    690          	{	//有小数位
+    691          		displen = len+1;	//增加小数点位数
+    692          		temp =len-temp;  //找出小数位
+    693          		if(len>4)
+    694          		{			        
+    695          			utemp=w_set/10000;
+    696          			w_set=w_set%10000;   
+    697          			text[countg++] = utemp+0x30;//翻译数值
+    698          		}
+    699          		utemp1=w_set/1000;
+    700          		w_set=w_set%1000;
+    701          		text[countg++] = utemp1+0x30;//翻译数值
+    702          		if (temp ==countg)
+    703          			text[countg++] = '.';
+    704          		utemp2=w_set/100;
+    705          		w_set=w_set%100;
+    706          		text[countg++] = utemp2+0x30;//翻译数值
+    707          		if (temp ==countg)
+    708          			text[countg++] = '.';                                
+    709          		utemp3=w_set/10;
+    710          		w_set=w_set%10;
+    711          		text[countg++] = utemp3+0x30;//翻译数值
+    712          		if (temp ==countg)
+    713          			text[countg++] = '.';                              
+    714          		utemp=w_set;
+    715          		text[countg] =utemp+0x30;//翻译数值	
+    716          	}
+    717          	
+    718          	for (i=1;i<(*p1+1);i++)
+    719          	{//查找数据在ASC数组中相对应的位置
+    720          		if (*(p1+i)==text[count])
+    721          		{
+    722          			pdisp = p1+i;
+    723          			break;
+    724          		}
+    725          	}
+    726          	
+    727          	if (KEY_Str.touch)
+    728          	{			//有按键
+    729          		MenuTimer=60;
+    730          		switch (KEY_Str.Value)
+    731          		{
+    732          		case UP_KEY:
+    733                       
+    734          			if (*pdisp==' ')
+    735          				pdisp = p1+1;
+    736          			else 
+    737          				pdisp++;
+    738          			text[count] = *pdisp;
+    739          			if(text[count]==' ')text[count]='0';
+    740          			break;
+    741          		case DOWN_KEY:
+    742          			if (*pdisp == '0')
+    743          				pdisp = p1 + *p1-1;
+    744          			else 
+    745          				pdisp--;
+    746          			text[count] = *pdisp;
+    747          			if(text[count]==' ')text[count]='0';
+    748          			break;
+    749          
+    750          		case LEFT_KEY:
+    751          			if(count == 0)
+    752          		        count= displen-1; 
+    753          			else
+    754          		        count--;
+    755          			for (i=0;i<*p1;i++)
+    756          			{	//查找数据在ASC数组中相对应的位置
+    757          				if (*(p1+i)==text[count])
+    758          				{
+    759          					pdisp = p1+i;
+    760          					break;
+    761          				}
+    762          			}
+    763          			if(text[count]=='.') count--;
+    764          			break; 
+    765          		case RIGHT_KEY:
+    766          			if(count == (displen-1))
+    767          		        count= 0; 
+    768          			else
+    769          		        count++;
+    770          			for (i=0;i<*p1;i++)
+    771          			{//查找数据在数组中相对应的位置
+    772          				if (*(p1+i)==text[count])
+    773          				{
+    774          					pdisp = p1+i;
+    775          					break;
+    776          				}
+    777          			}
+    778          			if(text[count]=='.') count++;
+    779          			break;
+    780          		case SET_KEY:
+    781          			KEY_Str.Value = 0;
+    782          			KEY_Str.touch = 0;
+    783          			Lcd_printstr(pshow%9+1,9,(char *)text);	//翻译			
+    784          			return  Available;
+    785          		case ESC_KEY:
+    786          			KEY_Str.Value = 0;
+    787          			KEY_Str.touch = 0;				
+    788          			return DisAvailable;
+    789          		default:
+    790          			KEY_Str.Value = 0;
+    791          			KEY_Str.touch = 0;
+    792          			break;
+    793          		}	//switch
+    794          		KEY_Str.Value = 0;
+    795          		KEY_Str.touch = 0;	
+    796          	}//if (KEY_Str.touch)
+    797          	
+    798           
+    799          
+    800          		temp = byAttrib&0x07;
+    801          												
+    802          
+    803                            qq=0;
+    804                              j=0;
+    805                            for (i=0;i<5;i++)
+    806                                    Tdata[i]=0;
+    807                            
+    808                            for (i=0;i<len+1;i++)
+    809                            {		//
+    810                                    if (i!=(len-temp))	//tpye=X表示有X位小数
+    811                                    {     if(text[qq]==' ')
+    812                                           Tdata[j++]=0;
+    813                                          else
+    814                                            Tdata[j++]=text[qq]-0x30;	
+    815                                    }		
+    816                                    qq++;
+    817                            }
+    818                            if(len>4)
+    819                              *w_PTR=Tdata[0]*10000+Tdata[1]*1000+Tdata[2]*100+Tdata[3]*10+Tdata[4];      
+    820                            else
+    821                              *w_PTR=Tdata[0]*1000+Tdata[1]*100+Tdata[2]*10+Tdata[3];  
+    822                              
+    823          		
+    824          	 
+    825          	
+    826          		
+    827          	Lcd_printstr(pshow%9+1,9,(char *)text);	//翻译
+    828          	Lcd_wrchar_T((pshow%9+1)*2,(9+count),(u8)text[count],1);	//反白显示				
+    829          	return count;
+    830          }
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+      32   ActiveCTL
+        32   -> Lcd_printstr
+        32   -> Lcd_printstr_W
+      64   ActiveXset
+        64   -> BCD5_ASC32
+        64   -> Lcd_printstr
+        64   -> Lcd_wrchar_T
+      28   CalZptr
+       8   LCD_Clear
+         8   -> Lcd_clrram
+         8   -> Lcd_printstr
+      24   Lcd_WR_MEAVALUE
+        24   -> Lcd_WriteDWORD
+        24   -> Lcd_WriteStr
+        24   -> WDog_Clear
+      56   Lcd_WR_TSETER
+        56   -> HEX_ASC32
+        56   -> Lcd_Write
+        56   -> Lcd_WriteStr
+      16   Lcd_Write
+      72   Lcd_WriteBH
+        72   -> Lcd_printstr
+        72   -> UI_ANG
+        72   -> __aeabi_memcpy4
+        72   -> sprintf
+      24   Lcd_WriteDWORD
+        24   -> Lcd_wrchar_T
+      32   Lcd_WriteFixname
+        32   -> LCD_Clear
+        32   -> Lcd_printstr
+        32   -> Lcd_printstr_W
+      48   Lcd_WriteMeasure
+        48   -> Lcd_WR_MEAVALUE
+        48   -> Lcd_WriteStr
+        48   -> Lcd_printstr
+        48   -> WDog_Clear
+      48   Lcd_WriteValname
+        48   -> LCD_Clear
+        48   -> Lcd_WR_TSETER
+        48   -> Lcd_WriteStr
+        48   -> Lcd_printstr
+      40   Lcd_WriteWORD
+        40   -> Lcd_wrchar_T
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable1
+       4  ??DataTable1_1
+       4  ??DataTable2
+       4  ??DataTable2_1
+       4  ??DataTable2_2
+       4  ??DataTable3
+       4  ??DataTable4
+       4  ??DataTable4_1
+       4  ??DataTable4_10
+       4  ??DataTable4_11
+       4  ??DataTable4_12
+       4  ??DataTable4_13
+       4  ??DataTable4_14
+       4  ??DataTable4_15
+       4  ??DataTable4_2
+       4  ??DataTable4_3
+       4  ??DataTable4_4
+       4  ??DataTable4_5
+       4  ??DataTable4_6
+       4  ??DataTable4_7
+       4  ??DataTable4_8
+       4  ??DataTable4_9
+       4  ??DataTable5
+       4  ??DataTable5_1
+       4  ??DataTable7
+       4  ??DataTable7_1
+       4  ??DataTable7_2
+       4  ??DataTable7_3
+       4  ??DataTable7_4
+       4  ??DataTable7_5
+       4  ??DataTable7_6
+       4  ??DataTable8
+       4  ??DataTable8_1
+       4  ??DataTable8_10
+       4  ??DataTable8_11
+       4  ??DataTable8_12
+       4  ??DataTable8_13
+       4  ??DataTable8_14
+       4  ??DataTable8_15
+       4  ??DataTable8_16
+       4  ??DataTable8_17
+       4  ??DataTable8_18
+       4  ??DataTable8_19
+       4  ??DataTable8_2
+       4  ??DataTable8_20
+       4  ??DataTable8_21
+       4  ??DataTable8_22
+       4  ??DataTable8_23
+       4  ??DataTable8_3
+       4  ??DataTable8_4
+       4  ??DataTable8_5
+       4  ??DataTable8_6
+       4  ??DataTable8_7
+       4  ??DataTable8_8
+       4  ??DataTable8_9
+       4  ??DataTable9
+       4  ??DataTable9_1
+       4  ??DataTable9_10
+       4  ??DataTable9_11
+       4  ??DataTable9_12
+       4  ??DataTable9_2
+       4  ??DataTable9_3
+       4  ??DataTable9_4
+       4  ??DataTable9_5
+       4  ??DataTable9_6
+       4  ??DataTable9_7
+       4  ??DataTable9_8
+       4  ??DataTable9_9
+       2  ?_0
+       2  ?_1
+       8  ?_10
+       2  ?_11
+       2  ?_12
+       2  ?_13
+       2  ?_2
+       2  ?_3
+      12  ?_4
+       4  ?_5
+       8  ?_6
+       4  ?_7
+      12  ?_8
+       8  ?_9
+     288  ActiveCTL
+    1298  ActiveXset
+     472  CalZptr
+     124  LCD_Clear
+     888  Lcd_WR_MEAVALUE
+     600  Lcd_WR_TSETER
+     144  Lcd_Write
+     458  Lcd_WriteBH
+     488  Lcd_WriteDWORD
+     136  Lcd_WriteFixname
+     708  Lcd_WriteMeasure
+     366  Lcd_WriteValname
+     202  Lcd_WriteWORD
+      16  SET_TER
+     176  UIBYQ_buff
+     192  UIMOTO_buff
+     176  UI_buff
+       4  dDat
+       4  dK
+       4  dXS
+       2  i
+       2  i
+       2  wNo
+      20  wWRDat
+       8  wXS
+       2  wZS
+
+ 
+   608 bytes in section .bss
+    70 bytes in section .rodata
+ 6 444 bytes in section .text
+ 
+ 6 444 bytes of CODE  memory
+    70 bytes of CONST memory
+   608 bytes of DATA  memory
+
+Errors: none
+Warnings: 3

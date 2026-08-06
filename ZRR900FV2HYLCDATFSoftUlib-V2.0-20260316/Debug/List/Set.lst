@@ -1,0 +1,862 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.70.2.11706/W32 for ARM       17/Jun/2026  08:45:30
+# Copyright 1999-2016 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Set.c
+#    Command line =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Set.c
+#        -D ATF403AVCT7 -D LIBRARY_VERSION -D USE_STDPERIPH_DRIVER -D
+#        AT_START_F403A_V1_0 -lcN
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List
+#        -lA
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List
+#        -o
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\Obj
+#        --no_cse --no_unroll --no_inline --no_code_motion --no_tbaa
+#        --no_clustering --no_scheduling --debug --endian=little
+#        --cpu=Cortex-M4 -e --char_is_signed --enable_multibytes --fpu=VFPv4_sp
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.5\arm\INC\c\DLib_Config_Full.h" -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\STM32F10x_StdPeriph_Driver\inc\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\CMSIS\CM4\CoreSupport\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\CMSIS\CM4\DeviceSupport\
+#        -On --use_c++_inline
+#    Locale       =  Chinese (Simplified)_China.936
+#    List file    =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List\Set.lst
+#    Object file  =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\Obj\Set.o
+#
+###############################################################################
+
+D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Set.c
+      1          
+      2          #include "stm32f10x.h"
+      3          #include "Drive.h"
+      4          #include "GlobeDef.h"
+      5          #include "Lib.h"
+      6          #include "Set.h"
+      7          #include "W25Q64.h"
+      8          #include "Eep.h"
+      9          #include "bhjdq.h"
+     10          #include "Flash.h"
+     11          
+     12          #define VERSCALEREF  1220
+     13          #define VERSCALEREF200  (2*VERSCALEREF)
+     14          #define VERSCALEREF50  (VERSCALEREF/2)
+     15          
+     16          
+     17          //////////////////////////////////////////////////////////////////////////////
+     18          //功能:填入缺省定值
+     19          //	初始化定值为默认值并写入定值区
+     20          //	用于恢复默认定值
+     21          ///////////////////////////////////////////////////////////////////////////////
+     22          void BOOTSET_Default(void)
+     23          {
+     24          	BOOTBAK_SET.uStatus = BOOTCONNECTED;
+     25          	BOOTBAK_SET.DownVer = 100;	//前次下载的应用程序版本号
+     26          //	BOOTBAK_SET.AppVer = 0;		//当前应用程序版本号
+     27          	BOOTBAK_SET.DownStatus = 0x55;	//下载状态,55--升级完成,AA--升级未完成
+     28          	BOOTBAK_SET.DownTotalNum = 0;	//下载程序总包数,512bytes为1包
+     29          	BOOTBAK_SET.DownPtr = 0;	//已接收包数(必须连续)
+     30          	BOOTBAK_SET.DownCRC = 0;	//下载程序CRC校验和
+     31          	BOOTBAK_SET.ProgCMD = 0;	//编程命令：55——需要编程,AA——不需要编程
+     32          	BOOTBAK_SET.RecvAppLen	=0;	//已接收数据总长度
+     33          	BOOTBAK_SET.TotalAppLen	=0;	//应用程序总长度
+     34          	//保存定值
+     35          	BOOTSET_Save(1);
+     36          }
+     37          
+     38          //////////////////////////////////////////////////////////////////////////////
+     39          //功能:定值初始化
+     40          //     读取定值区并初始化定值
+     41          //Date:
+     42          //2007.12.18,去掉了看门狗指令,定值初始化必须在看门狗使能前执行
+     43          //2007.12.18,同理,去掉了关中断、开中断指令
+     44          //2007.12.19,增加使用备份定值功能,当使用备份定值时需恢复运行定值
+     45          ///////////////////////////////////////////////////////////////////////////////
+     46          u8 BOOTSET_Init(void)
+     47          {
+     48          	u16 para_crc;
+     49          	u32 setadd;
+     50          	u32 setlen;
+     51          	u8 k=0;
+     52          	u8 *ptr;
+     53          	u8 i;
+     54          	u8 dataset[200];	//
+     55          	
+     56          	ptr = (u8*)&BOOTBAK_SET;
+     57          	setadd = (u32)BOOTSET_STARTADD;
+     58          	setlen = BOOTSET_len;
+     59          	
+     60          	//有定值做效验
+     61          	k=0;
+     62          	do
+     63          	{
+     64          		W25Q_ReadMultiBytes(dataset, setadd, setlen);	//
+     65          		para_crc = MAKEWORD(dataset[0], dataset[1]);
+     66          		if(para_crc!=BOOTCONNECTED)
+     67          		{
+     68          			BOOTSET_Default();		//使用默认定值
+     69          			k++;
+     70          			if(k==3)
+     71          			{
+     72          				Flag_BHER|=B_ERR_EEP;	
+     73          				l_fRelayAlarm|=l_fRelayAlarm_Set_Err;		 
+     74          				return 0;
+     75          			}
+     76          		}
+     77          		else
+     78          		{
+     79          			//有定值做效验
+     80          			para_crc = GetCRC16(dataset,setlen-2);	//计算CRC校验
+     81          			if((!para_crc) || (LOBYTE(para_crc)!=*(dataset+setlen-2)) || (HIBYTE(para_crc)!=*(dataset+setlen-1)))
+     82          			{
+     83          				k++;
+     84          				if(k==3)
+     85          				{
+     86          					Flag_BHER|=B_ERR_EEP;	
+     87          					l_fRelayAlarm|=l_fRelayAlarm_Set_Err;
+     88          					return 0;
+     89          				}
+     90          			}
+     91          			else k=0;
+     92          		}
+     93          	}while(k);
+     94          	
+     95          	//校验成功,直接拷贝初始化运行参数区、备份参数区
+     96          	for(i=0; i<setlen; i++)
+     97          	{
+     98          		*ptr++ = *(dataset+i);
+     99          	}
+    100          	BOOTRUN_SET = BOOTBAK_SET;
+    101          	return 1;
+    102          }
+    103          
+    104          //
+    105          //保存BOOT定值操作
+    106          //将定值保存操作合并为一个函数
+    107          //返回值:1-保存成功;0-保存失败
+    108          //
+    109          u8 BOOTSET_Save(u8 type)
+    110          {
+    111          	u8 k;
+    112          	u8 *ptr;
+    113          	u16 para_crc;
+    114          	u32 setadd;
+    115          	u16 setlen;
+    116          	u16 crcode;
+    117          	u8 dataset[200];	//
+    118          	
+    119          	ptr = (u8*)&BOOTBAK_SET;
+    120          	setadd = (u32)BOOTSET_STARTADD;
+    121          	setlen = BOOTSET_len;
+    122          	//计算校验码
+    123          	crcode = GetCRC16(ptr, setlen-2);
+    124          	*(ptr+setlen-2) = LOBYTE(crcode);
+    125          	*(ptr+setlen-1) = HIBYTE(crcode);
+    126          	
+    127          //	NVIC_SETFAULTMASK();	//关闭总中断
+    128          	if(!type)		//只更新不保存
+    129          	{
+    130          		BOOTRUN_SET = BOOTBAK_SET;
+    131          		return 1;
+    132          	}
+    133          	
+    134          	//写入定值区
+    135          	k=0;
+    136          	do
+    137          	{
+    138          		W25Q_WritePageBytes(ptr, setadd, setlen);
+    139          		W25Q_ReadMultiBytes(dataset, setadd, setlen);	//
+    140          		para_crc = GetCRC16(dataset,setlen-2);	//计算CRC校验
+    141          		if( (LOBYTE(para_crc)!=*(dataset+setlen-2)) || (HIBYTE(para_crc)!=*(dataset+setlen-1)))
+    142          		{
+    143          			k++;
+    144          			if(k==3) return 0;
+    145          		}
+    146          		else k=0;
+    147          	}while(k);
+    148          	
+    149          //	NVIC_RESETFAULTMASK();	//开放总中断
+    150          	
+    151          	//校验成功,直接拷贝初始化运行参数区、备份参数区
+    152          	BOOTRUN_SET = BOOTBAK_SET;
+    153          	return 1;
+    154          }
+    155          
+    156          
+    157          //////////////////////////////////////////////////////////////////////////////
+    158          //功能:填入缺省定值
+    159          //	初始化定值为默认值并写入定值区
+    160          //	用于恢复出厂设置
+    161          //	波特率:0-1200,1-2400,2-4800
+    162          ///////////////////////////////////////////////////////////////////////////////
+    163          void SETFZ_Default(u8 type)
+    164          {
+    165          	u8 i;
+    166          	u8 *ptr;
+    167          	u16 *syptr;
+    168          	
+    169          	if(!type)	//校准系数
+    170          	{
+    171          		/*CLBAK_SET.uStatus	= CLCONNECTED;
+    172          		for(i=0; i<9; i++)	//3U+3I+Pa+Pb+Pc
+    173          		{
+    174          			CLBAK_SET.Par4Table[i]=32800;	//系数取32800/32768=1.00097
+    175          		}
+    176          		for(i=9; i<12; i++)	//PhA+PhB+PhC
+    177          		{
+    178          			CLBAK_SET.Par4Table[i]=1;	//
+    179          		}
+    180          		CLBAK_SET.resv	=0;		//保留值,仅用于数据对齐
+    181          	  */
+    182          	}
+    183          	else if(type==1)	//保护类型定值
+    184          	{
+    185          		Bak_QFTZ.uStatus	= CLCONNECTED;
+    186          		//Bak_QFTZ.CtrlByte	= 0;	//控制字节:0-退出，1——欠费跳闸，2——保护失效
+    187          		//Bak_QFTZ.GJTimer	= 0;	//1天
+    188          		//Bak_QFTZ.TZTimer	= 0;
+    189          		Bak_QFTZ.YYType	= 0;		//显示语言选择:0——中文,1——英文
+    190          		Bak_QFTZ.YCType	= 0;		//显示语言选择:0——中文,1——英文
+    191          		Bak_QFTZ.resv	= 0;		//
+    192          	//	Bak_QFTZ.resv1	= 0;		//
+    193          		Bak_QFTZ.Type	= 1;		//保护型号选择:0——线路,1——变压器,2——电动机
+    194          	}
+    195          	else if((type==2) || (type==3) || (type==4))	//保护压板定值
+    196          	{
+    197          		if(type==2)
+    198          		{
+    199          			BAK_YB.uStatus = CLCONNECTED;
+    200          			BAK_YB.YB_YX=0;
+    201          			ptr=(u8 *)&BAK_YB.uStatus;
+    202          		}
+    203           #ifdef	ZRR900F
+    204          		else if(type==3)
+    205          		{
+    206          			BAK_YBBYQ.uStatus = CLCONNECTED;
+    207          			BAK_YBBYQ.YB_YX=0;
+    208          			ptr=(u8 *)&BAK_YBBYQ.uStatus;
+    209          		}
+    210          		else if(type==4)
+    211          		{
+    212          			BAK_YBMOTO.uStatus = CLCONNECTED;
+    213          			BAK_YBMOTO.YB_YX=0;
+    214          			ptr=(u8 *)&BAK_YBMOTO.uStatus;
+    215          		}
+    216          #endif
+    217          		else if(type==5)
+    218          		{
+    219          		}	
+    220          		ptr=ptr+4;
+    221          		for(i=0; i<16; i++)		//所有型号压板都是相同的16字节
+    222          			*ptr++=YBOFF;
+    223          
+    224          	}
+    225          	else if(type==8)	//系统运行参数
+    226          	{
+    227          		BAK_Syspar.uStatus = CLCONNECTED;
+    228          		BAK_Syspar.Yxfilter = 0x05;
+    229          		BAK_Syspar.RS485_Protocol = 0x02;	//2-MODBUS,3-94SEV
+    230          		BAK_Syspar.RS485_ADR = 0x01;
+    231          		BAK_Syspar.RS485_bps = 0;	//0-9600,1-4800,2-2400,3-1200
+    232          		BAK_Syspar.RS485_YC = 0;	
+    233          		BAK_Syspar.Password[0] = 0x00;
+    234          		BAK_Syspar.Password[1] = 0x00;
+    235          		BAK_Syspar.rev1 = 0;
+    236          	}
+    237          	else if(type==9)	//保护校准系数
+    238          	{
+    239          		BAK_BHUIpar.uStatus = CLCONNECTED;
+    240          		syptr = (u16*)&BAK_BHUIpar;
+    241          		syptr++;
+    242          		for(i=0; i<22; i++) *syptr++ = 1220;	//默认校准系数为1024
+    243          		BAK_BHUIpar.PXS=974;
+    244          		BAK_BHUIpar.QXS=-8;
+    245          	}
+    246          	//保存定值
+    247          	SETFZ_Save(type);
+    248          }
+    249          
+    250          //////////////////////////////////////////////////////////////////////////////
+    251          //功能:定值初始化
+    252          //     读取定值区并初始化定值
+    253          //Date:
+    254          //2007.12.18,去掉了看门狗指令,定值初始化必须在看门狗使能前执行
+    255          //2007.12.18,同理,去掉了关中断、开中断指令
+    256          //2007.12.19,增加使用备份定值功能,当使用备份定值时需恢复运行定值
+    257          ///////////////////////////////////////////////////////////////////////////////
+    258          u8 SETFZ_Init(u8 type)
+    259          {
+    260          	u16 para_crc;
+    261          	u16 setadd;
+    262          	u32 setlen;
+    263          	u8 retval;
+    264          	u8 *ptr;
+    265          	u8 i,k;
+    266          	u16  *pat,err;
+    267          	u8 dataset[100];	//
+    268          	
+    269          	if(type==1)	//保护类型
+    270          	{
+    271          		ptr = (u8*)&Bak_QFTZ;
+    272          		setadd = (u32)preQFTZAddr_Eep;
+    273          		setlen = Setlen_QFTZ;
+    274          	}
+    275          	else if(type==2)	 
+    276          	{
+    277          		ptr = (u8*)&BAK_YB;
+    278          		setadd = (u32)preYbStartAdrEep;
+    279          		setlen = sizeof(BAK_YB);
+    280          	}
+    281          #ifdef	ZRR900F
+    282          	else if(type==3)	//变压器压板
+    283          	{
+    284          		ptr = (u8*)&BAK_YBBYQ;
+    285          		setadd = (u32)preYbStartAdrEep;
+    286          		setlen = sizeof(BAK_YBBYQ);
+    287          	}
+    288          	else if(type==4)	//电动机压板
+    289          	{
+    290          		ptr = (u8*)&BAK_YBMOTO;
+    291          		setadd = (u32)preYbStartAdrEep;
+    292          		setlen = sizeof(BAK_YBMOTO);
+    293          	}
+    294          #endif
+    295          	else if(type==8)	//系统运行参数
+    296          	{
+    297          		ptr = (u8*)&BAK_Syspar;
+    298          		setadd = (u32)preSysParStartAdrEep;
+    299          		setlen = sizeof(BAK_Syspar);
+    300          	}
+    301          	else if(type==9)	//保护校准系数
+    302          	{
+    303          		ptr = (u8*)&BAK_BHUIpar;
+    304          		setadd = (u32)preBHUIparStartAdrEep;
+    305          		setlen = sizeof(BAK_BHUIpar);
+    306          	}
+    307          	
+    308          	if(type)
+    309          	{
+    310          		W25Q_ReadMultiBytes(dataset,setadd,setlen);
+    311          		if(dataset[0]!=CLCONNECTED)
+    312          		{
+    313          			SETFZ_Default(type);		//使用默认定值
+    314          			return 0;
+    315          		}
+    316          		//有定值做效验
+    317          		para_crc = GetCRC16(dataset,setlen-2);	//计算CRC校验
+    318          		if( (LOBYTE(para_crc)!=*(dataset+setlen-2)) || (HIBYTE(para_crc)!=*(dataset+setlen-1)))
+    319          		{
+    320          			//参数校验失败处理:调用初始化失败显示、禁止看门狗导致系统重启
+    321          		      if(type!=9) 
+    322          			  {
+    323          				SETFZ_Default(type);		//调试时如果没有设置则使用默认定值
+    324          		 
+    325          				retval = 0x00;
+    326          				Flag_BHER|=B_ERR_EEP;	
+    327          				l_fRelayAlarm|=l_fRelayAlarm_Set_Err;
+    328          				return 0;
+    329          			  }
+    330          			}
+    331          		
+    332          		//校验成功,直接拷贝初始化运行参数区、备份参数区
+    333          		for(i=0; i<setlen; i++)
+    334          		{
+    335          			*ptr++ = *(dataset+i);
+    336          		}
+    337          	}
+    338          	//校验成功,直接拷贝初始化运行参数区、备份参数区
+    339          	if(type==9)
+    340          	{
+    341          		//CLRUN_SET = CLBAK_SET;
+    342          	            err=0;
+    343                      pat=(u16*)&BAK_BHUIpar.IC1BHXS;
+    344                      for(i=0;i<22;i++)
+    345                      {      
+    346                          if(*pat>VERSCALEREF200 || *pat<VERSCALEREF50)
+    347                          {
+    348                              *pat=VERSCALEREF;
+    349                              err=1;
+    350                          } 
+    351                          pat++;
+    352                      }
+    353                  if(!MEA_Chk_PowScale(BAK_BHUIpar.PXS,BAK_BHUIpar.QXS))	
+    354          		{
+    355          			BAK_BHUIpar.PXS=974;
+    356          			BAK_BHUIpar.QXS=-8;
+    357                       err=1;
+    358          		} 
+    359          		if(err)
+    360          		  	SETFZ_Default(9);		//使用默认定值
+    361          
+    362          	}
+    363          	 if(type==1) Set_QFTZ = Bak_QFTZ;
+    364          	else if(type==2) RUN_YB = BAK_YB;
+    365          #ifdef	ZRR900F	
+    366          	else if(type==3) RUN_YBBYQ = BAK_YBBYQ;
+    367          	else if(type==4) RUN_YBMOTO = BAK_YBMOTO;
+    368          #endif
+    369          	else if(type==8) RUN_Syspar = BAK_Syspar;
+    370          	else if(type==9) RUN_BHUIpar = BAK_BHUIpar;
+    371          	retval = 0x01;
+    372          	return retval;
+    373          }
+    374          
+    375          //
+    376          //保存测量系数定值操作
+    377          //保存BAK_SET,并且成功后用于更新RUN_SET,保存失败则不更新
+    378          //将定值保存操作合并为一个函数
+    379          //输入：1——保存正常参数,2——保存电能累加值,3——保存负荷记录时标,4——负荷记录数据
+    380          //返回值:0-保存成功;1-保存失败
+    381          //
+    382          u8 SETFZ_Save(u8 type)
+    383          {
+    384          	u8 k,retval=0;
+    385          	u8 *ptr;
+    386          	u16 para_crc;
+    387          	u16 setadd;
+    388          	u16 setlen;
+    389          	u16 crcode;
+    390          	u8 dataset[100];	//
+    391          	
+    392          	if(type==1)	//保护类型
+    393          	{
+    394          		ptr = (u8*)&Bak_QFTZ;
+    395          		setadd = (u32)preQFTZAddr_Eep;
+    396          		setlen = Setlen_QFTZ;
+    397          	}
+    398          	else if(type==2)	//线路压板
+    399          	{
+    400          		ptr = (u8*)&BAK_YB;
+    401          		setadd = (u32)preYbStartAdrEep;
+    402          		setlen = sizeof(BAK_YB);
+    403          	}
+    404          #ifdef	ZRR900F
+    405          	else if(type==3)	//变压器压板
+    406          	{
+    407          		ptr = (u8*)&BAK_YBBYQ;
+    408          		setadd = (u32)preYbStartAdrEep;
+    409          		setlen = sizeof(BAK_YBBYQ);
+    410          	}
+    411          	else if(type==4)	//电动机压板
+    412          	{
+    413          		ptr = (u8*)&BAK_YBMOTO;
+    414          		setadd = (u32)preYbStartAdrEep;
+    415          		setlen = sizeof(BAK_YBMOTO);
+    416          	}
+    417          #endif
+    418          	else if(type==8)	//系统运行参数
+    419          	{
+    420          		ptr = (u8*)&BAK_Syspar;
+    421          		setadd = (u32)preSysParStartAdrEep;
+    422          		setlen = sizeof(BAK_Syspar);
+    423          	}
+    424          	else if(type==9)	//保护校准系数
+    425          	{
+    426          		ptr = (u8*)&BAK_BHUIpar;
+    427          		setadd = (u32)preBHUIparStartAdrEep;
+    428          		setlen = sizeof(BAK_BHUIpar);
+    429          	}
+    430          	
+    431          	//计算校验码
+    432          	crcode = GetCRC16(ptr, setlen-2);
+    433          	*(ptr+setlen-2) = LOBYTE(crcode);
+    434          	*(ptr+setlen-1) = HIBYTE(crcode);
+    435          	
+    436          	k=0;
+    437          	do
+    438          	{
+    439          		W25Q_WritePageBytes(ptr,setadd,setlen); 
+    440                  delay_ms(1);
+    441                  W25Q_ReadMultiBytes(dataset,setadd,setlen);
+    442          		
+    443          		para_crc = GetCRC16(dataset,setlen-2);	//计算CRC校验
+    444          		if( (LOBYTE(para_crc)!=*(dataset+setlen-2)) || (HIBYTE(para_crc)!=*(dataset+setlen-1)))
+    445          		{
+    446          			k++;
+    447          			if(k==3) return 0;
+    448          		}
+    449          		else k=0;
+    450          	}while(k);
+    451          	
+    452          	//校验成功,直接拷贝初始化运行参数区、备份参数区
+    453          	{
+    454          		//更新运行定值区
+    455          		 
+    456          		if(type==1) Set_QFTZ = Bak_QFTZ;
+    457          		else if(type==2) RUN_YB = BAK_YB;			//线路压板
+    458          #ifdef	ZRR900F	
+    459          		else if(type==3) RUN_YBBYQ = BAK_YBBYQ;		//变压器压板
+    460          		else if(type==4) RUN_YBMOTO = BAK_YBMOTO;	//电动机压板
+    461          #endif	
+    462          		else if(type==8) RUN_Syspar = BAK_Syspar;
+    463          		else if(type==9) RUN_BHUIpar = BAK_BHUIpar;
+    464          	}
+    465          	return retval;
+    466          }
+    467          
+    468          void	Set_Conversion(u16 *pBuff1)
+    469          {
+    470          	u16   j,i,*pBuff2;
+    471          	//定值转换
+    472          #ifdef  ZRR900F
+    473          	if(!Set_QFTZ.Type)		//线路保护
+    474          	{
+    475          	  	pBuff2=(u16*)&BAK_SET; 
+    476          
+    477          		for(i=0;i<NumOfSet;i++)
+    478          		{
+    479          			for(j=0;j<FixValueTableLN[i].uNum;j++)
+    480          				*pBuff2++=*pBuff1++;
+    481          		}
+    482                RUN_SET=BAK_SET;
+    483          	}
+    484          	else if(Set_QFTZ.Type==1)	//变压器保护
+    485          	{
+    486          	    	pBuff2=(u16*)&BAK_SETBYQ; 
+    487          		for(i=0;i<NumOfSetBYQ;i++)
+    488          		{
+    489          			for(j=0;j<FixBYQValueTable[i].uNum;j++)
+    490          				*pBuff2++=*pBuff1++;
+    491          		}
+    492                  RUN_SETBYQ=BAK_SETBYQ;
+    493          	}
+    494          
+    495          	else if(Set_QFTZ.Type==2)	//电动机保护
+    496          	{
+    497          	  pBuff2=(u16*)&BAK_SETMOTO; 
+    498          		for(i=0;i<NumOfSetMOTO;i++)
+    499          		{
+    500          			for(j=0;j<FixMOTOValueTable[i].uNum;j++)
+    501          				*pBuff2++=*pBuff1++;
+    502          		}
+    503                 RUN_SETMOTO=BAK_SETMOTO;
+    504          	}
+    505          #else
+    506           
+    507          	pBuff2=(u16*)&BAK_SET; 
+    508          
+    509          		for(i=0;i<NumOfSet;i++)
+    510          		{
+    511          			for(j=0;j<FixValueTableLN[i].uNum;j++)
+    512          				*pBuff2++=*pBuff1++;
+    513          		}
+    514                RUN_SET=BAK_SET;
+    515          #endif
+    516           	
+    517          }
+    518          
+    519          
+    520          void	SET_Init(u8 type)
+    521          {
+    522          	u8		sts1,sts2,err;
+    523          	u16  	sts,i;
+    524          	u16      *pBuff1;
+    525          	FixStatus   CurFixVal_Manage;
+    526          	
+    527          	err=0xff;
+    528          	//读定值管理区		 
+    529          	sts1= Drive_Eep_read_one(preFValMagStartAdrEep+0);			 
+    530          	sts2=~Drive_Eep_read_one(preFValMagStartAdrEep+1);
+    531          	Eep_Read_FixValueMag((FixStatus *)&FixVal_Manage);
+    532          	if((FixVal_Manage.uSectionS[FixVal_Manage.uCurSection]==Available)  
+    533          	   &&(sts1==sts2))	 
+    534          	{
+    535          		if(FixVal_Manage.uCurSection<preFSectionNum) 
+    536          			err=0;		
+    537          	}
+    538          	//填入缺省的定值管理区
+    539          	if(err)
+    540          	{
+    541          		FixVal_Manage.uCurSection=0;
+    542          		FixVal_Manage.uSectionS[0]=Available;
+    543          		for(i=1;i<preFSectionNum;i++)FixVal_Manage.uSectionS[i]=DisAvailable;	
+    544          		Drive_Eep_write_two(preFValMagStartAdrEep,SetSts);
+    545          		sts=Drive_Eep_read_one(preFValMagStartAdrEep)*0x100+Drive_Eep_read_one(preFValMagStartAdrEep+1);   		
+    546          		if(sts!=SetSts)	
+    547          		{
+    548          			//置EPP出错标志和报文
+    549              			Flag_BHER|=B_ERR_SET;	
+    550                          l_fRelayAlarm|=l_fRelayAlarm_Set_Err;		
+    551             			 return;
+    552          	}
+    553          			sts1=0;
+    554          		while(sts1++<3)
+    555          		{
+    556          			Eep_Write_FixValueMag((FixStatus *)&FixVal_Manage);
+    557          			delay_ms(10);
+    558          			Eep_Read_FixValueMag ((FixStatus *)&CurFixVal_Manage);			
+    559          			if(memcmp(&CurFixVal_Manage,&FixVal_Manage,sizeof(FixStatus)))    
+    560          			{
+    561          				continue;										 
+    562          			}
+    563          			else
+    564          				break;	
+    565          		}		
+    566          		
+    567          	}
+    568          	
+    569          	//定值读取
+    570          
+    571          		Cur_FixVal_Buff.uSectionNo=FixVal_Manage.uCurSection;
+    572          		Eep_Read_FixValue((FixValueBuff *)&Cur_FixVal_Buff);
+    573          		if(Set_Check((FixValueBuff *)&Cur_FixVal_Buff)==FALSE)
+    574          		{
+    575          			//置EPP出错标志和报文
+    576              			Flag_BHER|=B_ERR_SET;	
+    577                          l_fRelayAlarm|=l_fRelayAlarm_Set_Err;
+    578          			Set_Default();		
+    579          		}
+    580          			
+    581          		//定值转换
+    582          		pBuff1= (u16*)&Cur_FixVal_Buff.w_SetValue;
+    583          		Set_Conversion(pBuff1);
+    584          		
+    585          }
+    586          
+    587          bool	Set_Check(FixValueBuff *pReadFixvalBuff)
+    588          {
+    589          	u8	 ulen,i,j,*pBuff;
+    590          	u16  wSum1;
+    591          	u16 *pBuff1,set_buf;
+    592          	
+    593          	//状态位1校验
+    594          	if(pReadFixvalBuff->wStatus!=SetSts)
+    595          		return FALSE;
+    596           
+    597              //和1校验
+    598          	ulen=sizeof(SetBuff);
+    599          	pBuff=(u8 *)&pReadFixvalBuff->w_SetValue;
+    600          	wSum1=CalSum16(pBuff,ulen);
+    601          	if(wSum1!=pReadFixvalBuff->wCrc)
+    602          		return FALSE;
+    603            
+    604                  pBuff1=(u16 *)&pReadFixvalBuff->w_SetValue;
+    605          	for(i=0;i<NumOfSet;i++)
+    606          	{	              
+    607          		for(j=0;j<FixValueTable[i].uNum;j++)
+    608          		{
+    609          			set_buf=*pBuff1++;
+    610          			if((set_buf>FixValueTable[i].MENU[j].wMax)||(set_buf<FixValueTable[i].MENU[j].wMin))
+    611          				return FALSE;
+    612          		}
+    613          	}       
+    614          	return TRUE;
+    615          }
+    616          
+    617          
+    618          void	Set_Default()
+    619          {
+    620          	u8	i,j,uLen,*pBuff;
+    621          	u16 *ptr;
+    622          	
+    623                //取缺省值
+    624          		Cur_FixVal_Buff.wStatus=SetSts;
+    625          		Cur_FixVal_Buff.uSectionNo=FixVal_Manage.uCurSection;
+    626          		ptr=(u16*)&Cur_FixVal_Buff.w_SetValue;
+    627          		 
+    628          		for(i=0;i<NumOfSet;i++)
+    629          		{
+    630          			for(j=0;j<FixValueTable[i].uNum;j++)
+    631          			*ptr++=FixValueTable[i].MENU[j].wDef;
+    632          		}
+    633          		*ptr++=0;		//缺省定值不在FixValueTable[]里，需手工补上,2012.5.22
+    634          		pBuff=(u8 *)&Cur_FixVal_Buff.w_SetValue;
+    635          		uLen=sizeof(SetBuff);
+    636          		Cur_FixVal_Buff.wCrc=CalSum16(pBuff,uLen);
+    637          
+    638          
+    639          	Eep_Write_FixValue((FixValueBuff*)&Cur_FixVal_Buff);
+    640          
+    641          
+    642          }
+    643          
+    644          
+    645          
+    646          //固化定值
+    647          u8 SET_Write_Set(u8 uSource,u8 uSection)
+    648          {
+    649          	//
+    650          	u8 j;
+    651          	u16 *pBuff1,k;
+    652          	FixStatus CurFixVal_Manage;
+    653          	
+    654          		if(ZJ_FixVal_Buff.wStatus!=SetSts)
+    655          			return FALSE;
+    656          			
+    657          		ZJ_FixVal_Buff.uSectionNo=uSection;
+    658          	
+    659          		
+    660          		Cur_FixVal_Buff=ZJ_FixVal_Buff;	
+    661          		j=0;
+    662          		while(j++<3)
+    663          		{
+    664          			Eep_Write_FixValue(&Cur_FixVal_Buff);                         //将定值写到EEPROM			
+    665          			for(k=0;k<5000;k++);
+    666          			Eep_Read_FixValue(&ZJ_FixVal_Buff);                          //将EEPROM定值读到Run_FixVal_Buff
+    667          			if(memcmp(&Cur_FixVal_Buff,&ZJ_FixVal_Buff,sizeof(FixValueBuff)))    // 比较EEPROM的内容和下发的定值是否一样
+    668          			{
+    669          				for(k=0;k<255;k++);
+    670          				continue;										//不等
+    671          			}
+    672          			else								//等
+    673          				break;		
+    674          		}
+    675          		if(j>=3)
+    676          		{
+    677          			ZJ_FixVal_Buff.wStatus=ClearSts;                              //清暂存区状态
+    678          			
+    679          			return FALSE;
+    680          		}				
+    681          		FixVal_Manage.uSectionS[Cur_FixVal_Buff.uSectionNo]=Available;  //修改定值管理单元2002,11,10,sdg
+    682          		j=0;
+    683          		while(j++<3)
+    684          		{
+    685          			Eep_Write_FixValueMag(&FixVal_Manage);                     //将定值管理单元写入EEPROM
+    686          			for(k=0;k<255;k++);
+    687          			Eep_Read_FixValueMag(&CurFixVal_Manage);
+    688          			if(memcmp(&CurFixVal_Manage,&FixVal_Manage,sizeof(FixStatus)))    // 比较EEPROM的内容和下发的定值是否一样
+    689          			{
+    690          				for(k=0;k<255;k++);
+    691          				continue;										//不等
+    692          			}
+    693          			else								//等
+    694          				break;
+    695          		}
+    696          		ZJ_FixVal_Buff.wStatus=ClearSts; 						
+    697          		Cur_FixVal_Buff.uSectionNo=FixVal_Manage.uCurSection;						
+    698          		Eep_Read_FixValue(&Cur_FixVal_Buff); 
+    699          		 	//定值转换
+    700          		pBuff1= (u16*)&Cur_FixVal_Buff.w_SetValue;
+    701          		Set_Conversion(pBuff1);	        		
+    702          			
+    703          		return TRUE;
+    704          }
+    705           
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       8   BOOTSET_Default
+         8   -> BOOTSET_Save
+     232   BOOTSET_Init
+       232   -> BOOTSET_Default
+       232   -> GetCRC16
+       232   -> W25Q_ReadMultiBytes
+     232   BOOTSET_Save
+       232   -> GetCRC16
+       232   -> W25Q_ReadMultiBytes
+       232   -> W25Q_WritePageBytes
+      24   SETFZ_Default
+        24   -> SETFZ_Save
+     144   SETFZ_Init
+       144   -> GetCRC16
+       144   -> MEA_Chk_PowScale
+       144   -> SETFZ_Default
+       144   -> W25Q_ReadMultiBytes
+       144   -> __aeabi_memcpy
+     136   SETFZ_Save
+       136   -> GetCRC16
+       136   -> W25Q_ReadMultiBytes
+       136   -> W25Q_WritePageBytes
+       136   -> __aeabi_memcpy
+       136   -> delay_ms
+      48   SET_Init
+        48   -> Drive_Eep_read_one
+        48   -> Drive_Eep_write_two
+        48   -> Eep_Read_FixValue
+        48   -> Eep_Read_FixValueMag
+        48   -> Eep_Write_FixValueMag
+        48   -> Set_Check
+        48   -> Set_Conversion
+        48   -> Set_Default
+        48   -> delay_ms
+        48   -> memcmp
+      32   SET_Write_Set
+        32   -> Eep_Read_FixValue
+        32   -> Eep_Read_FixValueMag
+        32   -> Eep_Write_FixValue
+        32   -> Eep_Write_FixValueMag
+        32   -> Set_Conversion
+        32   -> __aeabi_memcpy
+        32   -> memcmp
+      40   Set_Check
+        40   -> CalSum16
+      24   Set_Conversion
+        24   -> __aeabi_memcpy
+      24   Set_Default
+        24   -> CalSum16
+        24   -> Eep_Write_FixValue
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable10
+       4  ??DataTable10_1
+       4  ??DataTable10_10
+       4  ??DataTable10_11
+       4  ??DataTable10_12
+       4  ??DataTable10_13
+       4  ??DataTable10_14
+       4  ??DataTable10_15
+       4  ??DataTable10_16
+       4  ??DataTable10_17
+       4  ??DataTable10_18
+       4  ??DataTable10_19
+       4  ??DataTable10_2
+       4  ??DataTable10_20
+       4  ??DataTable10_21
+       4  ??DataTable10_22
+       4  ??DataTable10_23
+       4  ??DataTable10_24
+       4  ??DataTable10_25
+       4  ??DataTable10_26
+       4  ??DataTable10_27
+       4  ??DataTable10_28
+       4  ??DataTable10_29
+       4  ??DataTable10_3
+       4  ??DataTable10_30
+       4  ??DataTable10_31
+       4  ??DataTable10_32
+       4  ??DataTable10_33
+       4  ??DataTable10_4
+       4  ??DataTable10_5
+       4  ??DataTable10_6
+       4  ??DataTable10_7
+       4  ??DataTable10_8
+       4  ??DataTable10_9
+       4  ??DataTable9
+       4  ??DataTable9_1
+       4  ??DataTable9_2
+      82  BOOTSET_Default
+     282  BOOTSET_Init
+     230  BOOTSET_Save
+     344  SETFZ_Default
+     622  SETFZ_Init
+     462  SETFZ_Save
+     342  SET_Init
+     274  SET_Write_Set
+     212  Set_Check
+     304  Set_Conversion
+     158  Set_Default
+
+ 
+ 3 460 bytes in section .text
+ 
+ 3 460 bytes of CODE memory
+
+Errors: none
+Warnings: 1

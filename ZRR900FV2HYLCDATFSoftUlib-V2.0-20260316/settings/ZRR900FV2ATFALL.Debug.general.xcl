@@ -1,0 +1,15 @@
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.5\arm\bin\armproc.dll" 
+
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.5\arm\bin\armjlink2.dll" 
+
+"D:\ZRR900F\ATF\ZRR900FV2ATFSoftALL-V2.0-20220409\Debug\Exe\ZRR900FV2ATFALL_flash.out" 
+
+--plugin "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.5\arm\bin\armbat.dll" 
+
+--device_macro "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.5\arm\config\debugger\ArteryTek\AT32F4xx_XL.dmac" 
+
+--flash_loader "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.5\arm\config\flashloader\ArteryTek\AT32F403A\AT32F403AVCT7\FlashAT32F403AVCT7.board" 
+
+
+
+

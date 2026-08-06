@@ -1,0 +1,427 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.70.2.11706/W32 for ARM       17/Jun/2026  08:45:31
+# Copyright 1999-2016 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Tim.c
+#    Command line =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Tim.c
+#        -D ATF403AVCT7 -D LIBRARY_VERSION -D USE_STDPERIPH_DRIVER -D
+#        AT_START_F403A_V1_0 -lcN
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List
+#        -lA
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List
+#        -o
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\Obj
+#        --no_cse --no_unroll --no_inline --no_code_motion --no_tbaa
+#        --no_clustering --no_scheduling --debug --endian=little
+#        --cpu=Cortex-M4 -e --char_is_signed --enable_multibytes --fpu=VFPv4_sp
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.5\arm\INC\c\DLib_Config_Full.h" -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\STM32F10x_StdPeriph_Driver\inc\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\CMSIS\CM4\CoreSupport\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\CMSIS\CM4\DeviceSupport\
+#        -On --use_c++_inline
+#    Locale       =  Chinese (Simplified)_China.936
+#    List file    =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List\Tim.lst
+#    Object file  =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\Obj\Tim.o
+#
+###############################################################################
+
+D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Tim.c
+      1          /* 
+      2          * Title:	Tim.c
+      3          * Description:	定时函数
+      4          * Function:
+      5          * Copyright:	 
+      6          * Company:	 
+      7          * Create Date:	2009.12.8
+      8          * @author:	 
+      9          * @version:	V1.00
+     10          * Modify Record:
+     11          */
+     12          
+     13          #include "Drive.h"
+     14          #include "GlobeDef.h"
+     15          #include "Tim.h"
+     16          //#include "Init.h"
+     17          //#include "MC56F834x.h"
+     18          #include "Lib.h"
+     19          #include "Bhjdq.h"
+     20          #include "Eep.h"
+     21          #include "stm32f10x.h"
+     22          #include "EventManage.h"
+     23          #include "UartDrv.h"
+     24          
+     25          
+     26           
+     27          /*
+     28          *******************************************************************
+     29          * Title:			void Clock_Raad()
+     30          * Description:		软时钟函数
+     31           
+     32          *******************************************************************
+     33          */
+     34          void Clock_Raad()
+     35          {
+     36          	u8  temp;
+     37          	Rsys_clock.Micros++;
+     38          	if(Rsys_clock.Micros>=1000)
+     39          	{
+     40          		Rsys_clock.Micros=0;
+     41          		//软时钟-秒
+     42          		temp=Bcd_Hex(Rsys_clock.Second);
+     43          	//	ClockReflashFlag=1;
+     44          		temp++;
+     45          	   	Rsys_clock.Second=BCD_08(temp);
+     46          		if(Rsys_clock.Second>=0x60)
+     47          		{
+     48          			Rsys_clock.Second=0;
+     49          		}
+     50          		//软时钟-分
+     51          		if(Rsys_clock.Second==0)
+     52          		{
+     53          			temp=Bcd_Hex(Rsys_clock.Minute);
+     54          			temp++;
+     55          			ClockReflashFlag=1;
+     56          			Rsys_clock.Minute=BCD_08(temp);
+     57          			if(Rsys_clock.Minute>=0x60)			
+     58          				Rsys_clock.Minute=0;
+     59          		}
+     60          		//软时钟-时
+     61          		if((Rsys_clock.Minute==0)&&(Rsys_clock.Second==0))
+     62          		{
+     63          			temp=Bcd_Hex(Rsys_clock.Hour);
+     64          			temp++;
+     65          			Rsys_clock.Hour=BCD_08(temp);
+     66          			if(Rsys_clock.Hour>=0x24)
+     67          			{
+     68          				Rsys_clock.Hour=0;
+     69          		//		ClockReflashFlag=1;			//避免在中断里面操作RTC跟循环里的RTC操作产生可能的冲突
+     70          		//		Drive_Read_clock((u8 *)&Rsys_clock);
+     71          			}
+     72          		}
+     73          	}
+     74          }
+     75          #define ADC_Additional_Bits 3
+     76          
+     77          #define ADC_OVER  8 /*pow(4, ADC_Additional_Bits)*/
+     78          
+     79          #define CR2_JEXTTRIG_JSWSTART_Set   ((u32)0x00208000)	
+     80          #define JDR_Offset                  ((u8)0x28)	
+     81          
+     82          u16 ADC_ConvertedValue[9][ADC_OVER];
+     83          
+     84           
+     85          
+     86          
+     87           
+     88          s16 Oversampling_GetConversion ( u16* tab ,u16 size)
+     89          {
+     90            u32 index = 0;
+     91            s32 result = 0;
+     92            s16 val=0;
+     93            result=0;
+     94            for( index = 0; index < size ; index++)
+     95              result += tab[index];
+     96            
+     97            result = result >> ADC_Additional_Bits;
+     98             
+     99            val=result-2048; 
+    100           
+    101           return ( (s16)val );
+    102          } 
+    103          
+    104          
+    105          void ADC_interrupt_handler(void)    
+    106          {
+    107            
+    108            
+    109          int i;
+    110          	//测试一：
+    111          	//条件:AD12M，ad1双通，ad2三通，ad3三通
+    112          	//结果：64us。
+    113          	//理论：((1.5+12.5)/12M)*3*16=56  1.5采样时间，12.5转换时间，3最大通道，16次数。
+    114          	
+    115          	//测试二：
+    116          	//条件:AD12M，ad1三通（两个1.5，一个28.5），ad2三通，ad3三通
+    117          	//结果：67.2us 不知道原因?
+    118          	//理论：((1.5*2+12.5*3+28.5)/12M)*16=92 
+    119          	for(i=0;i<ADC_OVER;i++)
+    120          	{
+    121          	/* Start ADC1 Software Conversion */ 
+    122          	//ADC_SoftwareStartInjectedConvCmd(ADC1, ENABLE);
+    123          	ADC1->CR2 |= CR2_JEXTTRIG_JSWSTART_Set;
+    124          	/* Start ADC2 Software Conversion */ 
+    125          	//ADC_SoftwareStartInjectedConvCmd(ADC2, ENABLE);
+    126          	ADC2->CR2 |= CR2_JEXTTRIG_JSWSTART_Set;
+    127          	/* Start ADC3 Software Conversion */ 
+    128          	//ADC_SoftwareStartInjectedConvCmd(ADC3, ENABLE); 
+    129          	ADC3->CR2 |= CR2_JEXTTRIG_JSWSTART_Set;
+    130          
+    131          	while( (ADC1->SR & ADC_FLAG_JEOC) == 0);
+    132          	while( (ADC2->SR & ADC_FLAG_JEOC) == 0);
+    133          	while( (ADC3->SR & ADC_FLAG_JEOC) == 0);
+    134          
+    135          	ADC_ConvertedValue[0][i]=(u16) (*(vu32*) ((((u32)ADC1) + ADC_InjectedChannel_1 + JDR_Offset)));
+    136          	ADC_ConvertedValue[1][i]=(u16) (*(vu32*) ((((u32)ADC1) + ADC_InjectedChannel_2 + JDR_Offset)));
+    137          #ifndef ZRR941F
+    138          	ADC_ConvertedValue[2][i]=(u16) (*(vu32*) ((((u32)ADC1) + ADC_InjectedChannel_3 + JDR_Offset)));	//liliang 打开PA2做为ADC1第3个通道
+    139          
+    140          	ADC_ConvertedValue[3][i]=(u16) (*(vu32*) ((((u32)ADC2) + ADC_InjectedChannel_1 + JDR_Offset)));
+    141          	ADC_ConvertedValue[4][i]=(u16) (*(vu32*) ((((u32)ADC2) + ADC_InjectedChannel_2 + JDR_Offset)));
+    142          	ADC_ConvertedValue[5][i]=(u16) (*(vu32*) ((((u32)ADC2) + ADC_InjectedChannel_3 + JDR_Offset)));
+    143          #else
+    144          	ADC_ConvertedValue[2][i]=(u16) (*(vu32*) ((((u32)ADC2) + ADC_InjectedChannel_1 + JDR_Offset)));	//liliang 打开PA2做为ADC1第3个通道
+    145          	ADC_ConvertedValue[3][i]=(u16) (*(vu32*) ((((u32)ADC2) + ADC_InjectedChannel_2 + JDR_Offset)));
+    146          	ADC_ConvertedValue[4][i]=(u16) (*(vu32*) ((((u32)ADC2) + ADC_InjectedChannel_3 + JDR_Offset)));
+    147          	ADC_ConvertedValue[5][i]=(u16) (*(vu32*) ((((u32)ADC2) + ADC_InjectedChannel_4 + JDR_Offset)));
+    148          #endif
+    149          	
+    150          	ADC_ConvertedValue[6][i]=(u16) (*(vu32*) ((((u32)ADC3) + ADC_InjectedChannel_1 + JDR_Offset)));
+    151          	ADC_ConvertedValue[7][i]=(u16) (*(vu32*) ((((u32)ADC3) + ADC_InjectedChannel_2 + JDR_Offset)));
+    152          	ADC_ConvertedValue[8][i]=(u16) (*(vu32*) ((((u32)ADC3) + ADC_InjectedChannel_3 + JDR_Offset)));	
+    153          
+    154          	}
+    155          
+    156          	SMP_buffer[3][SMP_point]=Oversampling_GetConversion(&ADC_ConvertedValue[3][0],ADC_OVER);
+    157          	SMP_buffer[4][SMP_point]=Oversampling_GetConversion(&ADC_ConvertedValue[4][0],ADC_OVER);
+    158          	SMP_buffer[5][SMP_point]=Oversampling_GetConversion(&ADC_ConvertedValue[5][0],ADC_OVER);
+    159          	SMP_buffer[6][SMP_point]=Oversampling_GetConversion(&ADC_ConvertedValue[6][0],ADC_OVER);
+    160          	SMP_buffer[7][SMP_point]=Oversampling_GetConversion(&ADC_ConvertedValue[7][0],ADC_OVER);
+    161          	SMP_buffer[8][SMP_point]=Oversampling_GetConversion(&ADC_ConvertedValue[8][0],ADC_OVER);
+    162          	SMP_buffer[0][SMP_point]=Oversampling_GetConversion(&ADC_ConvertedValue[0][0],ADC_OVER);
+    163          	SMP_buffer[1][SMP_point]=Oversampling_GetConversion(&ADC_ConvertedValue[1][0],ADC_OVER);
+    164          	SMP_buffer[2][SMP_point]=Oversampling_GetConversion(&ADC_ConvertedValue[2][0],ADC_OVER);
+    165          	 	
+    166               	SMP_point++;
+    167          		if(SMP_point>=SMP_NUM)	
+    168          		{
+    169          		    SMP_point=0;
+    170          			Power_flg=0;
+    171          		}
+    172          }
+    173          
+    174          
+    175          
+    176          
+    177          
+    178          
+    179          
+    180          
+    181          
+    182          u8    Timer_1ms=0;
+    183          u8    Timer_2ms=0;
+    184          
+    185          void TimerA0_int(void)  //中断执行时间约为25us-70us 
+    186          {
+    187          	u8 i;
+    188          //	Trip_P(KC_LED_GJ);		//点亮运行灯,用于监视中断执行时间,仅测试需要,2009.12.9
+    189            
+    190              Timer_1ms++;
+    191              ADC_interrupt_handler();
+    192          	if(Timer_1ms&1)
+    193          	{
+    194          		   Clock_Raad();	//时钟ms处理
+    195          		  SYS_TickNum++;   //软件ms计时器
+    196          			Timer_2ms++;
+    197          		MMI_Timer++;
+    198          			SampleTime++; 
+    199          				if(Timer_KC) Timer_KC--;
+    200          			for(i=0; i<MAX_UART_NUM; i++) CharTimeOut[i]++;		//串口超时计时器
+    201          			App_QD();				//保护启动扫描 
+    202          				KR_Hinterrupt();		//开入扫描					
+    203          				//判别TWJ和HWJ，为以后程序判断提供标志/
+    204          				if(W_THWFCZB==0)  //控制字THWFCZB用于跳合位选择内部操作板还是外部开入7/8
+    205          				{	// 内部操作板作为TWJ和HWJ
+    206          					if (YX1_sts[YX_EDI2]&KR_TWJN)
+    207          						FLAG_FZ|=FLG_TWJ;
+    208          					else
+    209          						FLAG_FZ&=~FLG_TWJ;
+    210          					if (YX1_sts[YX_EDI2]&KR_HWJN)
+    211          						FLAG_FZ|=FLG_HWJ;
+    212          					else
+    213          						FLAG_FZ&=~FLG_HWJ;
+    214          				}
+    215          				else	//外接开入
+    216          				{
+    217          					if (YX1_sts[YX_EDI2]&KR_HWJ)
+    218          						FLAG_FZ|=FLG_HWJ;
+    219          					else
+    220          						FLAG_FZ&=~FLG_HWJ;
+    221          					if (YX1_sts[YX_EDI2]&KR_TWJ)
+    222          						FLAG_FZ|=FLG_TWJ;
+    223          					else
+    224          						FLAG_FZ&=~FLG_TWJ;
+    225          				}
+    226          			 
+    227          			 
+    228          			 
+    229          	}
+    230          	else
+    231          	{
+    232          	     Event_Record();    //报文处理
+    233          
+    234          	}
+    235          //	Trip_F(KC_LED_GJ);		//点亮运行灯,用于监视中断执行时间,仅测试需要,2009.12.9
+    236          }
+    237          
+    238          /*
+    239          *******************************************************************
+    240          * Title:			void TimerB0_int(void)
+    241          * Description:		定时器B 10毫秒中断函数
+    242           
+    243          *******************************************************************
+    244          */
+    245          void TimerB0_int(void)
+    246          {
+    247          	
+    248            App_UI_Calculate();		//电流电压计算
+    249          
+    250          	Timer_10ms++;
+    251          	if(Timer_10ms>=2)
+    252          	{
+    253          		Timer_10ms=0;
+    254          	
+    255          		TIM3_LifeFlag=0;		//活动标志
+    256          		Timer_1s++;
+    257          		
+    258          		
+    259          		
+    260          		if(Power_flg ==PWR_ON)
+    261          			  return;
+    262          		
+    263          	    ScanKey();        //键盘开入扫描
+    264          		
+    265          		FLT_task();    //10ms  	//	故障处理任务   
+    266          		
+    267          		Timer_cnt_exe(&Timer_FG,FG_Timer_Over);			  // 信号复归脉冲时间继电器	    
+    268          		Timer_cnt_exe(&Timer_500ms,ResetSys);        // 系统复位
+    269          		
+    270          	//	Timer_cnt_exe(&com_test_timer,comtest_Timer_Over);        // 系统复位
+    271          		if (Timer_1s>=100)           // 一秒定时器
+    272          		{
+    273          			LightTimer++;	
+    274          			  
+    275          			Timer_1s=0;
+    276          			if(EventTimer) EventTimer--;  //事故报文刷新时间
+    277          			if(MenuTimer)  MenuTimer--;    //主菜单返回时间
+    278          			if(DisplyTimer)  DisplyTimer--; //循环显示时间
+    279          			if(uGhOvertime)
+    280          			{	      	
+    281          				uGhOvertime--;
+    282          				if(!uGhOvertime)
+    283          				{
+    284          					ZJ_FixVal_Buff.wStatus=ClearSts;
+    285          				}
+    286          			}
+    287          		}
+    288          	}
+    289          }
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       8   ADC_interrupt_handler
+         8   -> Oversampling_GetConversion
+       8   Clock_Raad
+         8   -> BCD_08
+         8   -> Bcd_Hex
+       8   Oversampling_GetConversion
+       8   TimerA0_int
+         8   -> ADC_interrupt_handler
+         8   -> App_QD
+         8   -> Clock_Raad
+         8   -> Event_Record
+         8   -> KR_Hinterrupt
+       8   TimerB0_int
+         8   -> App_UI_Calculate
+         8   -> FLT_task
+         8   -> ScanKey
+         8   -> Timer_cnt_exe
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable3
+       4  ??DataTable3_1
+       4  ??DataTable3_10
+       4  ??DataTable3_11
+       4  ??DataTable3_12
+       4  ??DataTable3_13
+       4  ??DataTable3_14
+       4  ??DataTable3_15
+       4  ??DataTable3_16
+       4  ??DataTable3_17
+       4  ??DataTable3_18
+       4  ??DataTable3_19
+       4  ??DataTable3_2
+       4  ??DataTable3_20
+       4  ??DataTable3_21
+       4  ??DataTable3_22
+       4  ??DataTable3_23
+       4  ??DataTable3_24
+       4  ??DataTable3_25
+       4  ??DataTable3_26
+       4  ??DataTable3_27
+       4  ??DataTable3_28
+       4  ??DataTable3_29
+       4  ??DataTable3_3
+       4  ??DataTable3_30
+       4  ??DataTable3_31
+       4  ??DataTable3_32
+       4  ??DataTable3_33
+       4  ??DataTable3_34
+       4  ??DataTable3_35
+       4  ??DataTable3_36
+       4  ??DataTable3_37
+       4  ??DataTable3_38
+       4  ??DataTable3_39
+       4  ??DataTable3_4
+       4  ??DataTable3_40
+       4  ??DataTable3_41
+       4  ??DataTable3_42
+       4  ??DataTable3_43
+       4  ??DataTable3_44
+       4  ??DataTable3_45
+       4  ??DataTable3_46
+       4  ??DataTable3_47
+       4  ??DataTable3_48
+       4  ??DataTable3_49
+       4  ??DataTable3_5
+       4  ??DataTable3_50
+       4  ??DataTable3_51
+       4  ??DataTable3_6
+       4  ??DataTable3_7
+       4  ??DataTable3_8
+       4  ??DataTable3_9
+     144  ADC_ConvertedValue
+     504  ADC_interrupt_handler
+     214  Clock_Raad
+      50  Oversampling_GetConversion
+     280  TimerA0_int
+     196  TimerB0_int
+       1  Timer_1ms
+       1  Timer_2ms
+
+ 
+   146 bytes in section .bss
+ 1 452 bytes in section .text
+ 
+ 1 452 bytes of CODE memory
+   146 bytes of DATA memory
+
+Errors: none
+Warnings: none

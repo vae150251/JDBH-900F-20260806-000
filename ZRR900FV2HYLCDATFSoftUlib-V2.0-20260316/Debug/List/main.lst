@@ -1,0 +1,706 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.70.2.11706/W32 for ARM       17/Jun/2026  08:45:30
+# Copyright 1999-2016 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\main.c
+#    Command line =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\main.c
+#        -D ATF403AVCT7 -D LIBRARY_VERSION -D USE_STDPERIPH_DRIVER -D
+#        AT_START_F403A_V1_0 -lcN
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List
+#        -lA
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List
+#        -o
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\Obj
+#        --no_cse --no_unroll --no_inline --no_code_motion --no_tbaa
+#        --no_clustering --no_scheduling --debug --endian=little
+#        --cpu=Cortex-M4 -e --char_is_signed --enable_multibytes --fpu=VFPv4_sp
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.5\arm\INC\c\DLib_Config_Full.h" -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\STM32F10x_StdPeriph_Driver\inc\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\CMSIS\CM4\CoreSupport\
+#        -I
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Libraries\CMSIS\CM4\DeviceSupport\
+#        -On --use_c++_inline
+#    Locale       =  Chinese (Simplified)_China.936
+#    List file    =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\List\main.lst
+#    Object file  =  
+#        D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\Debug\Obj\main.o
+#
+###############################################################################
+
+D:\2-通用定制归档程序\04-通用程序\00-900F\【通用程序】ZRR900FV2HYLCD-ATF3.03-解决零漂-8BA6-0F1B-20260316\00-源码\ZRR900FV2HYLCDATFSoftUlib-V2.0-20260316\main.c
+      1          
+      2          #include "stm32f10x.h"
+      3          #include "MenuDiplay.h"
+      4          #include "Bhjdq.h"
+      5          #include "GlobeDef.h"
+      6          #include "Drive.h"
+      7          #include "Lib.h"
+      8          #include "Eep.h"
+      9          #include "EventManage.h"
+     10          #include "Flash.h"
+     11          #include <stdio.h>
+     12          #include "rtctime.h"
+     13          #include "pmodbuss.h"
+     14          #include "UartDrv.h"
+     15          #include "SD3077.h"
+     16          
+     17          typedef enum {FAILED = 0, PASSED = !FAILED} TestStatus;
+     18          
+     19          //#define RTCClockSource_LSI   // Use the internal 32 KHz oscillator as RTC clock source  
+     20          #define RTCClockSource_LSE   // Use the external 32.768 KHz oscillator as RTC clock source  
+     21          //#define RTCClockOutput_Enable  // RTC Clock/64 is output on tamper pin(PC.13)  
+     22          
+     23          void  TX_Process(void);
+     24          void     main(void);  	  			//主程序
+     25          void     ALL_Init(void);  			//初始化程序
+     26          void     XH_Make1(); 
+     27          void RCC_Configuration(void);
+     28          void NVIC_Configuration(void);
+     29          
+     30          //仿真时为了方便要去掉加密，正式发行必须加密！
+     31          #define KEYDOG  1   //0——不加密,1——加密
+     32          
+     33          u16 	Timer_YUN;
+     34          
+     35          void main(void)  	
+     36          {	
+     37           
+     38          	
+     39          #ifdef DEBUG
+     40          	debug();
+     41          #endif
+     42          #if KEYDOG==1
+     43          	if(FLASH_GetReadOutProtectionStatus()!=SET)	//检查加密位,如果没有加密则先解锁再置加密位
+     44          	{
+     45          		FLASH_Unlock();
+     46          		FLASH_ReadOutProtection(ENABLE);
+     47          	}
+     48          #endif
+     49          	RTC_ERR=0;
+     50          	
+     51          	// System Clocks Configuration
+     52          	RCC_Configuration();
+     53          	
+     54          	__disable_irq();	//关闭总中断
+     55          	
+     56          	// NVIC Configuration  
+     57          	NVIC_Configuration();
+     58          	
+     59          //	TestUIPtr=0;
+     60          //	TestQDFlag=0;
+     61          	
+     62          	Timer_100ms=0;
+     63          	ADERRFlag=0;
+     64          	ADIntNum=0;
+     65          	ID_Sdata=0;
+     66             ALL_Init();	
+     67          	
+     68          	__enable_irq();	//开放总中断
+     69          	
+     70          	WDog_Enable();
+     71          	
+     72          	while(1)
+     73          	{
+     74          		FG_Scan();                //保护复归任务
+     75          		WDog_Clear();
+     76          			       	       	           	   
+     77          		if((MMI_Timer>=500)||(KEY_Str.touch ==1))
+     78          		{	 		          
+     79          			MMI_Timer=0; 
+     80          			
+     81          			if(!Event) LCD_Menu();	 //画面显示任务	//30ms 	 	               
+     82          		}
+     83          		     			    	
+     84          		WDog_Clear();
+     85          		LCD_Event();   //事故菜单显示// 50MS        	     		   
+     86          		Flash_task ();//1us  //Flash操作任务                   
+     87          		XH_Make1();  //信号灯的处理     	 	   
+     88          		WDog_Clear();
+     89          		
+     90          		if(SampleTime>=200)		//每1s计算一次PQS
+     91          		{
+     92          			SampleTime=0;
+     93          			App_PQ_Calculate();	    //功率计算
+     94          		}
+     95          		
+     96          		WDog_Clear();
+     97          		TX_Process();	//通信处理，
+     98          		if(ClockReflashFlag)
+     99          		{
+    100          			Drive_Read_clock((u8 *)&Rsys_clock);	//每分钟刷新时间年月日
+    101              		ClockReflashFlag=0;
+    102          
+    103              	}	
+    104          		//显示及在线升级规约处理
+    105          		if((BOOTRUN_SET.DownStatus == 0xaa) && (BOOTRUN_SET.ProgCMD == 0x55))
+    106          		{
+    107          			
+    108          		  while(1)
+    109          		  {
+    110          			if(LightTimer&1)
+    111          			{
+    112          				LED_RUN_H();
+    113          			}
+    114          			else
+    115          			{
+    116          				LED_RUN_L();
+    117          			}
+    118          			
+    119          		  } 			//关门放狗
+    120          		}
+    121          		
+    122          		Timer_YUN++;
+    123          		WDog_Clear();		//清看门狗
+    124          		if(Timer_YUN==35000)
+    125          		{
+    126          			LED_RUN_H();
+    127          		}
+    128          		if(Timer_YUN==65000)
+    129          		{
+    130          			Timer_YUN=0;
+    131          			LED_RUN_L();
+    132          		}
+    133          	}
+    134          }
+    135          
+    136          /*******************************************************************************
+    137          * Function Name  : RCC_Configuration
+    138          * Description    : Configures the different system clocks.
+    139          * Input          : None
+    140          * Output         : None
+    141          * Return         : None
+    142          *******************************************************************************/
+    143          void RCC_Configuration(void)
+    144          {   
+    145          	// TIM1 clock enable  
+    146          //	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
+    147          	// TIM2 clock enable  
+    148          	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+    149          	// TIM3 clock enable  
+    150          	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+    151          	// TIM4 clock enable  
+    152          	//RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+    153          	// SPI1 clock enable  
+    154          	//RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+    155          	// SPI2 clock enable  30M
+    156          	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+    157          	// SPI3 clock enable  
+    158          	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
+    159          	// USART1 clock enable  
+    160          	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+    161          	
+    162          	// GPIOA~E clock enable  
+    163          	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+    164          	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+    165          	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+    166          	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);
+    167          	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOE, ENABLE);
+    168          	
+    169          	// Enable DMA clock  
+    170          	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
+    171          	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA2, ENABLE);
+    172          	
+    173          	// Enable ADC1 clock  
+    174          	RCC_ADCCLKConfig(RCC_PCLK2_Div6);
+    175           	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1|RCC_APB2Periph_ADC2|RCC_APB2Periph_ADC3, ENABLE);
+    176          	
+    177          	// Enable AFIO clocks  
+    178          	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    179          	
+    180          //	RCC_LSICmd(ENABLE);//打开LSI
+    181          //	while(RCC_GetFlagStatus(RCC_FLAG_LSIRDY)==RESET);//等待直到LSI稳定
+    182          	
+    183          //	NVIC_SetVectorTable(NVIC_VectTab_RAM,0);
+    184          }
+    185          
+    186          /*******************************************************************************
+    187          * Function Name  : NVIC_Configuration
+    188          * Description    : Configure the nested vectored interrupt controller.
+    189          * Input          : None
+    190          * Output         : None
+    191          * Return         : None
+    192          *******************************************************************************/
+    193          void NVIC_Configuration(void)
+    194          { 
+    195          	NVIC_InitTypeDef NVIC_InitStructure;
+    196          	
+    197          #ifdef  VECT_TAB_RAM  
+    198          	// Set the Vector Table base location at 0x20000000   
+    199          	NVIC_SetVectorTable(NVIC_VectTab_RAM, 0x0); 
+    200          #else  // VECT_TAB_FLASH   
+    201          	// Set the Vector Table base location at 0x08000000   
+    202          	NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x4000);   
+    203          //	NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x0);   
+    204          #endif
+    205          	/* Configure the NVIC Preemption Priority Bits */
+    206          	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+    207          
+    208          	// Enable the TIM2 global Interrupt  
+    209          	NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
+    210          	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+    211          	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;  
+    212          	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    213          	NVIC_Init(&NVIC_InitStructure);
+    214          	
+    215          	// Enable the TIM3 global Interrupt  
+    216          	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+    217          	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
+    218          	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;  
+    219          	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    220          	NVIC_Init(&NVIC_InitStructure);	
+    221              
+    222              //Enable the USART1 Interrupt
+    223          	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+    224          	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
+    225          	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    226          	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    227          	NVIC_Init(&NVIC_InitStructure);
+    228          	
+    229          	// Enable the EXTI0_IRQChannel Interrupt
+    230          /*	NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQChannel;
+    231          	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
+    232          	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    233          	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    234          	NVIC_Init(&NVIC_InitStructure);*/
+    235          }
+    236          
+    237          ////////////
+    238          //初始化程序
+    239          ////////////
+    240          void ALL_Init(void) 
+    241          {
+    242          	
+    243          	u32 tmp,checksum;
+    244           	
+    245          	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+    246          	
+    247          	GPIO_Configuration();		// I/O初始化
+    248          	W25Q_SPI_Init();			//flash存储区初始化
+    249          	Power_flg = PWR_ON;
+    250          #ifdef	ZRR900F   
+    251              SETFZ_Init(DZ_BHType);		//读取保护类型
+    252          #endif
+    253          	BOOTSET_Init();
+    254          	
+    255          	Cpu_Init();	
+    256          	Signal_Init();
+    257              HYG160160A6G_Initial();     //液晶初始化
+    258          	TMR_Init();					// 定时器初始化
+    259          	
+    260          	AD_Init();                  //AD_SPI初始化	
+    261          	SETFZ_Init(DZ_CLpar);		//测量校准系数初始化,包含7022E初始化
+    262           
+    263          	
+    264          	Clock_init(); 
+    265          	SMP_Initialize(); 
+    266          	TIM_Initialize();   
+    267          	EventBuff_Init();
+    268          	SoeBuff_Init(); 
+    269              FM_Init_Rpt();
+    270              LED_Init();    
+    271              Signal_Init();
+    272          	
+    273          	
+    274          		if(!Set_QFTZ.Type)		//线路保护
+    275          		{ 	//事件描述
+    276          	        tEvtTab=tEvtTab_LN;	    
+    277          		    NumOfEvent=NumOfEventLN;
+    278          			//开入描述
+    279          		    tDITab=tDITab_Default;
+    280                      NumOfDI=NumOfDI_Default;
+    281          			
+    282          	         ybTab=ybTab_LN;
+    283                     NumOfYB=NumOfYBLN;	
+    284          		   P_YB_YX=(u16*)&BAK_YB.YB_YX;
+    285          		   Numset=sizeof(SetBuff)/2;
+    286          		   FixValueTable=FixValueTableLN;
+    287          		   NumOfSet=NumOfSetLN;
+    288          		   szType=szType_NAME;
+    289          		}
+    290          #ifdef	ZRR900F	
+    291          	    else if(Set_QFTZ.Type==1)	  // 变压器保护
+    292          		{ 	
+    293          	        tEvtTab=tEvtTab_BYQ;	
+    294          	    	 NumOfEvent=NumOfEventBYQ;
+    295          			 
+    296          		    tDITab=tDITab_DefaultBYQ;
+    297                      NumOfDI=NumOfDI_DefaultBYQ;		
+    298          			
+    299          		   ybTab=ybTab_BYQ;
+    300                     NumOfYB=NumOfYBBYQ;
+    301          		   P_YB_YX=(u16*)& BAK_YBBYQ.YB_YX;
+    302          		   
+    303          		   Numset=sizeof(SetBuffBYQ)/2;
+    304                      FixValueTable=FixBYQValueTable;
+    305          		    NumOfSet=NumOfSetBYQ;  
+    306          			szType=szType_NAMEBYQ;
+    307          		}	  
+    308           	    else if(Set_QFTZ.Type==2)	   //电动机保护
+    309          		{ 	
+    310          	       tEvtTab=tEvtTab_MOTO;
+    311          		    NumOfEvent=NumOfEventMOTO;
+    312          			
+    313          		    tDITab=tDITab_DefaultMOTO;
+    314                      NumOfDI=NumOfDI_DefaultMOTO;
+    315          			
+    316          		   ybTab=ybTab_MOTO;
+    317                     NumOfYB=NumOfYBMOTO;	
+    318          		   P_YB_YX=(u16*)&BAK_YBMOTO.YB_YX;
+    319          		  Numset=sizeof(SetBuffMOTO)/2;	 
+    320          		   FixValueTable=FixMOTOValueTable;
+    321          		     NumOfSet=NumOfSetMOTO;
+    322          			 szType=szType_NAMEMOTO;
+    323          		}
+    324          	  
+    325          #endif
+    326          		else
+    327          		{
+    328          		   Set_QFTZ.Type=0;
+    329          		   tEvtTab=tEvtTab_LN;	
+    330          		   NumOfEvent=NumOfEventLN;	  
+    331          		  
+    332          			tDITab=tDITab_Default;
+    333                      NumOfDI=NumOfDI_Default;	
+    334          			 szType=szType_NAME;
+    335          		    ybTab=ybTab_LN;
+    336                     NumOfYB=NumOfYBLN;	
+    337          		   P_YB_YX=(u16*)&BAK_YB.YB_YX;
+    338          		  Numset=sizeof(SetBuff)/2;	
+    339          	      FixValueTable=FixValueTableLN;
+    340          		  NumOfSet=NumOfSetLN;
+    341          		}
+    342              SET_Init(Set_QFTZ.Type);		//根据保护类型读取定值
+    343          	SETFZ_Init(Set_QFTZ.Type+2);	//根据保护类型读取保护压板
+    344          	SETFZ_Init(DZ_SYSpar);			//读取系统运行参数
+    345          	SETFZ_Init(DZ_BHUIpar);			//读取保护校准系数	
+    346          	checksum=(*(u32*)(ApplicationAddress+AppLength-4));	//校验码在程序空间最末端
+    347          	 
+    348              VAR_crc1=checksum>>24;
+    349          	VAR_crc1|=(checksum&0x00ff0000)>>8;
+    350          	
+    351          	Trip_P(KC_LCD_BL);				//点背光
+    352          	Lcd_clrram();  
+    353          	Menu_List_Head = &Menu_Normal_Index;
+    354          	Uart_Init(USART1, RUN_Syspar.RS485_bps, 0);
+    355          	PModBusS_Initialize();
+    356          	//P94Serv_Initialize();
+    357          	
+    358          }
+    359          
+    360          
+    361          /*
+    362          *******************************************************************
+    363          * Title:		void	XH_Make1() 
+    364          * Description:		/信号灯处理函数//
+    365          * InputParameter:	
+    366          * Copyright:		 
+    367          * Company:			 
+    368          * Create Date:		2005.08.12
+    369          * @author:			
+    370          * @version:			V1.00
+    371                   
+    372          * Modify Record:
+    373          *******************************************************************
+    374          */
+    375          
+    376          
+    377           u8   Signal_JY;
+    378          
+    379          //---------信号灯处理---------------------//
+    380          void	XH_Make1() 
+    381          {
+    382          #ifndef  ZRR_YK
+    383          
+    384                if(FLAG_FZ&FLG_HWJ)
+    385                    Trip_P(KC_LED_HZ);
+    386                 else
+    387                    Trip_F(KC_LED_HZ);
+    388                 
+    389                 if(FLAG_FZ&FLG_TWJ)
+    390                    Trip_P(KC_LED_TZ);
+    391                 else
+    392                    Trip_F(KC_LED_TZ);       
+    393          #endif 		
+    394             if(Timer_KC)  return;
+    395          	//I类告警
+    396          	//II类告警
+    397             
+    398           #ifdef  ZRR900F_SDGJ  
+    399             if(Flag_BHER)
+    400                Trip_F(KC_BY1);
+    401             else
+    402          	  Trip_P(KC_BY1);
+    403          #endif  
+    404             
+    405          		if(Flag_BHER||Flag_BHALM||l_fRelayAlarm)
+    406          		{
+    407          			 
+    408          				Trip_P(KC_GJ);
+    409           				
+    410          		 
+    411          		}
+    412                  else
+    413                       {
+    414                                 Trip_F(KC_GJ);
+    415                        }
+    416                  if(Flag_BHER)  //装置故障关闭出口
+    417                  {
+    418                     Trip_F(KC_BHTZ);
+    419                     Trip_F(KC_BHHZ);
+    420          		   Trip_F(KC_YKH);
+    421          		   Trip_F(KC_YKT);
+    422          		   Trip_F(KC_BY1);
+    423                  }
+    424          	//信号保存
+    425          		if(Signal_JY!=Run_Signal.uSignal)
+    426          		{
+    427          				Eep_Write_Signal(&Run_Signal);
+    428          				Signal_JY=Run_Signal.uSignal;
+    429          		}
+    430          
+    431          }
+    432          
+    433          
+    434          
+    435          void	SMP_Initialize() 					// 采样计算初始化函数
+    436          {
+    437          	SMP_point = 0;							// 采样区指针初始化
+    438          	MEM_clear((u8 *)&SMP_buffer,12*256*2);	// 采样数据区清零
+    439           }
+    440          
+    441          void	TIM_Initialize() 					// 定时器初始化函数
+    442          {
+    443          
+    444          
+    445          	  Timer_GZSZ=0;			// 故障时钟
+    446          	  Timer_1s=0;                       // 一秒定时器
+    447           	  Timer_10ms=0;
+    448          	  Timer_FG=0;
+    449          	  EventTimer=0;
+    450          	  LightTimer=0;
+    451          	  MenuTimer=0;
+    452          	  DisplyTimer=0;
+    453          	  MenuTimer_nom=0;
+    454                YK_Pluse=0;
+    455          	  Flag_BHER=0;
+    456                LockFlashWrite=0;
+    457                IDC.bReflash=0x5a;
+    458                ADERR=0;
+    459                Reset_cnt=0;
+    460                Power_flg=PWR_ON;
+    461                Normal=2;
+    462          	  Modbus_YX_sts[0]=0;
+    463          	  Modbus_YX_sts[1]=0;
+    464          	  Modbus_YX_sts[2]=0;
+    465          	  Modbus_YX_sts[3]=0;  	  
+    466          }
+    467          
+    468          //通信处理
+    469          void  TX_Process(void)
+    470          {
+    471          	if(CharTimeOut[0]>5)	//uart1 Modbus通讯处理任务,帧间超时时间设为30ms
+    472          	{
+    473          		CharTimeOut[0]=0;
+    474          		//为了跟以前系统定值兼容,采用废弃的定值BHSystem_par.CAN_bps作为规约选择,2011.6.25
+    475          		if(RUN_Syspar.RS485_Protocol==3)
+    476          		{
+    477          		}
+    478          		else if(RUN_Syspar.RS485_Protocol==2)
+    479          		{
+    480          			//PModBus_ModbusS();
+    481          		}
+    482          		PModBus_ModbusS();
+    483          
+    484          	}
+    485          		
+    486          }
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       8   ALL_Init
+         8   -> AD_Init
+         8   -> BOOTSET_Init
+         8   -> Clock_init
+         8   -> Cpu_Init
+         8   -> EventBuff_Init
+         8   -> FM_Init_Rpt
+         8   -> GPIO_Configuration
+         8   -> GPIO_PinRemapConfig
+         8   -> HYG160160A6G_Initial
+         8   -> LED_Init
+         8   -> Lcd_clrram
+         8   -> PModBusS_Initialize
+         8   -> SETFZ_Init
+         8   -> SET_Init
+         8   -> SMP_Initialize
+         8   -> Signal_Init
+         8   -> SoeBuff_Init
+         8   -> TIM_Initialize
+         8   -> TMR_Init
+         8   -> Trip_P
+         8   -> Uart_Init
+         8   -> W25Q_SPI_Init
+       8   NVIC_Configuration
+         8   -> NVIC_Init
+         8   -> NVIC_PriorityGroupConfig
+         8   -> NVIC_SetVectorTable
+       8   RCC_Configuration
+         8   -> RCC_ADCCLKConfig
+         8   -> RCC_AHBPeriphClockCmd
+         8   -> RCC_APB1PeriphClockCmd
+         8   -> RCC_APB2PeriphClockCmd
+       8   SMP_Initialize
+         8   -> MEM_clear
+       0   TIM_Initialize
+       8   TX_Process
+         8   -> PModBus_ModbusS
+       8   XH_Make1
+         8   -> Eep_Write_Signal
+         8   -> Trip_F
+         8   -> Trip_P
+       8   main
+         8   -> ALL_Init
+         8   -> App_PQ_Calculate
+         8   -> Drive_Read_clock
+         8   -> FG_Scan
+         8   -> FLASH_GetReadOutProtectionStatus
+         8   -> FLASH_ReadOutProtection
+         8   -> FLASH_Unlock
+         8   -> Flash_task
+         8   -> GPIO_ResetBits
+         8   -> GPIO_SetBits
+         8   -> LCD_Event
+         8   -> LCD_Menu
+         8   -> NVIC_Configuration
+         8   -> RCC_Configuration
+         8   -> TX_Process
+         8   -> WDog_Clear
+         8   -> WDog_Enable
+         8   -> XH_Make1
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable5
+       4  ??DataTable5_1
+       4  ??DataTable5_10
+       4  ??DataTable5_11
+       4  ??DataTable5_12
+       4  ??DataTable5_13
+       4  ??DataTable5_14
+       4  ??DataTable5_15
+       4  ??DataTable5_16
+       4  ??DataTable5_17
+       4  ??DataTable5_18
+       4  ??DataTable5_19
+       4  ??DataTable5_2
+       4  ??DataTable5_20
+       4  ??DataTable5_21
+       4  ??DataTable5_22
+       4  ??DataTable5_23
+       4  ??DataTable5_24
+       4  ??DataTable5_25
+       4  ??DataTable5_26
+       4  ??DataTable5_27
+       4  ??DataTable5_28
+       4  ??DataTable5_29
+       4  ??DataTable5_3
+       4  ??DataTable5_30
+       4  ??DataTable5_31
+       4  ??DataTable5_32
+       4  ??DataTable5_33
+       4  ??DataTable5_34
+       4  ??DataTable5_35
+       4  ??DataTable5_36
+       4  ??DataTable5_37
+       4  ??DataTable5_38
+       4  ??DataTable5_39
+       4  ??DataTable5_4
+       4  ??DataTable5_40
+       4  ??DataTable5_41
+       4  ??DataTable5_42
+       4  ??DataTable5_43
+       4  ??DataTable5_44
+       4  ??DataTable5_45
+       4  ??DataTable5_46
+       4  ??DataTable5_47
+       4  ??DataTable5_48
+       4  ??DataTable5_49
+       4  ??DataTable5_5
+       4  ??DataTable5_50
+       4  ??DataTable5_51
+       4  ??DataTable5_52
+       4  ??DataTable5_53
+       4  ??DataTable5_54
+       4  ??DataTable5_55
+       4  ??DataTable5_56
+       4  ??DataTable5_57
+       4  ??DataTable5_58
+       4  ??DataTable5_59
+       4  ??DataTable5_6
+       4  ??DataTable5_60
+       4  ??DataTable5_61
+       4  ??DataTable5_62
+       4  ??DataTable5_63
+       4  ??DataTable5_64
+       4  ??DataTable5_65
+       4  ??DataTable5_66
+       4  ??DataTable5_67
+       4  ??DataTable5_68
+       4  ??DataTable5_69
+       4  ??DataTable5_7
+       4  ??DataTable5_70
+       4  ??DataTable5_71
+       4  ??DataTable5_72
+       4  ??DataTable5_73
+       4  ??DataTable5_74
+       4  ??DataTable5_75
+       4  ??DataTable5_76
+       4  ??DataTable5_77
+       4  ??DataTable5_78
+       4  ??DataTable5_79
+       4  ??DataTable5_8
+       4  ??DataTable5_80
+       4  ??DataTable5_81
+       4  ??DataTable5_82
+       4  ??DataTable5_83
+       4  ??DataTable5_84
+       4  ??DataTable5_85
+       4  ??DataTable5_86
+       4  ??DataTable5_87
+       4  ??DataTable5_88
+       4  ??DataTable5_9
+     588  ALL_Init
+     114  NVIC_Configuration
+     132  RCC_Configuration
+      20  SMP_Initialize
+       1  Signal_JY
+     132  TIM_Initialize
+      28  TX_Process
+       2  Timer_YUN
+     158  XH_Make1
+     338  main
+
+ 
+     3 bytes in section .bss
+ 1 866 bytes in section .text
+ 
+ 1 866 bytes of CODE memory
+     3 bytes of DATA memory
+
+Errors: none
+Warnings: 5
